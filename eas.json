@@ -1,0 +1,35 @@
+{
+	"cli": {
+		"version": ">= 12.5.1",
+		"appVersionSource": "remote"
+	},
+	"build": {
+		"production": {},
+		"staging": {
+			"distribution": "internal",
+			"android": {
+				"image": "latest"
+			},
+			"ios": {
+				"image": "latest"
+			},
+			"env": {
+				"APP_ENV": "staging",
+				"APP_NAME": "Manncoin Staging",
+				"EXPO_NO_DOTENV": "1"
+			}
+		},
+		"development": {
+			"developmentClient": true,
+			"distribution": "internal",
+			"env": {
+				"APP_ENV": "development",
+				"APP_NAME": "Manncoin Dev",
+				"EXPO_NO_DOTENV": "1"
+			}
+		}
+	},
+	"submit": {
+		"production": {}
+	}
+}

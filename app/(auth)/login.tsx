@@ -1,0 +1,91 @@
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { Pressable, View } from 'react-native';
+import { z } from 'zod';
+import { ManncoinIcon } from '~/components/icons/ManncoinIcon';
+import { Button } from '~/components/ui/button';
+import { Input } from '~/components/ui/input';
+import { Text } from '~/components/ui/text';
+
+import { useSession } from '~/context/SessionContext';
+
+const loginSchema = z.object({
+	email: z.string().email('Invalid email address'),
+	password: z.string().min(8, 'Password must be at least 8 characters'),
+});
+
+type LoginForm = z.infer<typeof loginSchema>;
+
+export default function Login() {
+	const { signIn } = useSession();
+	const router = useRouter();
+	const [form, setForm] = useState<LoginForm>({ email: '', password: '' });
+	const [errors, setErrors] = useState<Partial<LoginForm>>({});
+
+	const handleChange = (field: keyof LoginForm) => (value: string) => {
+		setForm((prev) => ({ ...prev, [field]: value }));
+		// Clear the error for this field when the user starts typing
+		if (errors[field]) {
+			setErrors((prev) => ({ ...prev, [field]: undefined }));
+		}
+	};
+
+	const handleLogin = async () => {
+		try {
+			// Validate the form
+			loginSchema.parse(form);
+
+			// If validation passes, attempt to sign in
+			await signIn(form.email, form.password);
+			router.replace('/');
+		} catch (err) {
+			if (err instanceof z.ZodError) {
+				// Set form errors
+				const fieldErrors: Partial<LoginForm> = {};
+				for (const error of err.errors) {
+					if (error.path[0] as keyof LoginForm) {
+						fieldErrors[error.path[0] as keyof LoginForm] = error.message;
+					}
+				}
+				setErrors(fieldErrors);
+			} else {
+				// Handle other errors (e.g., network errors)
+				setErrors({ password: 'Invalid email or password' });
+			}
+		}
+	};
+
+	return (
+		<View className="flex-1 items-center bg-background p-6">
+			<View className="w-full max-w-sm flex-col justify-between gap-8">
+				<View className="flex items-center justify-center pt-8">
+					<ManncoinIcon className="h-24 w-24" />
+				</View>
+				<View className="gap-4">
+					<Input
+						placeholder="Email"
+						value={form.email}
+						onChangeText={handleChange('email')}
+						inputMode="email"
+						autoCapitalize="none"
+					/>
+					{errors.email && <Text className="text-destructive text-sm">{errors.email}</Text>}
+
+					<Input placeholder="Password" value={form.password} onChangeText={handleChange('password')} secureTextEntry />
+					{errors.password && <Text className="text-destructive text-sm">{errors.password}</Text>}
+				</View>
+
+				<Button onPress={handleLogin}>
+					<Text className="text-center font-body font-semibold">Login</Text>
+				</Button>
+
+				<View className="flex-row justify-center">
+					<Text>Don't have an account? </Text>
+					<Pressable onPress={() => router.push('/register')}>
+						<Text className="font-semibold text-primary">Sign Up</Text>
+					</Pressable>
+				</View>
+			</View>
+		</View>
+	);
+}

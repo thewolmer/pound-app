@@ -42,7 +42,15 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	experiments: {
 		typedRoutes: true,
 	},
-	plugins: ['expo-router'],
+	plugins: [
+		'expo-router',
+		[
+			'react-native-nfc-manager',
+			{
+				includeNdefEntitlement: false,
+			},
+		],
+	],
 	extra: {
 		...ClientEnv,
 		eas: {

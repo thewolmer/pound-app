@@ -8,7 +8,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	description: `${Env.NAME} Mobile App`,
 	owner: Env.EXPO_ACCOUNT_OWNER,
 	scheme: Env.SCHEME,
-	slug: 'manncoin',
+	slug: 'pound',
 	version: Env.VERSION.toString(),
 	orientation: 'portrait',
 	icon: './assets/images/icon.png',
@@ -16,7 +16,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	splash: {
 		image: './assets/images/splash.png',
 		resizeMode: 'contain',
-		backgroundColor: '#299FFF',
+		backgroundColor: '#0d103f',
 		animation: 'fade',
 	},
 	// updates: {
@@ -30,7 +30,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	android: {
 		adaptiveIcon: {
 			foregroundImage: './assets/images/adaptive-icon.png',
-			backgroundColor: '#299FFF',
+			backgroundColor: '#ffffff',
 		},
 		package: Env.PACKAGE,
 	},

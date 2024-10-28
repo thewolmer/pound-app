@@ -1,8 +1,9 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
-import { ManncoinIcon } from '~/components/icons/ManncoinIcon';
+import { PoundIcon } from '~/components/icons/PoundIcon';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
@@ -56,11 +57,9 @@ export default function Login() {
 	};
 
 	return (
-		<View className="flex-1 items-center bg-background p-6">
+		<SafeAreaView className="flex-1 items-center justify-center bg-background p-6">
 			<View className="w-full max-w-sm flex-col justify-between gap-8">
-				<View className="flex items-center justify-center pt-8">
-					<ManncoinIcon className="h-24 w-24" />
-				</View>
+				<PoundIcon />
 				<View className="gap-4">
 					<Input
 						placeholder="Email"
@@ -81,11 +80,11 @@ export default function Login() {
 
 				<View className="flex-row justify-center">
 					<Text>Don't have an account? </Text>
-					<Pressable onPress={() => router.push('/register')}>
+					<Pressable onPress={() => router.push('/auth/register')}>
 						<Text className="font-semibold text-primary">Sign Up</Text>
 					</Pressable>
 				</View>
 			</View>
-		</View>
+		</SafeAreaView>
 	);
 }

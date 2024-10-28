@@ -15,7 +15,7 @@
 			},
 			"env": {
 				"APP_ENV": "staging",
-				"APP_NAME": "Manncoin Staging",
+				"APP_NAME": "Pound Staging",
 				"EXPO_NO_DOTENV": "1"
 			}
 		},
@@ -24,7 +24,7 @@
 			"distribution": "internal",
 			"env": {
 				"APP_ENV": "development",
-				"APP_NAME": "Manncoin Dev",
+				"APP_NAME": "Pound Dev",
 				"EXPO_NO_DOTENV": "1"
 			}
 		}

@@ -2,12 +2,13 @@ import { isAuthApiError } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
-import { ManncoinIcon } from '~/components/icons/ManncoinIcon';
+import { PoundIcon } from '~/components/icons/PoundIcon';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
-import { Muted, P } from '~/components/ui/typography';
+import { P } from '~/components/ui/typography';
 import { useSession } from '~/context/SessionContext';
 
 const registerSchema = z
@@ -100,11 +101,9 @@ export default function Register() {
 	};
 
 	return (
-		<View className="flex-1 items-center bg-background p-6">
+		<SafeAreaView className="flex-1 items-center justify-center bg-background p-6">
 			<View className="w-full max-w-sm gap-8">
-				<View className="flex items-center justify-center pt-8">
-					<ManncoinIcon className="h-24 w-24" />
-				</View>
+				<PoundIcon />
 
 				<View className="gap-4">
 					<View>
@@ -143,11 +142,11 @@ export default function Register() {
 
 				<View className="flex-row justify-center">
 					<P>Already have an account? </P>
-					<Pressable onPress={() => router.push('/login')}>
+					<Pressable onPress={() => router.push('/auth/login')}>
 						<P className="font-semibold text-primary">Log In</P>
 					</Pressable>
 				</View>
 			</View>
-		</View>
+		</SafeAreaView>
 	);
 }

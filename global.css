@@ -5,15 +5,15 @@
 @layer base {
   :root {
     --background: 0 0% 100%; /* hsl(0 0% 100%) */
-    --foreground: 0 0% 0%; /* hsl(0 0% 0%) */
+    --foreground: 236 66% 15%; /* hsl(236 66% 15%) */
     --card: 0 0% 100%; /* hsl(0 0% 100%) */ 
     --card-foreground: 240 10% 3.9%; /* hsl(240 10% 3.9%) */
     --popover: 0 0% 100%; /* hsl(0 0% 100%) */
     --popover-foreground: 240 10% 3.9%; /* hsl(240 10% 3.9%) */
-    --primary: 57 100% 50%; /* hsl(57 100% 50%) */
-    --primary-foreground: 0 0% 0%; /* hsl(0 0% 0%) */
-    --secondary: 207 100% 58%; /* hsl(207 100% 58%) */
-    --secondary-foreground: 0 0% 100%; /* hsl(0 0% 100%) */
+    --primary: 254 66% 44%; /* hsl(254 66% 44%) */
+    --primary-foreground: 0 0% 100%; /* hsl(0 0% 100%) */
+    --secondary: 240 4.8% 95.9%; /* hsl(240 4.8% 95.9%) */
+    --secondary-foreground: 240 5.9% 10%; /* hsl(240 5.9% 10%) */
     --muted: 240 4.8% 95.9%; /* hsl(240 4.8% 95.9%) */
     --muted-foreground: 240 3.8% 46.1%; /* hsl(240 3.8% 46.1%) */
     --accent: 240 4.8% 95.9%; /* hsl(240 4.8% 95.9%) */
@@ -26,16 +26,16 @@
   }
 
   .dark:root {
-    --background: 0 0% 0%; /* hsl(0 0% 0%) */
+    --background: 236 66% 15%; /* hsl(236 66% 15%) */
     --foreground: 0 0% 100%; /* hsl(0 0% 100%) */
-    --card:  0 0% 0%; /* hsl(0 0% 0%) */
+    --card: 236 66% 15%; /* hsl(236 66% 15%) */
     --card-foreground: 0 0% 100%; /* hsl(0 0% 100%) */
     --popover: 240 10% 3.9%; /* hsl(240 10% 3.9%) */
     --popover-foreground: 0 0% 98%; /* hsl(0 0% 98%) */
-    --primary: 57 100% 50%; /* hsl(57 100% 50%) */
-    --primary-foreground: 0 0% 0%; /* hsl(0 0% 0%) */
-    --secondary: 207 100% 58%; /* hsl(207 100% 58%) */
-    --secondary-foreground: 0 0% 100%; /* hsl(0 0% 100%) */
+    --primary: 255 100% 65%; /* hsl(255 100% 65%) */
+    --primary-foreground: 0 0% 100%; /* hsl(0 0% 100%) */
+    --secondary: 240 3.7% 25.9%; /* hsl(240 3.7% 25.9%) */
+    --secondary-foreground: 0 0% 98%; /* hsl(0 0% 98%) */
     --muted: 240 3.7% 25.9%; /* hsl(240 3.7% 25.9%) */
     --muted-foreground: 240 5% 64.9%; /* hsl(240 5% 64.9%) */
     --accent: 240 3.7% 25.9%; /* hsl(240 3.7% 25.9%) */

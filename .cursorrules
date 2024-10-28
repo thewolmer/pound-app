@@ -5,6 +5,7 @@
   - Write concise, technical TypeScript code with accurate examples.
   - Use functional and declarative programming patterns; avoid classes.
   - Prefer iteration and modularization over code duplication.
+  - Use existing components and hooks from the project if they exist.
   - Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
   - Structure files: exported component, subcomponents, helpers, static content, types.
   - Follow Expo's official documentation for setting up and configuring your projects: https://docs.expo.dev/
@@ -28,7 +29,7 @@
   UI and Styling
   - Use Expo's built-in components for common UI patterns and layouts.
   - Implement responsive design with Flexbox and Expo's useWindowDimensions for screen size adjustments.
-  - Use styled-components or Tailwind CSS for component styling.
+  - Use Nativewind and Tailwind CSS for component styling.
   - Implement dark mode support using Expo's useColorScheme.
   - Ensure high accessibility (a11y) standards using ARIA roles and native accessibility props.
   - Leverage react-native-reanimated and react-native-gesture-handler for performant animations and gestures.

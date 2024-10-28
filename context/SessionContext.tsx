@@ -64,7 +64,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 	// 	const { data, error } = await supabase.auth.signInWithOAuth({
 	// 		provider: 'google',
 	// 		options: {
-	// 			redirectTo: 'manncoin://google-auth',
+	// 			redirectTo: 'pound://google-auth',
 	// 			skipBrowserRedirect: true,
 	// 		},
 	// 	});

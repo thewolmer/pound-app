@@ -1,9 +1,5 @@
-import { Redirect } from 'expo-router';
-import * as React from 'react';
-import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { H1, H2 } from '~/components/ui/typography';
-import { useSession } from '~/context/SessionContext';
+import { H1 } from '~/components/ui/typography';
 
 export default function StartScreen() {
 	return (

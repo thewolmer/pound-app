@@ -20,5 +20,15 @@
 	},
 	"editor.linkedEditing": true,
 	"files.eol": "\n",
-	"cSpell.words": ["Ionicons", "nativewind", "Pressable", "SUPABASE"]
+	"cSpell.words": [
+		"biomejs",
+		"clsx",
+		"Ionicons",
+		"lucide",
+		"nativewind",
+		"Pressable",
+		"SUPABASE",
+		"tailwindcss",
+		"zustand"
+	]
 }

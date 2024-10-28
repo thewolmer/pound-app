@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemeToggle } from '~/components/ThemeToggle';
@@ -9,6 +8,7 @@ import { useSession } from '~/context/SessionContext';
 
 export default function Profile() {
 	const { session, signOut } = useSession();
+
 	return (
 		<SafeAreaView className="flex-1 items-center justify-center gap-5 p-6">
 			<Text>{session?.user.email}</Text>

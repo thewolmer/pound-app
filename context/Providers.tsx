@@ -77,7 +77,7 @@ export const ProvidersWrapper = ({ children }: { children: React.ReactNode }) =>
 	return (
 		<ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
 			<StatusBar style={isDarkColorScheme ? 'light' : 'dark'} />
-			<SafeAreaProvider onLayout={onLayoutRootView} className="bg-red-500">
+			<SafeAreaProvider onLayout={onLayoutRootView}>
 				<SessionProvider>{children}</SessionProvider>
 			</SafeAreaProvider>
 			<PortalHost />

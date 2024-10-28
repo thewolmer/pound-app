@@ -32,7 +32,7 @@
 		"clsx": "^2.1.1",
 		"dotenv-cli": "^7.4.2",
 		"drizzle-orm": "^0.34.1",
-		"expo": "^51.0.37",
+		"expo": "~51.0.38",
 		"expo-apple-authentication": "~6.4.2",
 		"expo-constants": "~16.0.2",
 		"expo-dev-client": "~4.0.28",

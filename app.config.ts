@@ -25,6 +25,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	assetBundlePatterns: ['**/*'],
 	ios: {
 		supportsTablet: true,
+		icon: './assets/images/icon.png',
+		backgroundColor: '#ffffff',
 		bundleIdentifier: Env.BUNDLE_ID,
 	},
 	android: {

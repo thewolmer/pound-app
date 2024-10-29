@@ -11,8 +11,8 @@ export default function AuthLayout() {
 	return (
 		<Stack screenOptions={{ headerShown: false }} initialRouteName="welcome">
 			<Stack.Screen name="welcome" />
-			<Stack.Screen name="login" />
-			<Stack.Screen name="register" />
+			<Stack.Screen name="login" options={{ presentation: 'modal' }} />
+			<Stack.Screen name="register" options={{ presentation: 'modal' }} />
 		</Stack>
 	);
 }

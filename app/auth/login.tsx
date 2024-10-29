@@ -57,9 +57,12 @@ export default function Login() {
 	};
 
 	return (
-		<SafeAreaView className="flex-1 items-center justify-center bg-background p-6">
-			<View className="w-full max-w-sm flex-col justify-between gap-8">
-				<PoundIcon />
+		<SafeAreaView className="flex-1 items-center bg-background p-10">
+			<View className="w-full max-w-sm gap-8">
+				<View className="w-52 gap-2">
+					<PoundIcon />
+					<Text className="text-lg">Welcome Back!</Text>
+				</View>
 				<View className="gap-4">
 					<Input
 						placeholder="Email"
@@ -67,6 +70,9 @@ export default function Login() {
 						onChangeText={handleChange('email')}
 						inputMode="email"
 						autoCapitalize="none"
+						returnKeyType="done"
+						autoFocus
+						onSubmitEditing={handleLogin}
 					/>
 					{errors.email && <Text className="text-destructive text-sm">{errors.email}</Text>}
 

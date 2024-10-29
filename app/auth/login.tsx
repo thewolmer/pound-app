@@ -9,6 +9,7 @@ import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
 
 import { useSession } from '~/context/SessionContext';
+import { useHaptics } from '~/lib/useHaptics';
 
 const loginSchema = z.object({
 	email: z.string().email('Invalid email address'),
@@ -38,6 +39,7 @@ export default function Login() {
 
 			// If validation passes, attempt to sign in
 			await signIn(form.email, form.password);
+			useHaptics('notification-success');
 			router.replace('/');
 		} catch (err) {
 			if (err instanceof z.ZodError) {
@@ -49,9 +51,11 @@ export default function Login() {
 					}
 				}
 				setErrors(fieldErrors);
+				useHaptics('notification-error');
 			} else {
 				// Handle other errors (e.g., network errors)
 				setErrors({ password: 'Invalid email or password' });
+				useHaptics('notification-error');
 			}
 		}
 	};

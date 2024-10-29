@@ -2,6 +2,7 @@ import { isAuthApiError } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
+import Animated, { SlideInRight, SlideOutLeft } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
 import { PoundIcon } from '~/components/icons/PoundIcon';
@@ -10,6 +11,7 @@ import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
 import { P } from '~/components/ui/typography';
 import { useSession } from '~/context/SessionContext';
+import { useHaptics } from '~/lib/useHaptics';
 import { cn } from '~/lib/utils';
 
 const emailSchema = z.object({
@@ -69,6 +71,7 @@ export default function Register() {
 				});
 
 			setStep((prev) => prev + 1);
+			useHaptics('impact-light');
 		} catch (err) {
 			if (err instanceof z.ZodError) {
 				const fieldErrors: { [key: string]: string } = {};
@@ -76,6 +79,7 @@ export default function Register() {
 					fieldErrors[error.path[0]] = error.message;
 				}
 				setErrors(fieldErrors);
+				useHaptics('notification-error');
 			}
 		}
 	};
@@ -83,6 +87,7 @@ export default function Register() {
 	const handleRegister = async () => {
 		try {
 			await signUp(form.email, form.password);
+			useHaptics('notification-success');
 			router.replace('/');
 		} catch (err) {
 			if (isAuthApiError(err) && err.code === 'user_already_exists') {
@@ -98,12 +103,23 @@ export default function Register() {
 			<View className="w-full max-w-sm gap-8">
 				<View className="w-52 gap-2">
 					<PoundIcon />
-					<Text className="text-lg">Create a new Account.</Text>
+					<View className="flex flex-row gap-2 text-lg">
+						{step > 1 && form.email ? (
+							<>
+								<Text>{form.email}</Text>
+								<Pressable onPress={() => setStep(1)}>
+									<Text className="font-semibold text-primary">Change?</Text>
+								</Pressable>
+							</>
+						) : (
+							<Text>Create a New Account </Text>
+						)}
+					</View>
 				</View>
 
 				<View className="gap-4">
 					{step === 1 && (
-						<View>
+						<Animated.View entering={SlideInRight} exiting={SlideOutLeft}>
 							<P className={cn('px-1 text-destructive text-sm', errors.email ? 'opacity-100' : 'opacity-0')}>
 								{errors.email ? errors.email : 'Email'}
 							</P>
@@ -117,11 +133,11 @@ export default function Register() {
 								autoFocus
 								onSubmitEditing={handleNextStep}
 							/>
-						</View>
+						</Animated.View>
 					)}
 
 					{step === 2 && (
-						<View>
+						<Animated.View entering={SlideInRight} exiting={SlideOutLeft}>
 							<P className={cn('px-1 text-destructive text-sm', errors.password ? 'opacity-100' : 'opacity-0')}>
 								{errors.password ? errors.password : 'Password'}
 							</P>
@@ -134,11 +150,11 @@ export default function Register() {
 								autoFocus
 								onSubmitEditing={handleNextStep}
 							/>
-						</View>
+						</Animated.View>
 					)}
 
 					{step === 3 && (
-						<View>
+						<Animated.View entering={SlideInRight} exiting={SlideOutLeft}>
 							<P className={cn('px-1 text-destructive text-sm', errors.confirmPassword ? 'opacity-100' : 'opacity-0')}>
 								{errors.confirmPassword ? errors.confirmPassword : 'Password'}
 							</P>
@@ -151,7 +167,7 @@ export default function Register() {
 								autoFocus
 								onSubmitEditing={handleNextStep}
 							/>
-						</View>
+						</Animated.View>
 					)}
 				</View>
 

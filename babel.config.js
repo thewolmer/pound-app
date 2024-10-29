@@ -12,6 +12,7 @@ module.exports = (api) => {
 					},
 					extensions: ['.ios.ts', '.android.ts', '.ts', '.ios.tsx', '.android.tsx', '.tsx', '.jsx', '.js', '.json'],
 				},
+				'react-native-reanimated/plugin', // this has to be listed last. idk why
 			],
 		],
 	};

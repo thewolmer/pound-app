@@ -30,7 +30,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 		});
 
 		supabase.auth.onAuthStateChange((_event, session) => {
-			console.log('auth state changed', _event);
+			// console.log('auth state changed', _event);
 			setSession(session);
 		});
 	}, []);

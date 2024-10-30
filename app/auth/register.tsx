@@ -2,6 +2,7 @@ import { isAuthApiError } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
+import Animated, { SlideInRight, SlideOutLeft } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
 import { PoundIcon } from '~/components/icons/PoundIcon';
@@ -10,15 +11,25 @@ import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
 import { P } from '~/components/ui/typography';
 import { useSession } from '~/context/SessionContext';
+import { useHaptics } from '~/lib/useHaptics';
 
-const registerSchema = z
+import { cn } from '~/lib/utils';
+
+const emailSchema = z.object({
+	email: z.string().email('Invalid email address'),
+});
+
+const passwordSchema = z.object({
+	password: z
+		.string()
+		.min(8, 'Password must be at least 8 characters')
+		.regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+		.regex(/[0-9]/, 'Password must contain at least one number'),
+});
+
+const confirmPasswordSchema = z
 	.object({
-		email: z.string().email('Invalid email address'),
-		password: z
-			.string()
-			.min(8, 'Password must be at least 8 characters')
-			.regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-			.regex(/[0-9]/, 'Password must contain at least one number'),
+		password: z.string(),
 		confirmPassword: z.string(),
 	})
 	.refine((data) => data.password === data.confirmPassword, {
@@ -26,118 +37,147 @@ const registerSchema = z
 		path: ['confirmPassword'],
 	});
 
-type RegisterForm = z.infer<typeof registerSchema>;
+type RegisterForm = {
+	email: string;
+	password: string;
+	confirmPassword: string;
+};
 
 export default function Register() {
 	const { signUp } = useSession();
 	const router = useRouter();
+	const { triggerHaptics } = useHaptics();
 	const [form, setForm] = useState<RegisterForm>({
 		email: '',
 		password: '',
 		confirmPassword: '',
 	});
-	const [errors, setErrors] = useState<{ [key in keyof RegisterForm]?: string[] }>({});
+	const [errors, setErrors] = useState<{ [key: string]: string | null }>({});
+	const [step, setStep] = useState(1);
 
 	const handleChange = (field: keyof RegisterForm) => (value: string) => {
 		setForm((prev) => ({ ...prev, [field]: value }));
 		if (errors[field]) {
-			setErrors((prev) => ({ ...prev, [field]: undefined }));
+			setErrors((prev) => ({ ...prev, [field]: null }));
+		}
+	};
+
+	const handleNextStep = () => {
+		try {
+			if (step === 1) emailSchema.parse({ email: form.email });
+			if (step === 2) passwordSchema.parse({ password: form.password });
+			if (step === 3)
+				confirmPasswordSchema.parse({
+					password: form.password,
+					confirmPassword: form.confirmPassword,
+				});
+
+			setStep((prev) => prev + 1);
+			triggerHaptics('impact-light');
+		} catch (err) {
+			if (err instanceof z.ZodError) {
+				const fieldErrors: { [key: string]: string } = {};
+				for (const error of err.errors) {
+					fieldErrors[error.path[0]] = error.message;
+				}
+				setErrors(fieldErrors);
+				triggerHaptics('notification-error');
+			}
 		}
 	};
 
 	const handleRegister = async () => {
 		try {
-			// Validate the form
-			registerSchema.parse(form);
-
-			// If validation passes, attempt to sign up
 			await signUp(form.email, form.password);
+			triggerHaptics('notification-success');
 			router.replace('/');
 		} catch (err) {
-			if (err instanceof z.ZodError) {
-				// Set form errors
-				const fieldErrors: { [key in keyof RegisterForm]?: string[] } = {};
-				for (const error of err.errors) {
-					const field = error.path[0] as keyof RegisterForm;
-					if (field) {
-						if (!fieldErrors[field]) {
-							fieldErrors[field] = [];
-						}
-						fieldErrors[field].push(error.message);
-					}
-				}
-				setErrors(fieldErrors);
-				return;
+			if (isAuthApiError(err) && err.code === 'user_already_exists') {
+				setErrors({ email: 'User already exists' });
+			} else {
+				setErrors({ email: 'An error occurred during registration' });
 			}
-
-			if (isAuthApiError(err)) {
-				if (err.code === 'user_already_exists') {
-					setErrors({ email: ['User already exists'] });
-				}
-				console.log(JSON.stringify(err, null, 2));
-				console.log(err.code);
-				return;
-			}
-
-			// Handle other errors (e.g., network errors)
-			setErrors({ email: ['An error occurred during registration'] });
 		}
-	};
-
-	const renderErrors = (field: keyof RegisterForm) => {
-		if (errors[field] && errors[field].length > 0) {
-			return (
-				<View className="mt-1">
-					{errors[field].map((error, index) => (
-						// biome-ignore lint/suspicious/noArrayIndexKey: No other way to make it unique
-						<P key={`${field}-error-${index}`} className="text-destructive text-sm">
-							{error}
-						</P>
-					))}
-				</View>
-			);
-		}
-		return null;
 	};
 
 	return (
-		<SafeAreaView className="flex-1 items-center justify-center bg-background p-6">
+		<SafeAreaView className="flex-1 items-center bg-background p-10">
 			<View className="w-full max-w-sm gap-8">
-				<PoundIcon />
-
-				<View className="gap-4">
-					<View>
-						<Input
-							placeholder="Email"
-							value={form.email}
-							onChangeText={handleChange('email')}
-							inputMode="email"
-							autoCapitalize="none"
-						/>
-						{renderErrors('email')}
-					</View>
-					<View>
-						<Input
-							placeholder="Password"
-							value={form.password}
-							onChangeText={handleChange('password')}
-							secureTextEntry
-						/>
-						{renderErrors('password')}
-					</View>
-					<View>
-						<Input
-							placeholder="Confirm Password"
-							value={form.confirmPassword}
-							onChangeText={handleChange('confirmPassword')}
-							secureTextEntry
-						/>
-						{renderErrors('confirmPassword')}
+				<View className="w-52 gap-2">
+					<PoundIcon />
+					<View className="flex flex-row gap-2 text-lg">
+						{step > 1 && form.email ? (
+							<>
+								<Text>{form.email}</Text>
+								<Pressable onPress={() => setStep(1)}>
+									<Text className="font-semibold text-primary">Change?</Text>
+								</Pressable>
+							</>
+						) : (
+							<Text>Create a New Account </Text>
+						)}
 					</View>
 				</View>
 
-				<Button onPress={handleRegister}>
-					<Text className="text-center font-semibold">Sign Up</Text>
+				<View className="gap-4">
+					{step === 1 && (
+						<Animated.View entering={SlideInRight} exiting={SlideOutLeft}>
+							<P className={cn('px-1 text-destructive text-sm', errors.email ? 'opacity-100' : 'opacity-0')}>
+								{errors.email ? errors.email : 'Email'}
+							</P>
+							<Input
+								placeholder="Email"
+								value={form.email}
+								onChangeText={handleChange('email')}
+								inputMode="email"
+								autoCapitalize="none"
+								returnKeyType="next"
+								autoFocus
+								onSubmitEditing={handleNextStep}
+							/>
+						</Animated.View>
+					)}
+
+					{step === 2 && (
+						<Animated.View entering={SlideInRight} exiting={SlideOutLeft}>
+							<P className={cn('px-1 text-destructive text-sm', errors.password ? 'opacity-100' : 'opacity-0')}>
+								{errors.password ? errors.password : 'Password'}
+							</P>
+							<Input
+								placeholder="Password"
+								value={form.password}
+								onChangeText={handleChange('password')}
+								secureTextEntry
+								returnKeyType="next"
+								autoFocus
+								onSubmitEditing={handleNextStep}
+							/>
+						</Animated.View>
+					)}
+
+					{step === 3 && (
+						<Animated.View entering={SlideInRight} exiting={SlideOutLeft}>
+							<P className={cn('px-1 text-destructive text-sm', errors.confirmPassword ? 'opacity-100' : 'opacity-0')}>
+								{errors.confirmPassword ? errors.confirmPassword : 'Password'}
+							</P>
+							<Input
+								placeholder="Confirm Password"
+								value={form.confirmPassword}
+								onChangeText={handleChange('confirmPassword')}
+								secureTextEntry
+								returnKeyType="next"
+								autoFocus
+								onSubmitEditing={handleNextStep}
+							/>
+						</Animated.View>
+					)}
+				</View>
+
+				{/* incase of user already exists */}
+				{step >= 3 && errors.email && <P className="text-center text-destructive text-xs">{errors.email}</P>}
+
+				<Button onPress={step < 3 ? handleNextStep : handleRegister}>
+					<Text className="text-center font-semibold">{step < 3 ? 'Next' : 'Sign Up'}</Text>
 				</Button>
 
 				<View className="flex-row justify-center">

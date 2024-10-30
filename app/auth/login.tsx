@@ -10,6 +10,8 @@ import { Text } from '~/components/ui/text';
 
 import { useSession } from '~/context/SessionContext';
 
+import { useHaptics } from '~/lib/useHaptics';
+
 const loginSchema = z.object({
 	email: z.string().email('Invalid email address'),
 	password: z.string().min(8, 'Password must be at least 8 characters'),
@@ -22,6 +24,7 @@ export default function Login() {
 	const router = useRouter();
 	const [form, setForm] = useState<LoginForm>({ email: '', password: '' });
 	const [errors, setErrors] = useState<Partial<LoginForm>>({});
+	const { triggerHaptics } = useHaptics();
 
 	const handleChange = (field: keyof LoginForm) => (value: string) => {
 		setForm((prev) => ({ ...prev, [field]: value }));
@@ -38,6 +41,7 @@ export default function Login() {
 
 			// If validation passes, attempt to sign in
 			await signIn(form.email, form.password);
+			triggerHaptics('notification-success');
 			router.replace('/');
 		} catch (err) {
 			if (err instanceof z.ZodError) {
@@ -49,17 +53,22 @@ export default function Login() {
 					}
 				}
 				setErrors(fieldErrors);
+				triggerHaptics('notification-error');
 			} else {
 				// Handle other errors (e.g., network errors)
 				setErrors({ password: 'Invalid email or password' });
+				triggerHaptics('notification-error');
 			}
 		}
 	};
 
 	return (
-		<SafeAreaView className="flex-1 items-center justify-center bg-background p-6">
-			<View className="w-full max-w-sm flex-col justify-between gap-8">
-				<PoundIcon />
+		<SafeAreaView className="flex-1 items-center bg-background p-10">
+			<View className="w-full max-w-sm gap-8">
+				<View className="w-52 gap-2">
+					<PoundIcon />
+					<Text className="text-lg">Welcome Back!</Text>
+				</View>
 				<View className="gap-4">
 					<Input
 						placeholder="Email"
@@ -67,6 +76,9 @@ export default function Login() {
 						onChangeText={handleChange('email')}
 						inputMode="email"
 						autoCapitalize="none"
+						returnKeyType="done"
+						autoFocus
+						onSubmitEditing={handleLogin}
 					/>
 					{errors.email && <Text className="text-destructive text-sm">{errors.email}</Text>}
 

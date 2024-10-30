@@ -1,8 +1,6 @@
 import 'react-native-url-polyfill/auto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
-// import { drizzle } from 'drizzle-orm/postgres-js';
-// import postgres from 'postgres';
 import { Platform } from 'react-native';
 import { Env } from '~/config/env';
 
@@ -43,6 +41,3 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 		detectSessionInUrl: false,
 	},
 });
-
-// const connectionString = `postgresql://${env.DB_USER}:${env.DB_PASS}@${env.DB_HOST}:${env.DB_PORT}/${env.DB_NAME}`;
-// const client = postgres(connectionString);

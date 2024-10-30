@@ -47,9 +47,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	plugins: [
 		'expo-router',
 		[
-			'react-native-nfc-manager',
+			'expo-camera',
 			{
-				includeNdefEntitlement: false,
+				cameraPermission: `Allow ${Env.NAME} to access your camera to scan QR codes.`,
 			},
 		],
 	],

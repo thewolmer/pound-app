@@ -9,6 +9,7 @@ import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
 
 import { useSession } from '~/context/SessionContext';
+
 import { useHaptics } from '~/lib/useHaptics';
 
 const loginSchema = z.object({
@@ -23,6 +24,7 @@ export default function Login() {
 	const router = useRouter();
 	const [form, setForm] = useState<LoginForm>({ email: '', password: '' });
 	const [errors, setErrors] = useState<Partial<LoginForm>>({});
+	const { triggerHaptics } = useHaptics();
 
 	const handleChange = (field: keyof LoginForm) => (value: string) => {
 		setForm((prev) => ({ ...prev, [field]: value }));
@@ -39,7 +41,7 @@ export default function Login() {
 
 			// If validation passes, attempt to sign in
 			await signIn(form.email, form.password);
-			useHaptics('notification-success');
+			triggerHaptics('notification-success');
 			router.replace('/');
 		} catch (err) {
 			if (err instanceof z.ZodError) {
@@ -51,11 +53,11 @@ export default function Login() {
 					}
 				}
 				setErrors(fieldErrors);
-				useHaptics('notification-error');
+				triggerHaptics('notification-error');
 			} else {
 				// Handle other errors (e.g., network errors)
 				setErrors({ password: 'Invalid email or password' });
-				useHaptics('notification-error');
+				triggerHaptics('notification-error');
 			}
 		}
 	};

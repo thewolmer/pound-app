@@ -1,5 +1,4 @@
 import { type VariantProps, cva } from 'class-variance-authority';
-import * as Haptics from 'expo-haptics';
 import * as React from 'react';
 import { Pressable } from 'react-native';
 import { TextClassContext } from '~/components/ui/text';
@@ -73,6 +72,8 @@ type ButtonProps = React.ComponentPropsWithoutRef<typeof Pressable> &
 
 const Button = React.forwardRef<React.ElementRef<typeof Pressable>, ButtonProps>(
 	({ className, variant, size, haptics = 'none', ...props }, ref) => {
+		const { triggerHaptics } = useHaptics();
+
 		return (
 			<TextClassContext.Provider
 				value={cn(props.disabled && 'web:pointer-events-none', buttonTextVariants({ variant, size }))}
@@ -80,7 +81,7 @@ const Button = React.forwardRef<React.ElementRef<typeof Pressable>, ButtonProps>
 				<Pressable
 					onPressIn={() => {
 						if (haptics !== 'none') {
-							useHaptics(haptics);
+							triggerHaptics(haptics);
 						}
 					}}
 					className={cn(

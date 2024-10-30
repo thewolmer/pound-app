@@ -12,6 +12,7 @@ import { Text } from '~/components/ui/text';
 import { P } from '~/components/ui/typography';
 import { useSession } from '~/context/SessionContext';
 import { useHaptics } from '~/lib/useHaptics';
+
 import { cn } from '~/lib/utils';
 
 const emailSchema = z.object({
@@ -45,6 +46,7 @@ type RegisterForm = {
 export default function Register() {
 	const { signUp } = useSession();
 	const router = useRouter();
+	const { triggerHaptics } = useHaptics();
 	const [form, setForm] = useState<RegisterForm>({
 		email: '',
 		password: '',
@@ -71,7 +73,7 @@ export default function Register() {
 				});
 
 			setStep((prev) => prev + 1);
-			useHaptics('impact-light');
+			triggerHaptics('impact-light');
 		} catch (err) {
 			if (err instanceof z.ZodError) {
 				const fieldErrors: { [key: string]: string } = {};
@@ -79,7 +81,7 @@ export default function Register() {
 					fieldErrors[error.path[0]] = error.message;
 				}
 				setErrors(fieldErrors);
-				useHaptics('notification-error');
+				triggerHaptics('notification-error');
 			}
 		}
 	};
@@ -87,7 +89,7 @@ export default function Register() {
 	const handleRegister = async () => {
 		try {
 			await signUp(form.email, form.password);
-			useHaptics('notification-success');
+			triggerHaptics('notification-success');
 			router.replace('/');
 		} catch (err) {
 			if (isAuthApiError(err) && err.code === 'user_already_exists') {

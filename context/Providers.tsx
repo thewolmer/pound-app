@@ -1,10 +1,12 @@
 import { Poppins_400Regular, Poppins_600SemiBold } from '@expo-google-fonts/poppins';
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { type Theme, ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
 import { useFonts } from 'expo-font';
 import { SplashScreen } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { cssInterop } from 'nativewind';
 import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -12,6 +14,9 @@ import { NAV_THEME } from '~/constants/theme';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { SessionProvider } from './SessionContext';
+
+cssInterop(Ionicons, { className: 'style' });
+cssInterop(SafeAreaView, { className: 'style' });
 
 const LIGHT_THEME: Theme = {
 	dark: false,

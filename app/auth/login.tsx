@@ -1,6 +1,8 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { ActivityIndicator, Pressable, View } from 'react-native';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
 import { PoundIcon } from '~/components/icons/PoundIcon';
@@ -11,6 +13,7 @@ import { Text } from '~/components/ui/text';
 import { useSession } from '~/context/SessionContext';
 
 import { useHaptics } from '~/lib/useHaptics';
+import { cn } from '~/lib/utils';
 
 const loginSchema = z.object({
 	email: z.string().email('Invalid email address'),
@@ -24,6 +27,8 @@ export default function Login() {
 	const router = useRouter();
 	const [form, setForm] = useState<LoginForm>({ email: '', password: '' });
 	const [errors, setErrors] = useState<Partial<LoginForm>>({});
+	const [showPassword, setShowPassword] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 	const { triggerHaptics } = useHaptics();
 
 	const handleChange = (field: keyof LoginForm) => (value: string) => {
@@ -35,6 +40,7 @@ export default function Login() {
 	};
 
 	const handleLogin = async () => {
+		setIsSubmitting(true);
 		try {
 			// Validate the form
 			loginSchema.parse(form);
@@ -59,8 +65,12 @@ export default function Login() {
 				setErrors({ password: 'Invalid email or password' });
 				triggerHaptics('notification-error');
 			}
+		} finally {
+			setIsSubmitting(false);
 		}
 	};
+
+	const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 	return (
 		<SafeAreaView className="flex-1 items-center bg-background p-10">
@@ -79,15 +89,38 @@ export default function Login() {
 						returnKeyType="done"
 						autoFocus
 						onSubmitEditing={handleLogin}
+						className={cn(errors.email && 'border-destructive')}
 					/>
 					{errors.email && <Text className="text-destructive text-sm">{errors.email}</Text>}
-
-					<Input placeholder="Password" value={form.password} onChangeText={handleChange('password')} secureTextEntry />
+					<View className="flex flex-row items-center justify-between gap-1">
+						<Input
+							placeholder="Password"
+							value={form.password}
+							onChangeText={handleChange('password')}
+							secureTextEntry={!showPassword}
+							className={cn(errors.password && 'border-destructive', form.password ? 'w-[90%]' : 'w-full')}
+						/>
+						{form.password && (
+							<AnimatedPressable
+								entering={FadeIn}
+								exiting={FadeOut}
+								onPress={() => setShowPassword((prev) => !prev)}
+								className="w-[10%]"
+							>
+								{!showPassword ? (
+									<Ionicons name="eye-outline" size={24} className="text-foreground" />
+								) : (
+									<Ionicons name="eye-off-outline" size={24} className="text-foreground" />
+								)}
+							</AnimatedPressable>
+						)}
+					</View>
 					{errors.password && <Text className="text-destructive text-sm">{errors.password}</Text>}
 				</View>
 
-				<Button onPress={handleLogin}>
-					<Text className="text-center font-body font-semibold">Login</Text>
+				<Button onPress={handleLogin} disabled={isSubmitting} className="flex-row items-center">
+					{isSubmitting ? <ActivityIndicator size="small" color="white" className="mr-2" /> : null}
+					<Text className="text-center font-semibold">Log In</Text>
 				</Button>
 
 				<View className="flex-row justify-center">

@@ -1,8 +1,9 @@
+import { Ionicons } from '@expo/vector-icons';
 import { isAuthApiError } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, View } from 'react-native';
-import Animated, { SlideInRight, SlideOutLeft } from 'react-native-reanimated';
+import { ActivityIndicator, Pressable, View } from 'react-native';
+import Animated, { FadeIn, FadeOut, SlideInRight, SlideOutLeft } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
 import { PoundIcon } from '~/components/icons/PoundIcon';
@@ -12,7 +13,6 @@ import { Text } from '~/components/ui/text';
 import { P } from '~/components/ui/typography';
 import { useSession } from '~/context/SessionContext';
 import { useHaptics } from '~/lib/useHaptics';
-
 import { cn } from '~/lib/utils';
 
 const emailSchema = z.object({
@@ -46,6 +46,7 @@ type RegisterForm = {
 export default function Register() {
 	const { signUp } = useSession();
 	const router = useRouter();
+	const [showPassword, setShowPassword] = useState(false);
 	const { triggerHaptics } = useHaptics();
 	const [form, setForm] = useState<RegisterForm>({
 		email: '',
@@ -54,6 +55,7 @@ export default function Register() {
 	});
 	const [errors, setErrors] = useState<{ [key: string]: string | null }>({});
 	const [step, setStep] = useState(1);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const handleChange = (field: keyof RegisterForm) => (value: string) => {
 		setForm((prev) => ({ ...prev, [field]: value }));
@@ -87,6 +89,7 @@ export default function Register() {
 	};
 
 	const handleRegister = async () => {
+		setIsSubmitting(true);
 		try {
 			await signUp(form.email, form.password);
 			triggerHaptics('notification-success');
@@ -97,8 +100,12 @@ export default function Register() {
 			} else {
 				setErrors({ email: 'An error occurred during registration' });
 			}
+		} finally {
+			setIsSubmitting(false);
 		}
 	};
+
+	const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 	return (
 		<SafeAreaView className="flex-1 items-center bg-background p-10">
@@ -133,6 +140,7 @@ export default function Register() {
 								autoCapitalize="none"
 								returnKeyType="next"
 								autoFocus
+								className={cn(errors.email && 'border-destructive')}
 								onSubmitEditing={handleNextStep}
 							/>
 						</Animated.View>
@@ -143,15 +151,33 @@ export default function Register() {
 							<P className={cn('px-1 text-destructive text-sm', errors.password ? 'opacity-100' : 'opacity-0')}>
 								{errors.password ? errors.password : 'Password'}
 							</P>
-							<Input
-								placeholder="Password"
-								value={form.password}
-								onChangeText={handleChange('password')}
-								secureTextEntry
-								returnKeyType="next"
-								autoFocus
-								onSubmitEditing={handleNextStep}
-							/>
+							<View className="flex flex-row items-center justify-between gap-1">
+								<Input
+									placeholder="Password"
+									value={form.password}
+									onChangeText={handleChange('password')}
+									secureTextEntry={!showPassword}
+									returnKeyType="next"
+									autoFocus
+									className="w-[90%]"
+									onSubmitEditing={handleNextStep}
+								/>
+
+								{form.password && (
+									<AnimatedPressable
+										entering={FadeIn}
+										exiting={FadeOut}
+										onPress={() => setShowPassword((prev) => !prev)}
+										className="w-[10%] p-1"
+									>
+										{!showPassword ? (
+											<Ionicons name="eye-outline" size={24} className="text-foreground" />
+										) : (
+											<Ionicons name="eye-off-outline" size={24} className="text-foreground" />
+										)}
+									</AnimatedPressable>
+								)}
+							</View>
 						</Animated.View>
 					)}
 
@@ -160,15 +186,33 @@ export default function Register() {
 							<P className={cn('px-1 text-destructive text-sm', errors.confirmPassword ? 'opacity-100' : 'opacity-0')}>
 								{errors.confirmPassword ? errors.confirmPassword : 'Password'}
 							</P>
-							<Input
-								placeholder="Confirm Password"
-								value={form.confirmPassword}
-								onChangeText={handleChange('confirmPassword')}
-								secureTextEntry
-								returnKeyType="next"
-								autoFocus
-								onSubmitEditing={handleNextStep}
-							/>
+							<View className="flex flex-row items-center justify-between gap-1">
+								<Input
+									placeholder="Confirm Password"
+									value={form.confirmPassword}
+									onChangeText={handleChange('confirmPassword')}
+									secureTextEntry={!showPassword}
+									returnKeyType="next"
+									autoFocus
+									className="w-[90%]"
+									onSubmitEditing={handleNextStep}
+								/>
+
+								{form.confirmPassword && (
+									<AnimatedPressable
+										entering={FadeIn}
+										exiting={FadeOut}
+										onPress={() => setShowPassword((prev) => !prev)}
+										className="w-[10%]"
+									>
+										{!showPassword ? (
+											<Ionicons name="eye-outline" size={24} className="text-foreground" />
+										) : (
+											<Ionicons name="eye-off-outline" size={24} className="text-foreground" />
+										)}
+									</AnimatedPressable>
+								)}
+							</View>
 						</Animated.View>
 					)}
 				</View>
@@ -176,7 +220,12 @@ export default function Register() {
 				{/* incase of user already exists */}
 				{step >= 3 && errors.email && <P className="text-center text-destructive text-xs">{errors.email}</P>}
 
-				<Button onPress={step < 3 ? handleNextStep : handleRegister}>
+				<Button
+					onPress={step < 3 ? handleNextStep : handleRegister}
+					disabled={isSubmitting}
+					className="flex-row items-center"
+				>
+					{isSubmitting ? <ActivityIndicator size="small" color="white" className="mr-2" /> : null}
 					<Text className="text-center font-semibold">{step < 3 ? 'Next' : 'Sign Up'}</Text>
 				</Button>
 

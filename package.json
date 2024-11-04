@@ -64,7 +64,7 @@
 	},
 	"devDependencies": {
 		"@babel/core": "^7.25.8",
-		"@biomejs/biome": "1.9.3",
+		"@biomejs/biome": "1.9.4",
 		"@types/react": "~18.2.79",
 		"babel-plugin-module-resolver": "^5.0.2",
 		"commit-and-tag-version": "^12.5.0",

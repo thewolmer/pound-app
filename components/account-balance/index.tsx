@@ -3,73 +3,33 @@ import { useState } from 'react';
 import { Modal, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
+import { NumberPad } from '~/components/number-pad';
 import { QRScanner } from '~/components/qr-scanner';
 import { Button } from '~/components/ui/button';
 import { Text } from '~/components/ui/text';
 import { H1 } from '~/components/ui/typography';
-
-interface NumberPadProps {
-	onClose: () => void;
-	onSubmit: (amount: string) => void;
-}
-
-function NumberPad({ onClose, onSubmit }: NumberPadProps) {
-	const [amount, setAmount] = useState('');
-
-	const addDigit = (digit: string) => {
-		if (amount.includes('.') && digit === '.') return;
-		if (amount.includes('.')) {
-			const [, decimal] = amount.split('.');
-			if (decimal?.length >= 2) return;
-		}
-		setAmount((prev) => prev + digit);
-	};
-
-	return (
-		<View className="rounded-t-3xl bg-background p-4">
-			<View className="mb-4 items-center">
-				<Text className="text-2xl">Enter Amount</Text>
-				<Text className="mt-2 font-bold text-3xl">£{amount || '0'}</Text>
-			</View>
-
-			<View className="flex-row flex-wrap justify-between gap-y-4">
-				{['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '⌫'].map((key) => (
-					<Button
-						key={key}
-						variant="ghost"
-						className="w-[30%]"
-						onPress={() => {
-							if (key === '⌫') setAmount((prev) => prev.slice(0, -1));
-							else addDigit(key);
-						}}
-					>
-						<Text className="text-2xl">{key}</Text>
-					</Button>
-				))}
-			</View>
-
-			<View className="mt-4 flex-row gap-4">
-				<Button variant="outline" className="flex-1" onPress={onClose}>
-					<Text>Cancel</Text>
-				</Button>
-				<Button className="flex-1" onPress={() => onSubmit(amount)}>
-					<Text>OK</Text>
-				</Button>
-			</View>
-		</View>
-	);
-}
+import { useAccount } from '~/context/AccountContext';
+import { formatCurrency } from '~/lib/formatCurrency';
+import { supabase } from '~/lib/supabase';
+import { useHaptics } from '~/lib/useHaptics';
 
 interface PaymentRequest {
 	type: 'payment_request';
+	accountId: string;
 	amount: string;
+	reference: string;
 }
 
+type ActionType = 'deposit' | 'request' | null;
+
 export function AccountBalance() {
+	const { balance, accountId } = useAccount();
+	const { triggerHaptics } = useHaptics();
 	const [isScanning, setIsScanning] = useState(false);
-	const [showNumberPad, setShowNumberPad] = useState(false);
+	const [activeAction, setActiveAction] = useState<ActionType>(null);
 	const [requestAmount, setRequestAmount] = useState<string | null>(null);
 	const [pendingPayment, setPendingPayment] = useState<PaymentRequest | null>(null);
+	const [reference, setReference] = useState<string | null>(null);
 
 	function handleScan(data: string) {
 		setIsScanning(false);
@@ -84,21 +44,85 @@ export function AccountBalance() {
 		}
 	}
 
-	function handleApprovePayment() {
-		// Handle the payment approval logic here
-		console.log('Payment approved:', pendingPayment);
+	async function handleApprovePayment() {
+		const { data, error } = await supabase.rpc('make_transfer', {
+			amount: pendingPayment?.amount,
+			origin_account_id: accountId,
+			destination_account_id: pendingPayment?.accountId,
+			reference: pendingPayment?.reference,
+		});
+		if (error) console.error(error);
+		triggerHaptics('notification-success');
 		setPendingPayment(null);
 	}
 
 	function handleDeclinePayment() {
 		// Handle the payment decline logic here
 		console.log('Payment declined:', pendingPayment);
+		triggerHaptics('notification-warning');
 		setPendingPayment(null);
 	}
 
-	if (isScanning) {
-		return <QRScanner onScan={handleScan} onCancel={() => setIsScanning(false)} />;
+	// biome-ignore lint/suspicious/noExplicitAny: fix with correct type
+	const handleTransactionInsert = (payload: any) => {
+		if (payload.new.reference === reference) {
+			triggerHaptics('notification-success');
+			setRequestAmount(null);
+			setReference(null);
+		}
+	};
+
+	supabase
+		.channel('account-transaction')
+		.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transaction' }, handleTransactionInsert)
+		.subscribe();
+
+	async function handleNumberPadSubmit(amount: string) {
+		if (activeAction === 'deposit') {
+			const { data, error } = await supabase.rpc('make_deposit', {
+				amount,
+				destination_account_id: accountId,
+				reference: 'test',
+			});
+			if (error) console.error(error);
+			triggerHaptics('notification-success');
+			//TODO: add some visual feedback that deposit is completed
+			//TODO: add some data on rpc return
+		} else if (activeAction === 'request') {
+			setRequestAmount(amount);
+		}
+		setActiveAction(null);
 	}
+
+	function handleDeposit() {
+		setActiveAction('deposit');
+	}
+
+	function uuid() {
+		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+			const r = (Math.random() * 16) | 0;
+			const v = c === 'x' ? r : (r & 0x3) | 0x8;
+			return v.toString(16);
+		});
+	}
+
+	function handleRequest() {
+		setReference(uuid());
+		setActiveAction('request');
+	}
+
+	if (isScanning) {
+		return (
+			<Modal visible={isScanning} animationType="fade" transparent onRequestClose={() => setIsScanning(false)}>
+				<QRScanner onScan={handleScan} onCancel={() => setIsScanning(false)} />
+			</Modal>
+		);
+	}
+
+	const closeNumberPadModal = () => {
+		setReference(null);
+		setActiveAction(null);
+	};
 
 	const logoFromFile = require('~/assets/images/icon.png');
 
@@ -113,32 +137,26 @@ export function AccountBalance() {
 
 				<View className="mb-8 items-center">
 					<Text className="mb-2 text-accent-foreground">Available Balance</Text>
-					<H1>£1,234.56</H1>
+					<H1>{formatCurrency(Number(balance))}</H1>
 				</View>
 
 				<View className="flex-row justify-center gap-4">
-					<Button
-						onPress={() => {
-							/* Handle deposit */
-						}}
-					>
+					<Button onPress={handleDeposit}>
 						<Text>Deposit</Text>
 					</Button>
 
-					<Button onPress={() => setShowNumberPad(true)}>
+					<Button onPress={handleRequest}>
 						<Text>Request</Text>
 					</Button>
 				</View>
 			</View>
 
-			<Modal visible={showNumberPad} animationType="slide" transparent onRequestClose={() => setShowNumberPad(false)}>
+			<Modal visible={!!activeAction} animationType="slide" transparent onRequestClose={closeNumberPadModal}>
 				<View className="flex-1 justify-end bg-black/50">
 					<NumberPad
-						onClose={() => setShowNumberPad(false)}
-						onSubmit={(amount) => {
-							setRequestAmount(amount);
-							setShowNumberPad(false);
-						}}
+						title={activeAction === 'deposit' ? 'Deposit Amount' : 'Request Amount'}
+						onClose={closeNumberPadModal}
+						onSubmit={handleNumberPadSubmit}
 					/>
 				</View>
 			</Modal>
@@ -151,7 +169,9 @@ export function AccountBalance() {
 						<QRCode
 							value={JSON.stringify({
 								type: 'payment_request',
+								accountId,
 								amount: requestAmount,
+								reference: reference,
 							})}
 							logo={logoFromFile}
 							size={300}

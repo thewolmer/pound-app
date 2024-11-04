@@ -43,6 +43,33 @@ type RegisterForm = {
 	confirmPassword: string;
 };
 
+const PasswordRequirements = ({ password }: { password: string }) => {
+	const requirements = [
+		{ regex: /[A-Z]/, message: 'at least one uppercase letter' },
+		{ regex: /[0-9]/, message: 'at least one number' },
+		{ regex: /.{8,}/, message: '8 or more characters' },
+	];
+
+	return (
+		<View className="gap-1 py-2">
+			<Text className="text-muted-foreground">Your password must contain</Text>
+			{requirements.map((req, index) => (
+				// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+				<View key={index} className="flex flex-row items-center">
+					{password.match(req.regex) ? (
+						<Ionicons name="checkmark-outline" size={18} className="text-foreground" />
+					) : (
+						<Ionicons name="remove-outline" size={18} className="text-foreground" />
+					)}
+					<Text className={cn(password.match(req.regex) ? 'text-green-500' : 'text-destructive', 'pl-2')}>
+						{req.message}
+					</Text>
+				</View>
+			))}
+		</View>
+	);
+};
+
 export default function Register() {
 	const { signUp } = useSession();
 	const router = useRouter();
@@ -148,9 +175,6 @@ export default function Register() {
 
 					{step === 2 && (
 						<Animated.View entering={SlideInRight} exiting={SlideOutLeft}>
-							<P className={cn('px-1 text-destructive text-sm', errors.password ? 'opacity-100' : 'opacity-0')}>
-								{errors.password ? errors.password : 'Password'}
-							</P>
 							<View className="flex flex-row items-center justify-between gap-1">
 								<Input
 									placeholder="Password"
@@ -162,7 +186,6 @@ export default function Register() {
 									className="w-[90%]"
 									onSubmitEditing={handleNextStep}
 								/>
-
 								{form.password && (
 									<AnimatedPressable
 										entering={FadeIn}
@@ -178,6 +201,7 @@ export default function Register() {
 									</AnimatedPressable>
 								)}
 							</View>
+							<PasswordRequirements password={form.password} />
 						</Animated.View>
 					)}
 

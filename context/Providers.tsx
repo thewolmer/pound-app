@@ -13,6 +13,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { NAV_THEME } from '~/constants/theme';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
 import { useColorScheme } from '~/lib/useColorScheme';
+import { AccountProvider } from './AccountContext';
 import { PreferenceSettingsProvider } from './PreferenceContext';
 import { SessionProvider } from './SessionContext';
 
@@ -85,7 +86,9 @@ export const ProvidersWrapper = ({ children }: { children: React.ReactNode }) =>
 			<StatusBar style={isDarkColorScheme ? 'light' : 'dark'} />
 			<SafeAreaProvider onLayout={onLayoutRootView}>
 				<PreferenceSettingsProvider>
-					<SessionProvider>{children}</SessionProvider>
+					<SessionProvider>
+						<AccountProvider>{children}</AccountProvider>
+					</SessionProvider>
 				</PreferenceSettingsProvider>
 			</SafeAreaProvider>
 			<PortalHost />

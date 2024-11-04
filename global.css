@@ -28,7 +28,7 @@
 	.dark:root {
 		--background: 236 66% 15%; /* hsl(236 66% 15%) */
 		--foreground: 0 0% 100%; /* hsl(0 0% 100%) */
-		--card: 236 66% 15%; /* hsl(236 66% 15%) */
+		--card: 236 66% 25%; /* hsl(236 66% 25%) */
 		--card-foreground: 0 0% 100%; /* hsl(0 0% 100%) */
 		--popover: 240 10% 3.9%; /* hsl(240 10% 3.9%) */
 		--popover-foreground: 0 0% 98%; /* hsl(0 0% 98%) */

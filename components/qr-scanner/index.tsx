@@ -60,7 +60,7 @@ export function QRScanner({ onScan, onCancel }: QRScannerProps) {
 				}}
 				style={StyleSheet.absoluteFillObject}
 			/>
-			<Button className='absolute right-0 bottom-8 left-0 mx-auto w-32' onPress={onCancel}>
+			<Button className="absolute right-0 bottom-8 left-0 mx-auto w-32" onPress={onCancel}>
 				<Text>Cancel</Text>
 			</Button>
 		</View>

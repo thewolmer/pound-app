@@ -53,7 +53,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
 	const signOut = async () => {
 		if (session) {
-			const { error } = await supabase.auth.signOut();
+			const { error } = await supabase.auth.signOut({ scope: 'local' });
 			if (error) {
 				throw error;
 			}

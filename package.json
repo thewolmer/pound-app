@@ -28,6 +28,7 @@
 		"@rn-primitives/slot": "~1.0.5",
 		"@rn-primitives/types": "~1.0.5",
 		"@supabase/supabase-js": "^2.45.4",
+		"app-icon-badge": "^0.1.1",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.1",
 		"dotenv-cli": "^7.4.2",

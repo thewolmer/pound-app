@@ -53,6 +53,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 				cameraPermission: `Allow ${Env.NAME} to access your camera to scan QR codes.`,
 			},
 		],
+		[
+			'expo-notifications',
+			{
+				icon: './assets/images/notifications-icon.png',
+				color: '#ffffff',
+				defaultChannel: 'default',
+			},
+		],
 	],
 	extra: {
 		...ClientEnv,

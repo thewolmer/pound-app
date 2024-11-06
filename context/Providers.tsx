@@ -15,6 +15,7 @@ import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { AccountProvider } from './AccountContext';
 import { PreferenceSettingsProvider } from './PreferenceContext';
+import { PushNotifications } from './PushNotifications';
 import { SessionProvider } from './SessionContext';
 
 cssInterop(Ionicons, { className: 'style' });
@@ -87,7 +88,10 @@ export const ProvidersWrapper = ({ children }: { children: React.ReactNode }) =>
 			<SafeAreaProvider onLayout={onLayoutRootView}>
 				<PreferenceSettingsProvider>
 					<SessionProvider>
-						<AccountProvider>{children}</AccountProvider>
+						<AccountProvider>
+							<PushNotifications />
+							{children}
+						</AccountProvider>
 					</SessionProvider>
 				</PreferenceSettingsProvider>
 			</SafeAreaProvider>

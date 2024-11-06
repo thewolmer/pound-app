@@ -3,9 +3,6 @@ import * as Linking from 'expo-linking';
 import { useEffect, useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 
-import { Button } from '~/components/ui/button';
-import { Text } from '~/components/ui/text';
-
 interface QRScannerProps {
 	onScan: (data: string) => void;
 	onCancel: () => void;
@@ -54,15 +51,13 @@ export function QRScanner({ onScan, onCancel }: QRScannerProps) {
 	return (
 		<View className="flex-1">
 			<CameraView
+				className="absolute top-0 left-0 z-0 h-full w-full"
 				onBarcodeScanned={handleBarCodeScanned}
 				barcodeScannerSettings={{
 					barcodeTypes: ['qr'],
 				}}
 				style={StyleSheet.absoluteFillObject}
 			/>
-			<Button className="absolute right-0 bottom-8 left-0 mx-auto w-32" onPress={onCancel}>
-				<Text>Cancel</Text>
-			</Button>
 		</View>
 	);
 }

@@ -32,17 +32,19 @@ export default function TabLayout() {
 					headerLeft(props) {
 						return (
 							<Pressable onPress={() => router.back()} className="flex-row items-center px-5">
-								<TabBarIcon name="arrow-back" color="black" />
+								<TabBarIcon name="arrow-back" className="text-foreground" />
 							</Pressable>
 						);
 					},
 					headerTitle: 'Scan QR Code',
+
 					tabBarIcon: ({ color, focused }) => (
 						<TabBarIcon name={focused ? 'qr-code' : 'qr-code-outline'} color={color} />
 					),
 					tabBarStyle: { display: 'none' },
 				}}
 			/>
+
 			<Tabs.Screen
 				name="(profile)"
 				options={{

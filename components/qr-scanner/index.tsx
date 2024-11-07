@@ -20,7 +20,6 @@ export function QRScanner({ onScan, onCancel }: QRScannerProps) {
 		transform: [{ scale: scale.value }],
 	}));
 
-	// Request camera permission and start animation
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		requestCameraPermission();
@@ -91,7 +90,7 @@ export function QRScanner({ onScan, onCancel }: QRScannerProps) {
 				style={{
 					height: 22,
 					width: 100,
-					opacity: 0.4,
+					opacity: 0.6,
 					resizeMode: 'contain',
 					marginTop: 10,
 				}}

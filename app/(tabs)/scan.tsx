@@ -16,6 +16,7 @@ export default function Scan() {
 	const { triggerHaptics } = useHaptics();
 	const [isScannerOpen, setIsScannerOpen] = useState(true);
 	const [pendingPayment, setPendingPayment] = useState<PaymentRequest | null>(null);
+	const [isSuccessful, setIsSuccessful] = useState<boolean>(false);
 
 	interface PaymentRequest {
 		type: 'payment_request';
@@ -23,8 +24,6 @@ export default function Scan() {
 		amount: string;
 		reference: string;
 	}
-
-	type ActionType = 'deposit' | 'request' | null;
 
 	function handleScan(data: string) {
 		setIsScannerOpen(false);
@@ -50,8 +49,7 @@ export default function Scan() {
 		if (error) console.error(error);
 		triggerHaptics('notification-success');
 		setPendingPayment(null);
-		setIsScannerOpen(true);
-		router.replace('/(tabs)/');
+		setIsSuccessful(true);
 	}
 
 	function handleDeclinePayment() {
@@ -61,6 +59,12 @@ export default function Scan() {
 		setPendingPayment(null);
 		setIsScannerOpen(true);
 		router.replace('/(tabs)/');
+	}
+
+	function handleCloseModal() {
+		setIsSuccessful(false);
+		router.replace('/(tabs)/');
+		setIsScannerOpen(true);
 	}
 
 	return (
@@ -78,6 +82,20 @@ export default function Scan() {
 							</Button>
 							<Button className="flex-1" onPress={handleApprovePayment}>
 								<Text>Approve</Text>
+							</Button>
+						</View>
+					</View>
+				</View>
+			</Modal>
+			<Modal visible={isSuccessful} animationType="fade" transparent onRequestClose={() => handleCloseModal()}>
+				<View className="flex-1 items-center justify-center bg-black/50">
+					<View className="w-[80%] max-w-sm rounded-xl bg-background p-6">
+						<Text className="mb-2 text-center text-xl">Payment successful</Text>
+						<Text className="mb-2 text-center text-lg">Add a tick mark here</Text>
+
+						<View className="flex-row gap-4">
+							<Button className="flex-1" onPress={handleCloseModal}>
+								<Text>Ok</Text>
 							</Button>
 						</View>
 					</View>

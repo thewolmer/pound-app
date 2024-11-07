@@ -1,6 +1,7 @@
 import { Redirect, Tabs, router } from 'expo-router';
 import { View } from 'react-native';
 import { Pressable } from 'react-native';
+
 import { TabBarIcon } from '~/components/icons/TabBarIcon';
 import { useSession } from '~/context/SessionContext';
 
@@ -24,11 +25,13 @@ export default function TabLayout() {
 					tabBarIcon: ({ color, focused }) => <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />,
 				}}
 			/>
+
 			<Tabs.Screen
 				name="scan"
 				options={{
 					title: 'Scan',
 					headerShown: true,
+					tabBarLabel: '',
 					headerLeft(props) {
 						return (
 							<Pressable onPress={() => router.back()} className="flex-row items-center px-5">
@@ -39,18 +42,28 @@ export default function TabLayout() {
 					headerTitle: 'Scan QR Code',
 
 					tabBarIcon: ({ color, focused }) => (
-						<TabBarIcon name={focused ? 'qr-code' : 'qr-code-outline'} color={color} />
+						<View className="elevation-md mb-5 h-[65px] w-[65px] items-center justify-center rounded-full bg-primary ">
+							<TabBarIcon name={focused ? 'qr-code' : 'qr-code-outline'} className="text-white" />
+						</View>
 					),
-					tabBarStyle: { display: 'none' },
+				}}
+			/>
+
+			<Tabs.Screen
+				name="(recent)"
+				options={{
+					title: 'Recent',
+					headerShown: false,
+					tabBarIcon: ({ color, focused }) => (
+						<TabBarIcon name={focused ? 'swap-horizontal-outline' : 'swap-horizontal-outline'} color={color} />
+					),
 				}}
 			/>
 
 			<Tabs.Screen
 				name="(profile)"
 				options={{
-					title: 'Profile',
-					headerShown: false,
-					tabBarIcon: ({ color, focused }) => <TabBarIcon name={focused ? 'person' : 'person-outline'} color={color} />,
+					tabBarButton: () => null,
 				}}
 			/>
 		</Tabs>

@@ -8,11 +8,11 @@ import { Button } from '~/components/ui/button';
 import { Text } from '~/components/ui/text';
 
 const placeholderImages = [
-	'https://images.beta.cosmos.so/304a75e9-eb8e-4f0d-a3f1-ec80d7b57e47?format=jpeg',
-	'https://i.pinimg.com/564x/3e/88/ac/3e88acb58fc78337d4be205a335f9625.jpg',
-	'https://images.beta.cosmos.so/f21ba2f7-4952-46b0-bb50-e020003f5291?format=jpeg',
-	'https://i.pinimg.com/564x/d1/0b/b1/d10bb14cc8e4f4f377aaa547b66cc0c0.jpg',
-	'https://i.pinimg.com/564x/97/e6/2e/97e62e79c1857fb84d26349369eab75c.jpg',
+	{ src: 'https://images.beta.cosmos.so/b261a007-3388-45ff-a2f9-f9004259ebec?format=png', background: '#202020' },
+	{ src: 'https://images.beta.cosmos.so/b261a007-3388-45ff-a2f9-f9004259ebec?format=png', background: '#fecaca' },
+	{ src: 'https://images.beta.cosmos.so/b261a007-3388-45ff-a2f9-f9004259ebec?format=png', background: '#bfdbfe' },
+	{ src: 'https://images.beta.cosmos.so/b261a007-3388-45ff-a2f9-f9004259ebec?format=png', background: '#bbf7d0' },
+	{ src: 'https://images.beta.cosmos.so/b261a007-3388-45ff-a2f9-f9004259ebec?format=png', background: '#fef08a' },
 ];
 const { width, height } = Dimensions.get('screen');
 
@@ -75,8 +75,11 @@ export default function Welcome() {
 				onScroll={onScroll}
 				scrollEventThrottle={16}
 				renderItem={({ item }) => (
-					<View className="flex-1 items-center justify-center" style={{ width, height }}>
-						<Image source={{ uri: item }} style={{ width: width, height: height, resizeMode: 'contain' }} />
+					<View
+						className="flex-1 items-center justify-center"
+						style={{ width, height, backgroundColor: item.background }}
+					>
+						<Image source={{ uri: item.src }} style={{ width: width, height: height, resizeMode: 'contain' }} />
 					</View>
 				)}
 			/>

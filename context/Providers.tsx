@@ -1,5 +1,6 @@
 import { Poppins_400Regular, Poppins_600SemiBold } from '@expo-google-fonts/poppins';
 import { Ionicons } from '@expo/vector-icons';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { type Theme, ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
@@ -9,6 +10,7 @@ import { StatusBar } from 'expo-status-bar';
 import { cssInterop } from 'nativewind';
 import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { NAV_THEME } from '~/constants/theme';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
@@ -85,15 +87,19 @@ export const ProvidersWrapper = ({ children }: { children: React.ReactNode }) =>
 
 	return (
 		<ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-			<StatusBar style={isDarkColorScheme ? 'light' : 'dark'} />
-			<SafeAreaProvider onLayout={onLayoutRootView}>
-				<PreferenceSettingsProvider>
-					<SessionProvider>
-						<AccountProvider>{children}</AccountProvider>
-					</SessionProvider>
-				</PreferenceSettingsProvider>
-			</SafeAreaProvider>
-			<PortalHost />
+			<PreferenceSettingsProvider>
+				<GestureHandlerRootView>
+					<BottomSheetModalProvider>
+						<StatusBar style={isDarkColorScheme ? 'light' : 'dark'} />
+						<SafeAreaProvider onLayout={onLayoutRootView}>
+							<SessionProvider>
+								<AccountProvider>{children}</AccountProvider>
+							</SessionProvider>
+						</SafeAreaProvider>
+						<PortalHost />
+					</BottomSheetModalProvider>
+				</GestureHandlerRootView>
+			</PreferenceSettingsProvider>
 		</ThemeProvider>
 	);
 };

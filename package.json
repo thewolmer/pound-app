@@ -1,7 +1,7 @@
 {
 	"name": "pound-app",
 	"main": "index.js",
-	"version": "1.0.0",
+	"version": "0.1.0",
 	"scripts": {
 		"dev": "expo start -c",
 		"dev:dev-client": "expo start -c --dev-client",

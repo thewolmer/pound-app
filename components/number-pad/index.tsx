@@ -4,14 +4,9 @@ import { Button } from '~/components/ui/button';
 import { Text } from '~/components/ui/text';
 
 interface NumberPadProps {
-	onClose: () => void;
-	onSubmit: (amount: string) => void;
-}
-
-interface NumberPadProps {
 	title: string;
 	onClose: () => void;
-	onSubmit: (amount: string) => void;
+	onSubmit: (amount: number) => void;
 }
 
 export function NumberPad({ title, onClose, onSubmit }: NumberPadProps) {
@@ -19,6 +14,10 @@ export function NumberPad({ title, onClose, onSubmit }: NumberPadProps) {
 
 	const addDigit = (digit: string) => {
 		if (digit === '.' && amount.includes('.')) return;
+		if (digit === '.' && !amount) {
+			setAmount('0.');
+			return;
+		}
 		if (amount.includes('.')) {
 			const [whole, decimal] = amount.split('.');
 			if (decimal.length >= 2) return;
@@ -30,6 +29,10 @@ export function NumberPad({ title, onClose, onSubmit }: NumberPadProps) {
 		setAmount((prev) => prev + digit);
 	};
 
+	const handleSubmit = () => {
+		const sanitizedAmount = Number(amount);
+		onSubmit(sanitizedAmount || 0);
+	};
 	return (
 		<View className="rounded-t-3xl bg-background p-4">
 			<View className="mb-4 items-center">
@@ -57,7 +60,7 @@ export function NumberPad({ title, onClose, onSubmit }: NumberPadProps) {
 				<Button variant="outline" className="flex-1" onPress={onClose}>
 					<Text>Cancel</Text>
 				</Button>
-				<Button className="flex-1" onPress={() => onSubmit(amount)}>
+				<Button className="flex-1" onPress={handleSubmit}>
 					<Text>OK</Text>
 				</Button>
 			</View>

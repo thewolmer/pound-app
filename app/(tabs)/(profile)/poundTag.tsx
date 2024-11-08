@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, SafeAreaView, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { z } from 'zod';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
@@ -15,27 +15,25 @@ const tagSchema = z
 	.max(15, 'Tag can be up to 15 characters');
 
 export default function UpdateTag() {
+	const { session } = useSession();
+
 	const [tag, setTag] = useState('');
 	const [isAvailable, setIsAvailable] = useState(true);
 	const [error, setError] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [initialTag, setInitialTag] = useState<string | null>(null);
 	const debouncedTag = useDebounce(tag, 300);
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	const [user, setUser] = useState<any | null>(null);
-
-	const { session } = useSession();
 
 	useEffect(() => {
 		const fetchData = async () => {
-			const { data, error } = await supabase.from('person').select('identity_tag').eq('id', session?.user.id);
-			if (data?.[0]?.identity_tag) {
-				setUser(data[0]);
-				setInitialTag(data[0].identity_tag);
-				setTag(data[0].identity_tag);
-			}
+			const { data, error } = await supabase.from('person').select('identity_tag').eq('id', session?.user.id).single();
 			if (error) {
 				alert('Something went wrong');
+				return;
+			}
+			if (data) {
+				setInitialTag(data.identity_tag || '');
+				setTag(data.identity_tag || '');
 			}
 		};
 
@@ -54,15 +52,15 @@ export default function UpdateTag() {
 	useEffect(() => {
 		const checkTagAvailability = async () => {
 			if (debouncedTag) {
-				const { data } = await supabase.from('person').select('identity_tag').eq('identity_tag', debouncedTag);
-				setIsAvailable(data?.length === 0);
+				const { data } = await supabase.from('person').select('identity_tag').eq('identity_tag', debouncedTag).single();
+				setIsAvailable(data === null);
 			}
 		};
 		checkTagAvailability();
 	}, [debouncedTag]);
 
 	const handleTagChange = (input: string) => {
-		setTag(input);
+		setTag(input.toLowerCase());
 		validateTag(input);
 	};
 
@@ -79,7 +77,7 @@ export default function UpdateTag() {
 		}
 	};
 
-	if (user === null) {
+	if (initialTag === null) {
 		return (
 			<View className="flex-1 items-center justify-center">
 				<ActivityIndicator size="large" />
@@ -101,10 +99,14 @@ export default function UpdateTag() {
 						onChangeText={handleTagChange}
 						returnKeyType="done"
 						placeholder="Enter your pound tag"
+						autoCapitalize="none"
+						secureTextEntry={Platform.OS !== 'ios'}
+						keyboardType={Platform.OS === 'ios' ? undefined : 'visible-password'}
 						autoFocus
 						onSubmitEditing={handleSubmit}
 					/>
-					{tag && !error && tag !== initialTag ? (
+					{/* TODO: Add a loading indicator */}
+					{debouncedTag && !error && debouncedTag !== initialTag ? (
 						!isAvailable && !error ? (
 							<Text className="mt-2 text-destructive">Tag is already taken</Text>
 						) : (

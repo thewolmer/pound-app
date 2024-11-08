@@ -21,7 +21,7 @@ export default function Scan() {
 	interface PaymentRequest {
 		type: 'payment_request';
 		accountId: string;
-		amount: string;
+		amount: number;
 		reference: string;
 	}
 
@@ -40,11 +40,13 @@ export default function Scan() {
 	}
 
 	async function handleApprovePayment() {
+		if (!pendingPayment || !accountId) return;
+
 		const { data, error } = await supabase.rpc('make_transfer', {
-			amount: pendingPayment?.amount,
+			amount: pendingPayment.amount,
 			origin_account_id: accountId,
-			destination_account_id: pendingPayment?.accountId,
-			reference: pendingPayment?.reference,
+			destination_account_id: pendingPayment.accountId,
+			reference: pendingPayment.reference,
 		});
 		if (error) console.error(error);
 		triggerHaptics('notification-success');

@@ -26,6 +26,8 @@ export function AccountProvider({ children }: { children: ReactNode }) {
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
+		if (!session?.user.id) return;
+
 		const getAccount = async () => {
 			setIsLoading(true);
 			const { data, error } = await supabase
@@ -42,9 +44,8 @@ export function AccountProvider({ children }: { children: ReactNode }) {
 			}
 			setIsLoading(false);
 		};
-		if (session?.user.id) {
-			getAccount();
-		}
+
+		getAccount();
 	}, [session?.user.id]);
 
 	// biome-ignore lint/suspicious/noExplicitAny: FIXME later

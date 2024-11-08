@@ -24,6 +24,20 @@ export default function ProfileLayout() {
 					headerLargeTitle: true,
 				}}
 			/>
+			<Stack.Screen
+				name="user"
+				options={{
+					title: 'User',
+					headerLargeTitle: true,
+				}}
+			/>
+			<Stack.Screen
+				name="poundTag"
+				options={{
+					title: 'Pound Tag',
+					headerLargeTitle: true,
+				}}
+			/>
 		</Stack>
 	);
 }

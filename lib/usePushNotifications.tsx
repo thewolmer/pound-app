@@ -1,11 +1,12 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
+import { router } from 'expo-router';
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
-import { useSession } from '~/context/SessionContext';
 
-async function registerForPushNotificationsAsync() {
+export const registerForPushNotificationsAsync = async () => {
 	let token: Notifications.ExpoPushToken | undefined;
 
 	if (Platform.OS === 'android') {
@@ -13,7 +14,6 @@ async function registerForPushNotificationsAsync() {
 			name: 'default',
 			importance: Notifications.AndroidImportance.MAX,
 			vibrationPattern: [0, 250, 250, 250],
-			lightColor: '#FF231F7C',
 		});
 	}
 
@@ -31,27 +31,47 @@ async function registerForPushNotificationsAsync() {
 		token = await Notifications.getExpoPushTokenAsync({
 			projectId: Constants?.expoConfig?.extra?.eas.projectId,
 		});
-		console.log(token);
+		// await AsyncStorage.setItem('pushToken', token.data);
 	} else {
 		console.error('Must use physical device for Push Notifications');
 	}
 
 	return token?.data ?? '';
-}
+};
 
-export const PushNotifications = () => {
-	const { session } = useSession();
+export const usePushNotifications = () => {
+	Notifications.setNotificationHandler({
+		handleNotification: async () => ({
+			shouldShowAlert: true,
+			shouldPlaySound: true,
+			shouldSetBadge: false,
+		}),
+	});
+
 	useEffect(() => {
-		registerForPushNotificationsAsync()
-			.then(async (token) => {
-				if (token && session?.user.id) {
-					console.log('Updating push token for user', session?.user.id);
-				}
-			})
-			.catch((error) => console.error(error));
+		let isMounted = true;
 
-		return () => {};
-	}, [session?.user.id]);
+		function redirect(notification: Notifications.Notification) {
+			const url = notification.request.content.data?.url;
+			if (url) {
+				router.push(url);
+			}
+		}
 
-	return null;
+		Notifications.getLastNotificationResponseAsync().then((response) => {
+			if (!isMounted || !response?.notification) {
+				return;
+			}
+			redirect(response?.notification);
+		});
+
+		const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+			redirect(response.notification);
+		});
+
+		return () => {
+			isMounted = false;
+			subscription.remove();
+		};
+	}, []);
 };

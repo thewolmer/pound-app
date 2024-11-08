@@ -13,9 +13,9 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { NAV_THEME } from '~/constants/theme';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
 import { useColorScheme } from '~/lib/useColorScheme';
+import { usePushNotifications } from '~/lib/usePushNotifications';
 import { AccountProvider } from './AccountContext';
 import { PreferenceSettingsProvider } from './PreferenceContext';
-import { PushNotifications } from './PushNotifications';
 import { SessionProvider } from './SessionContext';
 
 cssInterop(Ionicons, { className: 'style' });
@@ -31,6 +31,7 @@ const DARK_THEME: Theme = {
 };
 
 export const ProvidersWrapper = ({ children }: { children: React.ReactNode }) => {
+	usePushNotifications();
 	const { colorScheme, setColorScheme, isDarkColorScheme } = useColorScheme();
 	const [fontsLoaded] = useFonts({
 		Poppins_400Regular,
@@ -48,7 +49,7 @@ export const ProvidersWrapper = ({ children }: { children: React.ReactNode }) =>
 					document.documentElement.classList.add('bg-background');
 				}
 				if (!theme) {
-					AsyncStorage.setItem('theme', colorScheme);
+					await AsyncStorage.setItem('theme', colorScheme);
 				} else {
 					const colorTheme = theme === 'dark' ? 'dark' : 'light';
 					if (colorTheme !== colorScheme) {
@@ -88,10 +89,7 @@ export const ProvidersWrapper = ({ children }: { children: React.ReactNode }) =>
 			<SafeAreaProvider onLayout={onLayoutRootView}>
 				<PreferenceSettingsProvider>
 					<SessionProvider>
-						<AccountProvider>
-							<PushNotifications />
-							{children}
-						</AccountProvider>
+						<AccountProvider>{children}</AccountProvider>
 					</SessionProvider>
 				</PreferenceSettingsProvider>
 			</SafeAreaProvider>

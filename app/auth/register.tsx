@@ -61,7 +61,7 @@ const PasswordRequirements = ({ password }: { password: string }) => {
 					) : (
 						<Ionicons name="remove-outline" size={18} className="text-foreground" />
 					)}
-					<Text className={cn(password.match(req.regex) ? 'text-green-500' : 'text-destructive', 'pl-2')}>
+					<Text className={cn(password.match(req.regex) ? 'text-green-500' : 'text-red-500', 'pl-2')}>
 						{req.message}
 					</Text>
 				</View>
@@ -156,7 +156,7 @@ export default function Register() {
 				<View className="gap-4">
 					{step === 1 && (
 						<Animated.View entering={SlideInRight} exiting={SlideOutLeft}>
-							<P className={cn('px-1 text-destructive text-sm', errors.email ? 'opacity-100' : 'opacity-0')}>
+							<P className={cn('px-1 text-red-500 text-sm', errors.email ? 'opacity-100' : 'opacity-0')}>
 								{errors.email ? errors.email : 'Email'}
 							</P>
 							<Input
@@ -167,7 +167,7 @@ export default function Register() {
 								autoCapitalize="none"
 								returnKeyType="next"
 								autoFocus
-								className={cn(errors.email && 'border-destructive')}
+								className={cn(errors.email && 'border-red-500')}
 								onSubmitEditing={handleNextStep}
 							/>
 						</Animated.View>
@@ -207,7 +207,7 @@ export default function Register() {
 
 					{step === 3 && (
 						<Animated.View entering={SlideInRight} exiting={SlideOutLeft}>
-							<P className={cn('px-1 text-destructive text-sm', errors.confirmPassword ? 'opacity-100' : 'opacity-0')}>
+							<P className={cn('px-1 text-red-500 text-sm', errors.confirmPassword ? 'opacity-100' : 'opacity-0')}>
 								{errors.confirmPassword ? errors.confirmPassword : 'Password'}
 							</P>
 							<View className="flex flex-row items-center justify-between gap-1">
@@ -242,7 +242,7 @@ export default function Register() {
 				</View>
 
 				{/* incase of user already exists */}
-				{step >= 3 && errors.email && <P className="text-center text-destructive text-xs">{errors.email}</P>}
+				{step >= 3 && errors.email && <P className="text-center text-red-500 text-xs">{errors.email}</P>}
 
 				<Button
 					onPress={step < 3 ? handleNextStep : handleRegister}

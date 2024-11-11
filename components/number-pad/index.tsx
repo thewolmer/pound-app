@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { Button } from '~/components/ui/button';
 import { Text } from '~/components/ui/text';
+import { useHaptics } from '~/lib/useHaptics';
 
 interface NumberPadProps {
 	title: string;
@@ -11,7 +12,7 @@ interface NumberPadProps {
 
 export function NumberPad({ title, onClose, onSubmit }: NumberPadProps) {
 	const [amount, setAmount] = useState('');
-
+	const { triggerHaptics } = useHaptics();
 	const addDigit = (digit: string) => {
 		if (digit === '.' && amount.includes('.')) return;
 		if (digit === '.' && !amount) {
@@ -34,25 +35,25 @@ export function NumberPad({ title, onClose, onSubmit }: NumberPadProps) {
 		onSubmit(sanitizedAmount || 0);
 	};
 	return (
-		<View className="rounded-t-3xl bg-background p-4">
+		<View className="bg-transparent p-4">
 			<View className="mb-4 items-center">
-				<Text className="text-2xl">{title}</Text>
+				<Text className="text-2xl text-muted-foreground">{title}</Text>
 				<Text className="mt-2 font-bold text-3xl">£{amount || '0'}</Text>
 			</View>
 
-			<View className="flex-row flex-wrap justify-between gap-y-4">
+			<View className="flex h-[40vh] flex-row flex-wrap justify-between gap-y-4">
 				{['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '⌫'].map((key) => (
-					<Button
+					<Pressable
 						key={key}
-						variant="ghost"
-						className="w-[30%]"
+						onPressIn={() => triggerHaptics('impact-light')}
+						className="flex h-[20%] w-[30%] items-center justify-center rounded-xl border border-accent"
 						onPress={() => {
 							if (key === '⌫') setAmount((prev) => prev.slice(0, -1));
 							else addDigit(key);
 						}}
 					>
 						<Text className="text-2xl">{key}</Text>
-					</Button>
+					</Pressable>
 				))}
 			</View>
 
@@ -60,7 +61,7 @@ export function NumberPad({ title, onClose, onSubmit }: NumberPadProps) {
 				<Button variant="outline" className="flex-1" onPress={onClose}>
 					<Text>Cancel</Text>
 				</Button>
-				<Button className="flex-1" onPress={handleSubmit}>
+				<Button className="flex-1" variant={'secondary'} onPress={handleSubmit}>
 					<Text>OK</Text>
 				</Button>
 			</View>

@@ -89,16 +89,16 @@ export default function Login() {
 						returnKeyType="done"
 						autoFocus
 						onSubmitEditing={handleLogin}
-						className={cn(errors.email && 'border-destructive')}
+						className={cn(errors.email && 'border-red-500')}
 					/>
-					{errors.email && <Text className="text-destructive text-sm">{errors.email}</Text>}
+					{errors.email && <Text className="text-red-500 text-sm">{errors.email}</Text>}
 					<View className="flex flex-row items-center justify-between gap-1">
 						<Input
 							placeholder="Password"
 							value={form.password}
 							onChangeText={handleChange('password')}
 							secureTextEntry={!showPassword}
-							className={cn(errors.password && 'border-destructive', form.password ? 'w-[90%]' : 'w-full')}
+							className={cn(errors.password && 'border-red-500', form.password ? 'w-[90%]' : 'w-full')}
 						/>
 						{form.password && (
 							<AnimatedPressable
@@ -115,7 +115,7 @@ export default function Login() {
 							</AnimatedPressable>
 						)}
 					</View>
-					{errors.password && <Text className="text-destructive text-sm">{errors.password}</Text>}
+					{errors.password && <Text className="text-red-500 text-sm">{errors.password}</Text>}
 				</View>
 
 				<Button onPress={handleLogin} disabled={isSubmitting} className="flex-row items-center">

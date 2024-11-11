@@ -5,7 +5,7 @@ import {
 	BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import React, { useCallback, useRef, useState } from 'react';
-import { Platform, Text, View } from 'react-native';
+import { Platform, Text } from 'react-native';
 import Animated, { SlideInRight, SlideOutLeft } from 'react-native-reanimated';
 import { useAccount } from '~/context/AccountContext';
 import { useSession } from '~/context/SessionContext';
@@ -15,6 +15,8 @@ import { NumberPad } from '../number-pad';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { H3 } from '../ui/typography';
+
+import { Ionicons } from '@expo/vector-icons';
 
 export default function SendButton() {
 	const { accountId } = useAccount();
@@ -79,13 +81,14 @@ export default function SendButton() {
 
 	return (
 		<>
-			<Button onPress={handleSend}>
-				<Text className="text-white">Send</Text>
+			<Button onPress={handleSend} haptics="impact-light" variant={'outline'} size={'lg'}>
+				<Ionicons name="arrow-up-circle-outline" className="text-foreground" size={24} />
+				<Text className="text-foreground text-xs">Send</Text>
 			</Button>
 			<BottomSheetModal
 				backdropComponent={renderBackDrop}
 				ref={sendModal}
-				snapPoints={['90']}
+				snapPoints={['80']}
 				enableDismissOnClose
 				onDismiss={() => {
 					handleClose();
@@ -106,7 +109,7 @@ export default function SendButton() {
 								onSubmitEditing={handleVerifyTag}
 								autoFocus
 							/>
-							<Button disabled={poundTag.length < 3} onPress={handleVerifyTag}>
+							<Button disabled={poundTag.length < 3} onPress={handleVerifyTag} className="mt-5">
 								<Text className="text-white">Next</Text>
 							</Button>
 						</Animated.View>

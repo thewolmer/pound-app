@@ -1,8 +1,8 @@
 import { Redirect, Tabs, router } from 'expo-router';
 import { View } from 'react-native';
-import { Pressable } from 'react-native';
 
 import { TabBarIcon } from '~/components/icons/TabBarIcon';
+import { Button } from '~/components/ui/button';
 import { useSession } from '~/context/SessionContext';
 
 export default function TabLayout() {
@@ -32,17 +32,23 @@ export default function TabLayout() {
 					title: 'Scan',
 					headerShown: true,
 					tabBarLabel: '',
+					tabBarStyle: { display: 'none' },
 					headerLeft(props) {
 						return (
-							<Pressable onPress={() => router.back()} className="flex-row items-center px-5">
+							<Button
+								haptics="impact-light"
+								variant={'link'}
+								onPress={() => router.back()}
+								className="flex-row items-center px-5"
+							>
 								<TabBarIcon name="arrow-back" className="text-foreground" />
-							</Pressable>
+							</Button>
 						);
 					},
 					headerTitle: 'Scan QR Code',
 
 					tabBarIcon: ({ color, focused }) => (
-						<View className="elevation-md mb-5 h-[65px] w-[65px] items-center justify-center rounded-full bg-primary ">
+						<View className="elevation-md mb-5 h-[65px] w-[65px] items-center justify-center rounded-full bg-primary">
 							<TabBarIcon name={focused ? 'qr-code' : 'qr-code-outline'} className="text-white" />
 						</View>
 					),

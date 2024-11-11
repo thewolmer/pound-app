@@ -38,7 +38,7 @@ export default function StartScreen() {
 	}, []);
 
 	return (
-		<SafeAreaView className="flex-1 gap-5">
+		<SafeAreaView className="flex-1 gap-5 px-4">
 			<View className="flex flex-row items-center justify-between px-2 text-foreground">
 				<Text className="text-foreground"> Welcome</Text>
 				<Pressable onPress={() => router.navigate('/(profile)')} className="px-5">

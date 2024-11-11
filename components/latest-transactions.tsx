@@ -123,18 +123,22 @@ export function LatestTransactions({ count }: LatestTransactionsProps) {
 
 	const renderTransaction = ({ item }: { item: Transaction }) => {
 		return (
-			<View className="flex-row justify-between pb-4">
+			<View className="flex-row items-center justify-between pb-4">
 				<View className="flex-row items-center gap-4">
 					<View className="relative h-12 w-12 items-center justify-center rounded-full border border-border bg-muted">
 						<Text>IMG</Text>
 						{renderTransactionIcon(item)}
 					</View>
 					<View>
-						<Text className="font-bold text-xl">Sender/Receiver</Text>
+						<Text className="font-bold text-md">Sender/Receiver</Text>
 						<Text className="text-muted-foreground text-sm">{formatTransactionDate(new Date(item.created_at))}</Text>
 					</View>
 				</View>
-				<Text>
+				<Text
+					className={
+						item.destination_account_id === accountId ? 'text-success-foreground' : 'text-destructive-foreground'
+					}
+				>
 					{item.destination_account_id === accountId ? '+' : '-'}
 					{formatCurrency(item.amount)}
 				</Text>
@@ -143,15 +147,13 @@ export function LatestTransactions({ count }: LatestTransactionsProps) {
 	};
 
 	return (
-		<View className="px-4">
-			<Card>
-				<CardHeader>
-					<CardTitle>Latest Transactions</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<FlatList data={transactions} renderItem={renderTransaction} keyExtractor={(item) => item.id} />
-				</CardContent>
-			</Card>
-		</View>
+		<Card>
+			<CardHeader>
+				<CardTitle className="text-lg">Latest Transactions</CardTitle>
+			</CardHeader>
+			<CardContent>
+				<FlatList data={transactions} renderItem={renderTransaction} keyExtractor={(item) => item.id} />
+			</CardContent>
+		</Card>
 	);
 }

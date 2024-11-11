@@ -17,7 +17,7 @@ import { NumberPad } from '../number-pad';
 import { Button } from '../ui/button';
 import { H3 } from '../ui/typography';
 
-export default function RequestButton() {
+export const RequestButton = () => {
 	const { accountId } = useAccount();
 	const requestModal = useRef<BottomSheetModal>(null);
 	const { triggerHaptics } = useHaptics();
@@ -77,11 +77,13 @@ export default function RequestButton() {
 				snapPoints={['80']}
 				enableDismissOnClose
 				enablePanDownToClose={false}
+				handleIndicatorStyle={{ backgroundColor: '#fff' }}
+				backgroundStyle={{ backgroundColor: 'transparent' }}
 				onDismiss={() => {
 					handleClose();
 				}}
 			>
-				<BottomSheetView className="flex-1 gap-5 bg-background p-5">
+				<BottomSheetView className="flex-1 gap-5 rounded-t-2xl bg-card p-5">
 					{!requestAmount ? (
 						<Animated.View exiting={SlideOutLeft}>
 							<NumberPad title={'Request Amount'} onClose={handleClose} onSubmit={handleNumberPadSubmit} />
@@ -117,4 +119,4 @@ export default function RequestButton() {
 			</BottomSheetModal>
 		</>
 	);
-}
+};

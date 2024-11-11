@@ -59,6 +59,7 @@ export default function TabLayout() {
 				name="(recent)"
 				options={{
 					title: 'Recent',
+					tabBarStyle: { display: 'none' },
 					headerShown: false,
 					tabBarIcon: ({ color, focused }) => (
 						<TabBarIcon name={focused ? 'swap-horizontal-outline' : 'swap-horizontal-outline'} color={color} />

@@ -1,6 +1,6 @@
 import { Stack, router } from 'expo-router';
-import { Pressable } from 'react-native';
 import { TabBarIcon } from '~/components/icons/TabBarIcon';
+import { Button } from '~/components/ui/button';
 
 export default function ProfileLayout() {
 	return (
@@ -8,10 +8,19 @@ export default function ProfileLayout() {
 			<Stack.Screen
 				name="index"
 				options={{
-					title: 'Recent',
-					headerLargeTitle: true,
-					headerSearchBarOptions: {
-						placeholder: 'Search Recent transactions',
+					title: 'Transactions',
+					headerLargeTitle: false,
+					headerLeft(props) {
+						return (
+							<Button
+								haptics="impact-light"
+								variant={'link'}
+								onPress={() => router.back()}
+								className="flex-row items-center px-5"
+							>
+								<TabBarIcon name="arrow-back" className="text-foreground" />
+							</Button>
+						);
 					},
 				}}
 			/>

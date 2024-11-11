@@ -82,7 +82,7 @@ export default function SendButton() {
 	return (
 		<>
 			<Button onPress={handleSend} haptics="impact-light" variant={'outline'} size={'lg'}>
-				<Ionicons name="arrow-up-circle-outline" size={24} />
+				<Ionicons name="arrow-up-circle-outline" className="text-foreground" size={24} />
 				<Text className="text-foreground text-xs">Send</Text>
 			</Button>
 			<BottomSheetModal

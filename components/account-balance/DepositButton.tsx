@@ -60,7 +60,7 @@ export default function DepositButton() {
 	return (
 		<>
 			<Button onPress={handleDeposit} variant={'outline'} haptics="impact-light" size={'lg'}>
-				<Ionicons name="business-outline" size={22} />
+				<Ionicons name="business-outline" className="text-foreground" size={22} />
 				<Text className="text-foreground text-xs">Deposit</Text>
 			</Button>
 			<BottomSheetModal

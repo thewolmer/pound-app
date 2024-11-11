@@ -68,7 +68,7 @@ export default function RequestButton() {
 	return (
 		<>
 			<Button onPress={handleRequest} haptics="impact-light" variant={'outline'} size={'lg'}>
-				<Ionicons name="arrow-down-circle-outline" size={24} />
+				<Ionicons name="arrow-down-circle-outline" className="text-foreground" size={24} />
 				<Text className="text-foreground text-xs">Request</Text>
 			</Button>
 			<BottomSheetModal

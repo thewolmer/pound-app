@@ -32,7 +32,7 @@
       --info-foreground: 232 82% 20%;
     }
   
-    .dark {
+    .dark:root {
       --background: 236.4 66% 3%;
       --foreground: 42 12% 78%;
       --muted: 203 9% 10%;

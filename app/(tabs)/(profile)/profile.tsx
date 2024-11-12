@@ -13,16 +13,18 @@ import { supabase } from '~/lib/supabase';
 
 export default function Profile() {
 	const { session } = useSession();
+	if (!session) return null;
+
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	const [user, setUser] = useState<any | null>(null);
 
 	useFocusEffect(
 		useCallback(() => {
 			const fetchData = async () => {
-				if (session?.user?.id) {
-					const { data, error } = await supabase.from('person').select().eq('id', session.user.id);
+				if (session.user.id) {
+					const { data, error } = await supabase.from('person').select().eq('id', session.user.id).single();
 					if (data) {
-						setUser(data[0]);
+						setUser(data);
 					}
 					if (error) {
 						alert('Something went wrong');
@@ -32,7 +34,7 @@ export default function Profile() {
 			};
 
 			fetchData();
-		}, [session?.user?.id]),
+		}, [session.user.id]),
 	);
 
 	if (user === null) {

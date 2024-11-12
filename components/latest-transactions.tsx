@@ -4,20 +4,9 @@ import { FlatList, View } from 'react-native';
 import { useAccount } from '~/context/AccountContext';
 import { formatCurrency } from '~/lib/formatCurrency';
 import { supabase } from '~/lib/supabase';
-import { cn } from '~/lib/utils';
+import type { Tables } from '~/types/database.types';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Text } from './ui/text';
-//TODO: replace with generated transaction type
-interface Transaction {
-	id: string;
-	type: 'deposit' | 'withdrawal' | 'transfer' | 'payment' | 'purchase';
-	amount: number;
-	origin_account_id: string;
-	destination_account_id: string;
-	reference: string;
-	status: 'pending' | 'in_progress' | 'completed' | 'failed' | 'cancelled' | 'on_hold';
-	created_at: Date;
-}
 
 interface LatestTransactionsProps {
 	count: number;
@@ -59,19 +48,17 @@ function formatTransactionDate(date: Date): string {
 
 export function LatestTransactions({ count }: LatestTransactionsProps) {
 	const { accountId } = useAccount();
-	const [transactions, setTransactions] = useState<Transaction[] | null>([]);
+	const [transactions, setTransactions] = useState<Tables<'account_transactions'>[] | null>([]);
 
 	useEffect(() => {
-		//TODO: grab this data from a special view
 		const getTransactions = async () => {
 			const { data, error } = await supabase
-				.from('transaction')
+				.from('account_transactions')
 				.select('*')
 				.or(`origin_account_id.eq.${accountId},destination_account_id.eq.${accountId}`)
 				.order('created_at', { ascending: false })
 				.limit(count);
 			if (error) console.error(error);
-			// console.log(data);
 			setTransactions(data);
 		};
 		if (accountId) {
@@ -79,22 +66,12 @@ export function LatestTransactions({ count }: LatestTransactionsProps) {
 
 			supabase
 				.channel('transaction')
-				.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transaction' }, handleTransactionInsert)
+				.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transaction' }, getTransactions)
 				.subscribe();
 		}
 	}, [accountId, count]);
 
-	// biome-ignore lint/suspicious/noExplicitAny: fix with correct type
-	const handleTransactionInsert = (payload: any) => {
-		if (payload.new.origin_account_id === accountId || payload.new.destination_account_id === accountId) {
-			setTransactions((prevTransactions) => [
-				payload.new,
-				...(prevTransactions?.length === count ? prevTransactions.slice(0, -1) : prevTransactions || []),
-			]);
-		}
-	};
-
-	const renderTransactionIcon = (transaction: Transaction) => {
+	const renderTransactionIcon = (transaction: Tables<'account_transactions'>) => {
 		if (transaction.type === 'deposit') {
 			return (
 				<View className="absolute right-0 bottom-0 h-4 w-4 items-center justify-center rounded-full bg-primary">
@@ -121,7 +98,21 @@ export function LatestTransactions({ count }: LatestTransactionsProps) {
 		return null;
 	};
 
-	const renderTransaction = ({ item }: { item: Transaction }) => {
+	const renderTransactionParticipant = (transaction: Tables<'account_transactions'>) => {
+		if (transaction.type === 'deposit') {
+			return 'Bank deposit';
+		}
+		if (transaction.type === 'transfer') {
+			if (transaction.destination_account_id === accountId) {
+				return `${transaction.origin_first_name} ${transaction.origin_last_name}`;
+			}
+			return `${transaction.destination_first_name} ${transaction.destination_last_name}`;
+		}
+
+		return '';
+	};
+
+	const renderTransaction = ({ item }: { item: Tables<'account_transactions'> }) => {
 		return (
 			<View className="flex-row items-center justify-between pb-4">
 				<View className="flex-row items-center gap-4">
@@ -130,8 +121,10 @@ export function LatestTransactions({ count }: LatestTransactionsProps) {
 						{renderTransactionIcon(item)}
 					</View>
 					<View>
-						<Text className="font-bold text-md">Sender/Receiver</Text>
-						<Text className="text-muted-foreground text-sm">{formatTransactionDate(new Date(item.created_at))}</Text>
+						<Text className="font-bold text-md">{renderTransactionParticipant(item)}</Text>
+						<Text className="text-muted-foreground text-sm">
+							{formatTransactionDate(new Date(item.created_at || ''))}
+						</Text>
 					</View>
 				</View>
 				<Text
@@ -140,7 +133,7 @@ export function LatestTransactions({ count }: LatestTransactionsProps) {
 					}
 				>
 					{item.destination_account_id === accountId ? '+' : '-'}
-					{formatCurrency(item.amount)}
+					{formatCurrency(item.amount || 0)}
 				</Text>
 			</View>
 		);
@@ -152,7 +145,11 @@ export function LatestTransactions({ count }: LatestTransactionsProps) {
 				<CardTitle className="text-lg">Latest Transactions</CardTitle>
 			</CardHeader>
 			<CardContent>
-				<FlatList data={transactions} renderItem={renderTransaction} keyExtractor={(item) => item.id} />
+				<FlatList
+					data={transactions}
+					renderItem={renderTransaction}
+					keyExtractor={(item) => item.id || Math.random().toString()}
+				/>
 			</CardContent>
 		</Card>
 	);

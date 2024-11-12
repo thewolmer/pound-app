@@ -26,21 +26,34 @@ export function AccountProvider({ children }: { children: ReactNode }) {
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
+		const accountChannel = supabase.channel('account');
+		if (accountId) {
+			accountChannel
+				.on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'account' }, handleAccountUpdate)
+				.subscribe();
+		}
+		return () => {
+			supabase.removeChannel(accountChannel);
+		};
+	}, [accountId]);
+
+	useEffect(() => {
 		if (!session?.user.id) return;
 
+		//TODO: make it multiple accounts
 		const getAccount = async () => {
 			setIsLoading(true);
 			const { data, error } = await supabase
 				.from('account')
 				.select('id, balance')
-				.eq('person_id', session?.user.id)
+				.eq('person_id', session.user.id)
 				.single();
 			if (error) {
 				console.error(error);
 				setError(error.message);
 			} else {
 				setAccountId(data?.id);
-				setBalance(data?.balance || 0.0);
+				setBalance(data?.balance || 0);
 			}
 			setIsLoading(false);
 		};
@@ -54,13 +67,6 @@ export function AccountProvider({ children }: { children: ReactNode }) {
 			setBalance(payload.new.balance);
 		}
 	};
-
-	if (accountId) {
-		supabase
-			.channel('account')
-			.on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'account' }, handleAccountUpdate)
-			.subscribe();
-	}
 
 	const value = {
 		accountId,

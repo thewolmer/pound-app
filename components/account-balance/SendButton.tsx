@@ -17,6 +17,7 @@ import { Input } from '../ui/input';
 import { H3 } from '../ui/typography';
 
 import { Ionicons } from '@expo/vector-icons';
+import type { Tables } from '~/types/database.types';
 
 export default function SendButton() {
 	const { accountId } = useAccount();
@@ -32,7 +33,7 @@ export default function SendButton() {
 
 	const [poundTag, setPoundTag] = useState<string>('');
 	const [step, setStep] = useState<number>(1);
-	const [id, setId] = useState<string>('');
+	const [accountTo, setAccountTo] = useState<Tables<'account_details'> | null>(null);
 
 	function handleSend() {
 		setPoundTag('');
@@ -46,36 +47,36 @@ export default function SendButton() {
 	};
 
 	const handleVerifyTag = async () => {
-		const { data: person, error } = await supabase.from('person').select('id').eq('identity_tag', poundTag).single();
-		if (!person) {
+		const { data, error } = await supabase.from('account_details').select().eq('identity_tag', poundTag).single();
+		if (!data) {
 			alert(`${poundTag} is not a valid PoundTag`);
-		} else if (error) {
-			alert('Something went wrong');
-		} else if (person.id === session?.user.id) {
-			alert('You cannot send money to yourself');
-		} else {
-			setId(person.id);
-			setStep(2);
+			return;
 		}
+
+		if (error) {
+			alert('Something went wrong');
+			return;
+		}
+
+		if (data.person_id === session?.user.id) {
+			alert('You cannot send money to yourself');
+			return;
+		}
+
+		setAccountTo(data);
+		setStep(2);
 	};
 
 	const handleSendSubmit = async (amount: number) => {
-		if (!accountId) return;
-		const { data: account, error: accountError } = await supabase
-			.from('account')
-			.select('id')
-			.eq('person_id', id)
-			.single();
-		if (accountError) console.error(accountError);
-		if (!account) return;
+		if (!accountId || !accountTo?.account_id) return;
 
-		const { data, error: transactionError } = await supabase.rpc('make_transfer', {
+		const { error } = await supabase.rpc('make_transfer', {
 			amount,
 			origin_account_id: accountId,
-			destination_account_id: account.id,
+			destination_account_id: accountTo.account_id,
 			reference: uuid(), //TODO: add reference field in the modal
 		});
-		if (transactionError) console.error(transactionError);
+		if (error) console.error(error);
 		handleClose();
 	};
 

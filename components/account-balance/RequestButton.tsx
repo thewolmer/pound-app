@@ -40,13 +40,13 @@ export default function RequestButton() {
 	};
 
 	function handleRequest() {
-		setReference(uuid());
 		setRequestAmount(null);
 		requestModal.current?.present();
 	}
 
 	async function handleNumberPadSubmit(amount: number) {
 		if (!accountId) return;
+		setReference(uuid());
 		setRequestAmount(amount);
 	}
 

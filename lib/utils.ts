@@ -12,3 +12,34 @@ export function uuid() {
 		return v.toString(16);
 	});
 }
+
+export function formatTransactionDate(date: Date): string {
+	const now = new Date();
+	const transactionDate = new Date(date);
+
+	if (transactionDate.toDateString() === now.toDateString()) {
+		return `Today, ${transactionDate.toLocaleTimeString('en-US', {
+			hour: '2-digit',
+			minute: '2-digit',
+			hour12: false,
+		})}`;
+	}
+
+	const yesterday = new Date(now);
+	yesterday.setDate(yesterday.getDate() - 1);
+	if (transactionDate.toDateString() === yesterday.toDateString()) {
+		return `Yesterday, ${transactionDate.toLocaleTimeString('en-US', {
+			hour: '2-digit',
+			minute: '2-digit',
+			hour12: false,
+		})}`;
+	}
+
+	return transactionDate.toLocaleDateString('en-US', {
+		day: 'numeric',
+		month: 'short',
+		hour: '2-digit',
+		minute: '2-digit',
+		hour12: false,
+	});
+}

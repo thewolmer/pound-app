@@ -19,7 +19,7 @@ import { H3 } from '../ui/typography';
 import { Ionicons } from '@expo/vector-icons';
 import type { Tables } from '~/types/database.types';
 
-export default function SendButton() {
+export const SendButton = () => {
 	const { accountId } = useAccount();
 	const { session } = useSession();
 	const sendModal = useRef<BottomSheetModal>(null);
@@ -91,11 +91,13 @@ export default function SendButton() {
 				ref={sendModal}
 				snapPoints={['80']}
 				enableDismissOnClose
+				handleIndicatorStyle={{ backgroundColor: '#fff' }}
+				backgroundStyle={{ backgroundColor: 'transparent' }}
 				onDismiss={() => {
 					handleClose();
 				}}
 			>
-				<BottomSheetView className="flex-1 gap-5 p-5">
+				<BottomSheetView className="flex-1 gap-5 rounded-t-2xl bg-card p-5">
 					<H3>Send Money</H3>
 					{step === 1 && (
 						<Animated.View exiting={SlideOutLeft}>
@@ -124,4 +126,4 @@ export default function SendButton() {
 			</BottomSheetModal>
 		</>
 	);
-}
+};

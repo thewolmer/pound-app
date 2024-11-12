@@ -16,7 +16,7 @@ import { uuid } from '~/lib/utils';
 import { NumberPad } from '../number-pad';
 import { Button } from '../ui/button';
 
-export default function DepositButton() {
+export const DepositButton = () => {
 	const { accountId } = useAccount();
 	const depositModal = useRef<BottomSheetModal>(null);
 	const { triggerHaptics } = useHaptics();
@@ -66,14 +66,17 @@ export default function DepositButton() {
 			<BottomSheetModal
 				backdropComponent={renderBackDrop}
 				ref={depositModal}
+				style={{ backgroundColor: 'transparent' }}
 				snapPoints={['80']}
 				enableDismissOnClose
 				enablePanDownToClose={false}
+				handleIndicatorStyle={{ backgroundColor: '#fff' }}
+				backgroundStyle={{ backgroundColor: 'transparent' }}
 				onDismiss={() => {
 					handleClose();
 				}}
 			>
-				<BottomSheetView className="flex-1 gap-5 bg-background p-5">
+				<BottomSheetView className="flex-1 gap-5 rounded-t-2xl bg-card p-5">
 					<Animated.View exiting={SlideOutLeft}>
 						<NumberPad title={'Deposit Amount'} onClose={handleClose} onSubmit={handleNumberPadSubmit} />
 					</Animated.View>
@@ -81,4 +84,4 @@ export default function DepositButton() {
 			</BottomSheetModal>
 		</>
 	);
-}
+};

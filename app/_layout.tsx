@@ -17,7 +17,7 @@ export default function RootLayout() {
 				initialRouteName="auth"
 			>
 				<Stack.Screen name="auth" />
-				<Stack.Screen name="(tabs)" />
+				<Stack.Screen name="(main)" />
 			</Stack>
 		</ProvidersWrapper>
 	);

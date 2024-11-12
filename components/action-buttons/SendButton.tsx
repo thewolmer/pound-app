@@ -17,6 +17,7 @@ import { Input } from '../ui/input';
 import { H3 } from '../ui/typography';
 
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import type { Tables } from '~/types/database.types';
 
 export const SendButton = () => {
@@ -82,7 +83,8 @@ export const SendButton = () => {
 
 	return (
 		<>
-			<Button onPress={handleSend} haptics="impact-light" variant={'outline'} size={'lg'}>
+			{/* TODO: move this to the send screen */}
+			<Button onPress={() => router.push('/(main)/(send)')} haptics="impact-light" variant={'outline'} size={'lg'}>
 				<Ionicons name="arrow-up-circle-outline" className="text-foreground" size={24} />
 				<Text className="text-foreground text-xs">Send</Text>
 			</Button>

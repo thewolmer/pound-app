@@ -3,7 +3,6 @@ import { Text } from '~/components/ui/text';
 import { H1 } from '~/components/ui/typography';
 import { useAccount } from '~/context/AccountContext';
 import { formatCurrency } from '~/lib/formatCurrency';
-import { usePrevious } from '~/lib/usePrevious';
 import { Card, CardFooter, CardHeader } from '../ui/card';
 import DepositButton from './DepositButton';
 import RequestButton from './RequestButton';

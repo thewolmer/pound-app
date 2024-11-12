@@ -16,6 +16,7 @@ const tagSchema = z
 
 export default function UpdateTag() {
 	const { session } = useSession();
+	if (!session?.user.id) return null;
 
 	const [tag, setTag] = useState('');
 	const [isAvailable, setIsAvailable] = useState(true);
@@ -26,7 +27,11 @@ export default function UpdateTag() {
 
 	useEffect(() => {
 		const fetchData = async () => {
-			const { data, error } = await supabase.from('person').select('identity_tag').eq('id', session?.user.id).single();
+			const { data, error } = await supabase
+				.from('account_details')
+				.select('identity_tag')
+				.eq('person_id', session.user.id)
+				.single();
 			if (error) {
 				alert('Something went wrong');
 				return;
@@ -38,7 +43,7 @@ export default function UpdateTag() {
 		};
 
 		fetchData();
-	}, [session?.user.id]);
+	}, [session.user.id]);
 
 	const validateTag = (input: string) => {
 		const result = tagSchema.safeParse(input);
@@ -52,7 +57,11 @@ export default function UpdateTag() {
 	useEffect(() => {
 		const checkTagAvailability = async () => {
 			if (debouncedTag) {
-				const { data } = await supabase.from('person').select('identity_tag').eq('identity_tag', debouncedTag).single();
+				const { data } = await supabase
+					.from('account_details')
+					.select('identity_tag')
+					.eq('identity_tag', debouncedTag)
+					.single();
 				setIsAvailable(data === null);
 			}
 		};
@@ -68,7 +77,7 @@ export default function UpdateTag() {
 		if (error || !isAvailable) return;
 		setLoading(true);
 		try {
-			await supabase.from('person').update({ identity_tag: tag }).eq('id', session?.user.id);
+			await supabase.from('person').update({ identity_tag: tag }).eq('id', session.user.id);
 			router.back();
 		} catch (error) {
 			console.error(error);

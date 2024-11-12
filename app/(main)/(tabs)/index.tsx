@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -6,8 +7,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { DepositButton } from '~/components/action-buttons/DepositButton';
 import { RequestButton } from '~/components/action-buttons/RequestButton';
 import { SendButton } from '~/components/action-buttons/SendButton';
-import { TabBarIcon } from '~/components/icons/TabBarIcon';
-import { LatestTransactions } from '~/components/latest-transactions';
+import { LatestTransactions } from '~/components/transactions/latest-transactions';
+import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Card, CardFooter, CardHeader } from '~/components/ui/card';
 import { H1 } from '~/components/ui/typography';
 import { useAccount } from '~/context/AccountContext';
@@ -17,7 +18,7 @@ import { supabase } from '~/lib/supabase';
 import { registerForPushNotificationsAsync } from '~/lib/usePushNotifications';
 
 export default function StartScreen() {
-	const { session } = useSession();
+	const { session, person } = useSession();
 	if (!session) return null;
 
 	const { balance, isLoading } = useAccount();
@@ -78,7 +79,12 @@ export default function StartScreen() {
 				<View className="flex flex-row items-center justify-between px-2 text-foreground">
 					<Text className="text-foreground"> Welcome</Text>
 					<Pressable onPress={() => router.navigate('/(profile)')} className="px-5">
-						<TabBarIcon name="person" className="text-foreground" />
+						<Avatar alt="User avatar">
+							<AvatarImage source={{ uri: person?.avatar_url || undefined }} />
+							<AvatarFallback>
+								<Ionicons name="person" size={24} className="text-foreground" />
+							</AvatarFallback>
+						</Avatar>
 					</Pressable>
 				</View>
 				<Card>

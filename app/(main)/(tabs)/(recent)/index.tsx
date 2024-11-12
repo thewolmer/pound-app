@@ -4,7 +4,7 @@ import { ActivityIndicator } from 'react-native';
 import { SectionList } from 'react-native';
 import { RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { TransactionItem } from '~/components/transaction-item';
+import { TransactionItem } from '~/components/transactions/transaction-item';
 import { useAccount } from '~/context/AccountContext';
 import { formatCurrency } from '~/lib/formatCurrency';
 import { supabase } from '~/lib/supabase';

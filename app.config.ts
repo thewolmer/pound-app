@@ -77,6 +77,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			},
 		],
 		['app-icon-badge', appIconBadgeConfig],
+		[
+			'expo-contacts',
+			{
+				contactsPermission: `Allow ${Env.NAME} to access your contacts to make payments.`,
+			},
+		],
 	],
 	extra: {
 		...ClientEnv,

@@ -1,12 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ScrollView } from 'react-native';
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { DepositButton } from '~/components/account-balance/DepositButton';
-import { RequestButton } from '~/components/account-balance/RequestButton';
-import { SendButton } from '~/components/account-balance/SendButton';
+import { DepositButton } from '~/components/action-buttons/DepositButton';
+import { RequestButton } from '~/components/action-buttons/RequestButton';
+import { SendButton } from '~/components/action-buttons/SendButton';
 import { TabBarIcon } from '~/components/icons/TabBarIcon';
 import { LatestTransactions } from '~/components/latest-transactions';
 import { Card, CardFooter, CardHeader } from '~/components/ui/card';
@@ -75,29 +74,27 @@ export default function StartScreen() {
 
 	return (
 		<SafeAreaView className="flex-1">
-			<ScrollView>
-				<View className="flex flex-1 flex-col gap-5 px-4">
-					<View className="flex flex-row items-center justify-between px-2 text-foreground">
-						<Text className="text-foreground"> Welcome</Text>
-						<Pressable onPress={() => router.navigate('/(profile)')} className="px-5">
-							<TabBarIcon name="person" className="text-foreground" />
-						</Pressable>
-					</View>
-					<Card>
-						<CardHeader className="items-center">
-							<Text className="mb-2 text-accent-foreground">Available Balance</Text>
-							<H1 className={getBalanceColor()}>{formatCurrency(Number(balance))}</H1>
-						</CardHeader>
-
-						<CardFooter className="flex justify-between">
-							<DepositButton />
-							<SendButton />
-							<RequestButton />
-						</CardFooter>
-					</Card>
-					<LatestTransactions count={5} />
+			<View className="flex flex-1 flex-col gap-5 px-4">
+				<View className="flex flex-row items-center justify-between px-2 text-foreground">
+					<Text className="text-foreground"> Welcome</Text>
+					<Pressable onPress={() => router.navigate('/(profile)')} className="px-5">
+						<TabBarIcon name="person" className="text-foreground" />
+					</Pressable>
 				</View>
-			</ScrollView>
+				<Card>
+					<CardHeader className="items-center">
+						<Text className="mb-2 text-accent-foreground">Available Balance</Text>
+						<H1 className={getBalanceColor()}>{formatCurrency(Number(balance))}</H1>
+					</CardHeader>
+
+					<CardFooter className="flex justify-between">
+						<DepositButton />
+						<SendButton />
+						<RequestButton />
+					</CardFooter>
+				</Card>
+				<LatestTransactions count={5} />
+			</View>
 		</SafeAreaView>
 	);
 }

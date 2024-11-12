@@ -1,17 +1,10 @@
-import { Redirect, Tabs, router } from 'expo-router';
-import { View } from 'react-native';
-
+import { Tabs, router } from 'expo-router';
+import React from 'react';
+import { Text, View } from 'react-native';
 import { TabBarIcon } from '~/components/icons/TabBarIcon';
 import { Button } from '~/components/ui/button';
-import { useSession } from '~/context/SessionContext';
 
-export default function TabLayout() {
-	const { session } = useSession();
-
-	if (!session) {
-		return <Redirect href="/auth" />;
-	}
-
+export default function TabsLayout() {
 	return (
 		<Tabs
 			screenOptions={{
@@ -64,13 +57,6 @@ export default function TabLayout() {
 					tabBarIcon: ({ color, focused }) => (
 						<TabBarIcon name={focused ? 'swap-horizontal-outline' : 'swap-horizontal-outline'} color={color} />
 					),
-				}}
-			/>
-
-			<Tabs.Screen
-				name="(profile)"
-				options={{
-					tabBarButton: () => null,
 				}}
 			/>
 		</Tabs>

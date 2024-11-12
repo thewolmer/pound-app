@@ -260,10 +260,9 @@ export type Database = {
 				Row: {
 					account_id: string | null;
 					avatar_url: string | null;
+					display_name: string | null;
 					email: string | null;
-					first_name: string | null;
 					identity_tag: string | null;
-					last_name: string | null;
 					person_id: string | null;
 					phone: string | null;
 				};
@@ -275,13 +274,11 @@ export type Database = {
 					created_at: string | null;
 					destination_account_id: string | null;
 					destination_avatar_url: string | null;
-					destination_first_name: string | null;
-					destination_last_name: string | null;
+					destination_display_name: string | null;
 					id: string | null;
 					origin_account_id: string | null;
 					origin_avatar_url: string | null;
-					origin_first_name: string | null;
-					origin_last_name: string | null;
+					origin_display_name: string | null;
 					type: Database['public']['Enums']['transaction_type'] | null;
 				};
 				Relationships: [

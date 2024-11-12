@@ -8,11 +8,11 @@ import {
 import React, { useCallback, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-import Animated, { SlideInRight, SlideOutLeft } from 'react-native-reanimated';
+import Animated, { SlideInDown, SlideInRight, SlideOutDown, SlideOutLeft, SlideOutUp } from 'react-native-reanimated';
 import { useAccount } from '~/context/AccountContext';
 import { supabase } from '~/lib/supabase';
 import { useHaptics } from '~/lib/useHaptics';
-import { uuid } from '~/lib/utils';
+import { cn, uuid } from '~/lib/utils';
 import { NumberPad } from '../number-pad';
 import { Button } from '../ui/button';
 import { H3 } from '../ui/typography';
@@ -83,16 +83,30 @@ export const RequestButton = () => {
 					handleClose();
 				}}
 			>
-				<BottomSheetView className="flex-1 gap-5 rounded-t-2xl bg-card p-5">
-					{!requestAmount ? (
-						<Animated.View exiting={SlideOutLeft}>
+				<BottomSheetView
+					className={cn(
+						'flex-1 gap-5 rounded-t-2xl p-5 transition-all duration-700',
+						requestAmount ? 'bg-cyan-50' : 'bg-card',
+					)}
+				>
+					{!requestAmount && (
+						<Animated.View entering={SlideInDown} exiting={SlideOutDown}>
 							<NumberPad title={'Request Amount'} onClose={handleClose} onSubmit={handleNumberPadSubmit} />
 						</Animated.View>
-					) : (
-						<Animated.View entering={SlideInRight}>
-							<H3 className="text-center">Payment Request</H3>
+					)}
+
+					{requestAmount !== null && requestAmount > 0 && (
+						<Animated.View entering={SlideInDown} exiting={SlideOutUp}>
+							<H3 className={cn('text-center', requestAmount ? 'text-neutral-800' : '')}>Payment Request</H3>
 							<View className="items-center rounded-xl p-6">
-								<Text className="mb-6 font-bold text-2xl text-accent-foreground">£{requestAmount}</Text>
+								<Text
+									className={cn(
+										'mb-6 font-bold text-2xl ',
+										requestAmount ? 'text-neutral-800' : 'text-accent-foreground',
+									)}
+								>
+									£{requestAmount}
+								</Text>
 								<QRCode
 									value={JSON.stringify({
 										type: 'payment_request',
@@ -104,13 +118,14 @@ export const RequestButton = () => {
 									size={300}
 								/>
 								<Button
-									className="mt-6"
+									className="mt-20 w-full max-w-sm"
+									variant={'default'}
 									onPress={() => {
 										requestModal.current?.close();
 										setRequestAmount(null);
 									}}
 								>
-									<Text>Close</Text>
+									<Text className="text-white">Close</Text>
 								</Button>
 							</View>
 						</Animated.View>

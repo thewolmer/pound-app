@@ -33,9 +33,9 @@ export default function SendLayout() {
 				}}
 			/>
 			<Stack.Screen
-				name="pay"
+				name="transfer"
 				options={{
-					title: 'Pay',
+					title: 'Transfer',
 					// headerLargeTitle: true,
 					headerShadowVisible: false,
 				}}

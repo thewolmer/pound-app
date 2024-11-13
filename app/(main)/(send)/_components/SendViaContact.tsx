@@ -26,7 +26,7 @@ interface ContactWithAccountDetails extends Contacts.Contact {
 	account_details?: Tables<'account_details'>;
 }
 
-export default function SendViaContact() {
+export const SendViaContact = () => {
 	const contactsModalRef = useRef<BottomSheetModal>(null);
 	const [contacts, setContacts] = useState<ContactWithAccountDetails[]>([]);
 	const [search, setSearch] = useState('');
@@ -98,7 +98,7 @@ export default function SendViaContact() {
 		<>
 			<Card className="mb-3 flex flex-row items-center justify-between px-4">
 				<View className="flex w-[85%] flex-row items-center">
-					<Ionicons name="person-circle" size={38} className="text-foreground" />
+					<Ionicons name="people" size={38} className="text-foreground" />
 					<View>
 						<CardHeader className="pb-0">
 							<H4>Send from contacts</H4>
@@ -141,7 +141,7 @@ export default function SendViaContact() {
 			</BottomSheetModal>
 		</>
 	);
-}
+};
 
 const renderContactItem = ({
 	item,
@@ -151,7 +151,7 @@ const renderContactItem = ({
 		disabled={!item.isPoundUser}
 		onPress={() => {
 			ref.current?.close();
-			router.push({ pathname: '/(send)/pay', params: { account_details: JSON.stringify(item.account_details) } });
+			router.push({ pathname: '/(send)/transfer', params: { account_details: JSON.stringify(item.account_details) } });
 		}}
 		className={cn(
 			'flex-row items-center justify-start border-border border-b p-2',

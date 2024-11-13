@@ -1,8 +1,9 @@
 import { useNavigation } from '@react-navigation/native';
 import { format, isToday, isYesterday, parseISO } from 'date-fns';
-import type React from 'react';
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { ActivityIndicator, RefreshControl, SectionList, Text, View } from 'react-native';
+import { type SetStateAction, useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { ActivityIndicator } from 'react-native';
+import { SectionList } from 'react-native';
+import { RefreshControl, Text, View } from 'react-native';
 import { TransactionItem } from '~/components/transactions/transaction-item';
 import { useAccount } from '~/context/AccountContext';
 import { formatCurrency } from '~/lib/formatCurrency';
@@ -84,7 +85,7 @@ export default function Recent() {
 		navigation.setOptions({
 			headerSearchBarOptions: {
 				placeholder: 'Search transactions',
-				onChangeText: (event: { nativeEvent: { text: React.SetStateAction<string> } }) =>
+				onChangeText: (event: { nativeEvent: { text: SetStateAction<string> } }) =>
 					setSearchQuery(event.nativeEvent.text),
 			},
 		});

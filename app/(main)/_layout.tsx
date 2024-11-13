@@ -2,7 +2,7 @@ import { Redirect, Stack } from 'expo-router';
 
 import { useSession } from '~/context/SessionContext';
 
-export default function TabLayout() {
+export default function MainLayout() {
 	const { session } = useSession();
 
 	if (!session) {

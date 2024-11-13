@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
-import React, { type ComponentProps } from 'react';
+import type { ComponentProps } from 'react';
 import { Text, View } from 'react-native';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { useAccount } from '~/context/AccountContext';

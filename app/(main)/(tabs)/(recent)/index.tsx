@@ -1,9 +1,8 @@
+import { useNavigation } from '@react-navigation/native';
 import { format, isToday, isYesterday, parseISO } from 'date-fns';
-import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator } from 'react-native';
-import { SectionList } from 'react-native';
-import { RefreshControl, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import type React from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { ActivityIndicator, RefreshControl, SectionList, Text, View } from 'react-native';
 import { TransactionItem } from '~/components/transactions/transaction-item';
 import { useAccount } from '~/context/AccountContext';
 import { formatCurrency } from '~/lib/formatCurrency';
@@ -17,12 +16,15 @@ interface TransactionSection {
 
 export default function Recent() {
 	const { accountId } = useAccount();
-	const [transactions, setTransactions] = useState<TransactionSection[]>([]);
+	const navigation = useNavigation();
+	const [allTransactions, setAllTransactions] = useState<Tables<'account_transactions'>[]>([]);
+	const [filteredTransactions, setFilteredTransactions] = useState<TransactionSection[]>([]);
 	const [refreshing, setRefreshing] = useState(false);
-	// const headerHeight = useHeaderHeight();
+	const [searchQuery, setSearchQuery] = useState('');
 
 	const fetchTransactions = async () => {
 		if (!accountId) return;
+
 		const { data, error } = await supabase
 			.from('account_transactions')
 			.select('*')
@@ -35,7 +37,8 @@ export default function Recent() {
 			return;
 		}
 
-		if (data) setTransactions(groupTransactionsByDate(data));
+		setAllTransactions(data || []);
+		setFilteredTransactions(groupTransactionsByDate(data || []));
 	};
 
 	const groupTransactionsByDate = (data: Tables<'account_transactions'>[]): TransactionSection[] => {
@@ -61,25 +64,50 @@ export default function Recent() {
 		}, []);
 	};
 
+	// Update filtered data based on search query
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
-		fetchTransactions();
-	}, [accountId]);
+		const filteredData = allTransactions.filter((transaction) => {
+			const displayNameMatches = transaction.destination_display_name
+				?.toLowerCase()
+				.includes(searchQuery.toLowerCase());
+			const amountMatches = transaction.amount?.toString().includes(searchQuery);
+
+			return displayNameMatches || amountMatches;
+		});
+
+		setFilteredTransactions(groupTransactionsByDate(filteredData));
+	}, [searchQuery, allTransactions]);
+
+	// Update search bar in header
+	useLayoutEffect(() => {
+		navigation.setOptions({
+			headerSearchBarOptions: {
+				placeholder: 'Search transactions',
+				onChangeText: (event: { nativeEvent: { text: React.SetStateAction<string> } }) =>
+					setSearchQuery(event.nativeEvent.text),
+			},
+		});
+	}, [navigation]);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	const onRefresh = useCallback(async () => {
 		setRefreshing(true);
 		await fetchTransactions();
 		setRefreshing(false);
+	}, []);
+
+	// Initial Fetch
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	useEffect(() => {
+		fetchTransactions();
 	}, [accountId]);
 
-	const renderTransaction = ({ item }: { item: Tables<'account_transactions'> }) => {
-		return (
-			<View className="px-5">
-				<TransactionItem item={item} showDate={false} />
-			</View>
-		);
-	};
+	const renderTransaction = ({ item }: { item: Tables<'account_transactions'> }) => (
+		<View className="px-5">
+			<TransactionItem item={item} onlyShowTime />
+		</View>
+	);
 
 	const renderSectionHeader = ({ section }: { section: TransactionSection }) => {
 		const totalAmount = section.data.reduce((sum, transaction) => {
@@ -95,26 +123,26 @@ export default function Recent() {
 		const formattedAmount = totalAmount !== 0 ? `${totalAmount > 0 ? '+' : ''}${formatCurrency(totalAmount)}` : '0';
 
 		return (
-			<View className="flex-row items-center justify-between px-5 py-6 backdrop-blur-xl">
+			<View className="flex-row items-center justify-between bg-card px-5 py-6">
 				<Text className="font-bold text-card-foreground text-xl">{section.title}</Text>
 				<Text className="font-bold text-muted-foreground text-xl">{formattedAmount}</Text>
 			</View>
 		);
 	};
 
-	if (!transactions) {
+	if (!filteredTransactions) {
 		return (
-			<SafeAreaView className="flex-1">
-				<View className="flex-1 items-center justify-center">
-					<ActivityIndicator size="large" />
-				</View>
-			</SafeAreaView>
+			<View className="flex flex-1 items-center justify-center">
+				<ActivityIndicator size="large" />
+			</View>
 		);
 	}
 
 	return (
 		<SectionList
-			sections={transactions}
+			contentInsetAdjustmentBehavior="automatic"
+			keyboardDismissMode="on-drag"
+			sections={filteredTransactions}
 			keyExtractor={(item) => item.id || Math.random().toString()}
 			refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
 			renderItem={renderTransaction}

@@ -1,10 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
+import { format } from 'date-fns';
 import React, { type ComponentProps } from 'react';
 import { Text, View } from 'react-native';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { useAccount } from '~/context/AccountContext';
 import { formatCurrency } from '~/lib/formatCurrency';
-import { formatTransactionDate } from '~/lib/utils';
+import { cn, formatTransactionDate } from '~/lib/utils';
 import type { Tables } from '~/types/database.types';
 
 function getInitials(name: string | null) {
@@ -19,8 +20,8 @@ function getInitials(name: string | null) {
 
 export function TransactionItem({
 	item,
-	showDate = true,
-}: { item: Tables<'account_transactions'>; showDate?: boolean }) {
+	onlyShowTime = false,
+}: { item: Tables<'account_transactions'>; onlyShowTime?: boolean }) {
 	const { accountId } = useAccount();
 
 	let accountDetails: {
@@ -58,7 +59,7 @@ export function TransactionItem({
 	}
 
 	return (
-		<View className="flex-row items-center justify-between pb-4">
+		<View className="flex-row items-center justify-between border-border border-b p-2">
 			<View className="flex-row items-center gap-4">
 				<View className="relative h-12 w-12">
 					<Avatar alt={accountDetails.displayName || ''} className="h-12 w-12 bg-muted">
@@ -73,18 +74,19 @@ export function TransactionItem({
 				</View>
 
 				<View>
-					<Text className="font-bold text-md text-muted-foreground">{accountDetails.displayName}</Text>
-					{showDate && (
-						<Text className="text-muted-foreground text-sm">
-							{formatTransactionDate(new Date(item.created_at || ''))}
-						</Text>
+					<Text className="font-bold text-foreground text-md">{accountDetails.displayName}</Text>
+					{onlyShowTime ? (
+						<Text className="text-muted-foreground text-sm">{format(new Date(item.created_at || ''), 'h:mm a')}</Text>
+					) : (
+						<Text className="text-muted-foreground text-sm">{formatTransactionDate(item.created_at || '')}</Text>
 					)}
 				</View>
 			</View>
 			<Text
-				className={
-					item.destination_account_id === accountId ? 'text-success-foreground' : 'text-destructive-foreground'
-				}
+				className={cn(
+					item.destination_account_id === accountId ? 'text-success-foreground' : 'text-destructive-foreground',
+					'font-semibold',
+				)}
 			>
 				{item.destination_account_id === accountId ? '+' : '-'}
 				{formatCurrency(item.amount || 0)}

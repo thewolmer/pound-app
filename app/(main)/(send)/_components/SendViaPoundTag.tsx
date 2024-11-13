@@ -14,6 +14,7 @@ import type React from 'react';
 import { useCallback, useRef, useState } from 'react';
 import { ActivityIndicator, Platform, Pressable } from 'react-native';
 import { Image, Text, View } from 'react-native';
+import { TextInput } from 'react-native-gesture-handler';
 import { Button } from '~/components/ui/button';
 import { Card, CardFooter, CardHeader } from '~/components/ui/card';
 import { H3, H4 } from '~/components/ui/typography';
@@ -91,15 +92,28 @@ export const SendViaPoundTag = () => {
 			>
 				<BottomSheetView className="flex-1 gap-5 rounded-t-2xl bg-card p-5 py-10">
 					<H3>Send Via Pound tag</H3>
-					<BottomSheetTextInput
-						placeholder="@poundtag"
-						value={poundTag}
-						onChangeText={setPoundTag}
-						autoCapitalize="none"
-						returnKeyType="next"
-						onSubmitEditing={handleVerifyTag}
-						className="rounded-xl border border-border bg-muted p-2 text-foreground"
-					/>
+
+					{Platform.OS === 'ios' ? (
+						<BottomSheetTextInput
+							placeholder="poundtag"
+							value={poundTag}
+							onChangeText={setPoundTag}
+							autoCapitalize="none"
+							returnKeyType="next"
+							onSubmitEditing={handleVerifyTag}
+							className="rounded-xl border border-border bg-muted p-2 text-foreground"
+						/>
+					) : (
+						<TextInput
+							placeholder="poundtag"
+							value={poundTag}
+							onChangeText={setPoundTag}
+							autoCapitalize="none"
+							returnKeyType="next"
+							onSubmitEditing={handleVerifyTag}
+							className="rounded-xl border border-border bg-muted p-2 text-foreground"
+						/>
+					)}
 					<Button disabled={poundTag.length < 3} onPress={handleVerifyTag} className="mt-5">
 						<Text className="text-white">Next</Text>
 					</Button>

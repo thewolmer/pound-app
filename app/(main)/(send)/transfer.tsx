@@ -12,9 +12,11 @@ import { ActivityIndicator, Image, SafeAreaView, ScrollView, View } from 'react-
 import { Text } from 'react-native';
 import Animated, { BounceIn, FadeInDown, FadeOut } from 'react-native-reanimated';
 import { NumberPad } from '~/components/number-pad';
+import { Button } from '~/components/ui/button';
 import { useAccount } from '~/context/AccountContext';
 import { formatCurrency } from '~/lib/formatCurrency';
 import { supabase } from '~/lib/supabase';
+import { useHaptics } from '~/lib/useHaptics';
 import { cn, uuid } from '~/lib/utils';
 import type { Tables } from '~/types/database.types';
 
@@ -26,6 +28,7 @@ export default function TransferScreen() {
 	const successModal = useRef<BottomSheetModal>(null);
 	const [success, setSuccess] = useState<boolean | null>(null);
 	const [amount, setAmount] = useState<number | null>(null);
+	const { triggerHaptics } = useHaptics();
 
 	const { accountId } = useAccount();
 
@@ -40,12 +43,14 @@ export default function TransferScreen() {
 		});
 		if (error) {
 			console.error(error);
+			triggerHaptics('notification-error');
 			return alert('Something went wrong');
 		}
 		successModal.current?.present();
 		setTimeout(() => {
 			setAmount(amount);
 			setSuccess(true);
+			triggerHaptics('notification-success');
 		}, 1000);
 	};
 
@@ -93,7 +98,7 @@ export default function TransferScreen() {
 				handleIndicatorStyle={{ backgroundColor: '#fff' }}
 				backgroundStyle={{ backgroundColor: 'transparent' }}
 				onDismiss={() => {
-					router.push('/(main)/(tabs)/');
+					router.dismissAll();
 				}}
 			>
 				<BottomSheetView
@@ -109,10 +114,20 @@ export default function TransferScreen() {
 						</Animated.View>
 					)}
 					{success === true && amount && (
-						<Animated.View entering={FadeInDown} exiting={FadeOut}>
+						<Animated.View entering={FadeInDown} exiting={FadeOut} className={'flex gap-20'}>
 							<Text className="font-semibold text-success-foreground">
 								You sent {formatCurrency(amount)} to {user?.display_name}
 							</Text>
+							<Button
+								variant={'secondary'}
+								haptics={'impact-light'}
+								onPress={() => {
+									successModal.current?.dismiss();
+									router.dismissAll();
+								}}
+							>
+								<Text className="text-secondary-foreground">Done</Text>
+							</Button>
 						</Animated.View>
 					)}
 				</BottomSheetView>

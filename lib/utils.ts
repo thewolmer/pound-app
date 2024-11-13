@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from 'clsx';
+import { format, isDate, isToday, isYesterday } from 'date-fns';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
@@ -13,33 +14,16 @@ export function uuid() {
 	});
 }
 
-export function formatTransactionDate(date: Date): string {
-	const now = new Date();
-	const transactionDate = new Date(date);
-
-	if (transactionDate.toDateString() === now.toDateString()) {
-		return `Today, ${transactionDate.toLocaleTimeString('en-US', {
-			hour: '2-digit',
-			minute: '2-digit',
-			hour12: false,
-		})}`;
+export function formatTransactionDate(date: Date | string): string {
+	let d: Date;
+	if (typeof date === 'string') {
+		d = new Date(date);
+	} else {
+		d = date;
 	}
-
-	const yesterday = new Date(now);
-	yesterday.setDate(yesterday.getDate() - 1);
-	if (transactionDate.toDateString() === yesterday.toDateString()) {
-		return `Yesterday, ${transactionDate.toLocaleTimeString('en-US', {
-			hour: '2-digit',
-			minute: '2-digit',
-			hour12: false,
-		})}`;
-	}
-
-	return transactionDate.toLocaleDateString('en-US', {
-		day: 'numeric',
-		month: 'short',
-		hour: '2-digit',
-		minute: '2-digit',
-		hour12: false,
-	});
+	if (!isDate(d)) return 'invalid date';
+	const time = format(d, 'h:mm a');
+	if (isToday(d)) return `Today, ${time}`;
+	if (isYesterday(d)) return `Yesterday, ${time}`;
+	return format(d, 'MMM d, yyyy h:mm a');
 }

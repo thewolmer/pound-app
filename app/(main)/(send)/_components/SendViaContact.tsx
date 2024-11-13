@@ -12,8 +12,9 @@ import * as Contacts from 'expo-contacts';
 import { router } from 'expo-router';
 import type React from 'react';
 import { useCallback, useRef, useState } from 'react';
-import { ActivityIndicator, Pressable } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, TextInput } from 'react-native';
 import { Image, Text, View } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 import { Button } from '~/components/ui/button';
 import { Card, CardFooter, CardHeader } from '~/components/ui/card';
 import { H3, H4 } from '~/components/ui/typography';
@@ -113,10 +114,10 @@ export const SendViaContact = () => {
 				</Button>
 			</Card>
 			<BottomSheetModal
+				// enableContentPanningGesture={false}
 				backdropComponent={renderBackDrop}
 				ref={contactsModalRef}
-				snapPoints={['50%', '80%']}
-				enableDynamicSizing
+				snapPoints={['85%']}
 				enableDismissOnClose
 				handleIndicatorStyle={{ backgroundColor: '#fff' }}
 				backgroundStyle={{ backgroundColor: 'transparent' }}
@@ -124,15 +125,37 @@ export const SendViaContact = () => {
 					setSearch('');
 				}}
 			>
-				<BottomSheetView className="flex-1 gap-5 rounded-t-2xl bg-card p-5">
-					<H3>Select a contact</H3>
-					<BottomSheetTextInput
-						placeholder="Search by name"
-						value={search}
-						onChangeText={setSearch}
-						className="rounded-xl border border-border bg-muted p-2 text-foreground "
-					/>
-					<BottomSheetFlatList
+				<BottomSheetView className="h-full flex-1 gap-5 rounded-t-2xl bg-card p-5">
+					<View className="flex flex-row items-center justify-between">
+						<H3>Select a contact</H3>
+						<Button variant={'link'} onPress={() => contactsModalRef.current?.close()}>
+							<Ionicons name="close" size={24} className="text-foreground" />
+						</Button>
+					</View>
+
+					{Platform.OS === 'ios' ? (
+						<BottomSheetTextInput
+							placeholder="Search by name"
+							value={search}
+							onChangeText={setSearch}
+							className="rounded-xl border border-border bg-muted p-2 text-foreground "
+						/>
+					) : (
+						<TextInput
+							placeholder="Search by name"
+							value={search}
+							onChangeText={setSearch}
+							style={{
+								borderRadius: 8,
+								borderWidth: 1,
+								borderColor: '#ccc',
+								backgroundColor: '#f7f7f7',
+								padding: 8,
+								color: '#333',
+							}}
+						/>
+					)}
+					<FlatList
 						data={filteredContacts}
 						keyExtractor={(item) => item.id || ''}
 						renderItem={(props) => renderContactItem({ ...props, ref: contactsModalRef })}

@@ -1,10 +1,13 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { type Session, type User, type WeakPassword, isAuthApiError } from '@supabase/supabase-js';
 import type React from 'react';
 import { createContext, useContext, useEffect, useState } from 'react';
+import type { Tables } from '~/types/database.types';
 import { supabase } from '../lib/supabase';
 
 interface SessionContextProps {
 	session: Session | null;
+	person: Tables<'person'> | null;
 	signIn: (email: string, password: string) => Promise<{ user: User; session: Session; weakPassword?: WeakPassword }>;
 	signUp: (email: string, password: string) => Promise<{ user: User | null; session: Session | null }>;
 	signOut: () => Promise<void>;
@@ -23,6 +26,7 @@ export const useSession = () => {
 
 export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const [session, setSession] = useState<Session | null>(null);
+	const [person, setPerson] = useState<Tables<'person'> | null>(null);
 
 	useEffect(() => {
 		supabase.auth.getSession().then(({ data: { session } }) => {
@@ -30,10 +34,35 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 		});
 
 		supabase.auth.onAuthStateChange((_event, session) => {
-			console.log('auth state changed', _event);
 			setSession(session);
 		});
 	}, []);
+
+	useEffect(() => {
+		if (!session?.user.id) return;
+
+		const getPerson = async () => {
+			const { data: personData, error: personError } = await supabase
+				.from('person')
+				.select('*')
+				.eq('id', session?.user.id)
+				.single();
+			if (personError) {
+				console.error(personError);
+			}
+			setPerson(personData);
+		};
+
+		getPerson();
+	}, [session]);
+
+	const clearData = async () => {
+		const pushToken = await AsyncStorage.getItem('pushToken');
+		if (pushToken) {
+			await supabase.from('expo_push_token').delete().eq('expo_push_token', pushToken);
+			await AsyncStorage.removeItem('pushToken');
+		}
+	};
 
 	const signIn = async (email: string, password: string) => {
 		const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -53,7 +82,8 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
 	const signOut = async () => {
 		if (session) {
-			const { error } = await supabase.auth.signOut();
+			await clearData();
+			const { error } = await supabase.auth.signOut({ scope: 'local' });
 			if (error) {
 				throw error;
 			}
@@ -88,7 +118,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 	// };
 
 	return (
-		<SessionContext.Provider value={{ session, setSession, signIn, signUp, signOut }}>
+		<SessionContext.Provider value={{ session, person, setSession, signIn, signUp, signOut }}>
 			{children}
 		</SessionContext.Provider>
 	);

@@ -1,7 +1,6 @@
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Pressable, View } from 'react-native';
-import { MoonStarIcon } from '~/components/icons/MoonStarIcon';
-import { SunIcon } from '~/components/icons/SunIcon';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { cn } from '~/lib/utils';
@@ -10,11 +9,11 @@ export function ThemeToggle() {
 	const { isDarkColorScheme, setColorScheme } = useColorScheme();
 	return (
 		<Pressable
-			onPress={() => {
+			onPress={async () => {
 				const newTheme = isDarkColorScheme ? 'light' : 'dark';
 				setColorScheme(newTheme);
 				setAndroidNavigationBar(newTheme);
-				AsyncStorage.setItem('theme', newTheme);
+				await AsyncStorage.setItem('theme', newTheme);
 			}}
 			className="web:ring-offset-background web:transition-colors web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2"
 		>
@@ -23,9 +22,9 @@ export function ThemeToggle() {
 					className={cn('aspect-square flex-1 items-start justify-center web:px-5 pt-0.5', pressed && 'opacity-70')}
 				>
 					{isDarkColorScheme ? (
-						<MoonStarIcon className="text-foreground" size={23} strokeWidth={1.25} />
+						<Ionicons name="sunny-outline" className="text-foreground" size={24} strokeWidth={1.25} />
 					) : (
-						<SunIcon className="text-foreground" size={24} strokeWidth={1.25} />
+						<Ionicons name="moon-outline" className="text-foreground" size={23} strokeWidth={1.25} />
 					)}
 				</View>
 			)}

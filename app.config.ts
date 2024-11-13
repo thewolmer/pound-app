@@ -1,7 +1,22 @@
 import type { ConfigContext, ExpoConfig } from '@expo/config';
 
+import type { AppIconBadgeConfig } from 'app-icon-badge/types';
 import { ClientEnv, Env } from './env';
 
+const appIconBadgeConfig: AppIconBadgeConfig = {
+	enabled: Env.APP_ENV === 'staging', // enable/ disable the plugin based on the environment (usually disabled for production builds)
+	badges: [
+		{
+			text: Env.APP_ENV,
+			type: 'banner',
+			color: 'white', // by default it will be white and the only color supported for now is white and black
+		},
+		{
+			text: Env.VERSION.toString(),
+			type: 'ribbon',
+		},
+	],
+};
 export default ({ config }: ConfigContext): ExpoConfig => ({
 	...config,
 	name: Env.NAME,
@@ -25,6 +40,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	assetBundlePatterns: ['**/*'],
 	ios: {
 		supportsTablet: true,
+		icon: './assets/images/icon.png',
+		backgroundColor: '#ffffff',
 		bundleIdentifier: Env.BUNDLE_ID,
 	},
 	android: {
@@ -33,6 +50,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			backgroundColor: '#ffffff',
 		},
 		package: Env.PACKAGE,
+		googleServicesFile: './google-services.json',
 	},
 	web: {
 		favicon: './assets/images/favicon.png',
@@ -45,9 +63,24 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	plugins: [
 		'expo-router',
 		[
-			'react-native-nfc-manager',
+			'expo-camera',
 			{
-				includeNdefEntitlement: false,
+				cameraPermission: `Allow ${Env.NAME} to access your camera to scan QR codes.`,
+			},
+		],
+		[
+			'expo-notifications',
+			{
+				icon: './assets/images/notifications-icon.png',
+				color: '#764aff',
+				defaultChannel: 'default',
+			},
+		],
+		['app-icon-badge', appIconBadgeConfig],
+		[
+			'expo-contacts',
+			{
+				contactsPermission: `Allow ${Env.NAME} to access your contacts to make payments.`,
 			},
 		],
 	],

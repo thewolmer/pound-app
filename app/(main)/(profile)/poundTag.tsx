@@ -117,12 +117,12 @@ export default function UpdateTag() {
 					{/* TODO: Add a loading indicator */}
 					{debouncedTag && !error && debouncedTag !== initialTag ? (
 						!isAvailable && !error ? (
-							<Text className="mt-2 text-destructive">Tag is already taken</Text>
+							<Text className="mt-2 text-destructive-foreground">Tag is already taken</Text>
 						) : (
-							<Text className="mt-2 text-green-500">Tag is available</Text>
+							<Text className="mt-2 text-success-foreground">Tag is available</Text>
 						)
 					) : null}
-					{error && <Text className="mt-2 text-destructive">{error}</Text>}
+					{error && <Text className="mt-2 text-destructive-foreground">{error}</Text>}
 				</View>
 				<Button onPress={handleSubmit} disabled={loading || !!error || !isAvailable || initialTag === tag}>
 					{initialTag ? (

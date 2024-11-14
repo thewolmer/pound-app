@@ -1,22 +1,18 @@
-import { Ionicons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, ScrollView, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Button } from '~/components/ui/button';
-import { Card, CardFooter, CardHeader } from '~/components/ui/card';
+import { ForwardCard } from '~/components/ui/ForwardCard';
 
-import { Text } from '~/components/ui/text';
-import { H4 } from '~/components/ui/typography';
 import { useSession } from '~/context/SessionContext';
 import { supabase } from '~/lib/supabase';
+import type { Tables } from '~/types/database.types';
 
 export default function Profile() {
 	const { session } = useSession();
 	if (!session) return null;
 
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	const [user, setUser] = useState<any | null>(null);
+	const [user, setUser] = useState<Tables<'person'> | null>(null);
 
 	useFocusEffect(
 		useCallback(() => {
@@ -48,43 +44,29 @@ export default function Profile() {
 	return (
 		<SafeAreaView className="w-full flex-1">
 			<ScrollView contentInsetAdjustmentBehavior="automatic" className="flex w-full flex-1 p-6">
-				<Card className="mb-3 flex flex-row items-center justify-between px-4">
-					<View className="flex flex-row items-center">
-						<Ionicons name="person-circle" size={38} className="text-foreground" />
-						<View>
-							<CardHeader className="pb-0">
-								<H4 className="">Your name</H4>
-							</CardHeader>
-							<CardFooter>
-								<Text>{session?.user?.email}</Text>
-							</CardFooter>
-						</View>
-					</View>
-					<Button variant={'link'} onPress={() => router.push('/(profile)/user')}>
-						<Ionicons name="chevron-forward-outline" size={24} className="text-foreground" />
-					</Button>
-				</Card>
+				<ForwardCard
+					title={user.first_name || 'You'}
+					description={user.email}
+					ionicons={user.avatar_url ? undefined : 'person-circle'}
+					IconLeft={
+						user.avatar_url && (
+							<Image
+								source={{ uri: user.avatar_url?.toString() }}
+								style={{ width: 38, height: 38, borderRadius: 19 }}
+								resizeMode="cover"
+							/>
+						)
+					}
+					onPress={() => router.push('/(profile)/user')}
+				/>
 				{/*  */}
-				<Card className="mb-3 flex flex-row items-center justify-between px-4">
-					<View className="flex flex-row items-center">
-						<Ionicons name="id-card" size={38} className="text-foreground" />
-						<View>
-							<CardHeader className="pb-0">
-								<H4 className="">Pound tag</H4>
-							</CardHeader>
-							<CardFooter>
-								{user.identity_tag !== null ? (
-									<Text>{user.identity_tag}</Text>
-								) : (
-									<Text className="text-green-500">Setup your Pound Tag</Text>
-								)}
-							</CardFooter>
-						</View>
-					</View>
-					<Button variant={'link'} onPress={() => router.push('/(profile)/poundTag')}>
-						<Ionicons name="chevron-forward-outline" size={24} className="text-foreground" />
-					</Button>
-				</Card>
+				<ForwardCard
+					title="Pound Tag"
+					description={user.identity_tag !== null ? (user.identity_tag as string) : 'Setup your Pound Tag'}
+					descriptionClassName={user.identity_tag !== null ? 'text-muted-foreground' : 'text-'}
+					ionicons="id-card"
+					onPress={() => router.push('/(profile)/poundTag')}
+				/>
 			</ScrollView>
 		</SafeAreaView>
 	);

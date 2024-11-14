@@ -137,16 +137,18 @@ export default function Register() {
 	return (
 		<SafeAreaView className="flex-1 items-center bg-background p-10">
 			<View className="w-full max-w-sm gap-8">
-				<View className="w-52 gap-2">
-					<PoundIcon />
+				<View className="gap-2">
+					<View className="w-52">
+						<PoundIcon />
+					</View>
 					<View className="flex flex-row gap-2 text-lg">
 						{step > 1 && form.email ? (
-							<>
-								<Text>{form.email}</Text>
+							<View className="flex flex-row gap-2">
+								<Text className="max-w-[90%] truncate text-muted-foreground">{form.email}</Text>
 								<Pressable onPress={() => setStep(1)}>
-									<Text className="font-semibold text-primary">Change?</Text>
+									<Text className="font-semibold text-accent-foreground">Change?</Text>
 								</Pressable>
-							</>
+							</View>
 						) : (
 							<Text>Create a New Account </Text>
 						)}

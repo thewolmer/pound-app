@@ -144,7 +144,7 @@ export default function Register() {
 					<View className="flex flex-row gap-2 text-lg">
 						{step > 1 && form.email ? (
 							<View className="flex flex-row gap-2">
-								<Text className="max-w-[90%] text-muted-foreground">{form.email}</Text>
+								<Text className="max-w-[90%] truncate text-muted-foreground">{form.email}</Text>
 								<Pressable onPress={() => setStep(1)}>
 									<Text className="font-semibold text-accent-foreground">Change?</Text>
 								</Pressable>

@@ -15,6 +15,7 @@ import { useCallback, useRef, useState } from 'react';
 import { ActivityIndicator, Platform, Pressable } from 'react-native';
 import { Image, Text, View } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
+import { ForwardCard } from '~/components/ui/ForwardCard';
 import { Button } from '~/components/ui/button';
 import { Card, CardFooter, CardHeader } from '~/components/ui/card';
 import { H3, H4 } from '~/components/ui/typography';
@@ -60,24 +61,12 @@ export const SendViaPoundTag = () => {
 
 	return (
 		<>
-			<Card className="mb-3 flex flex-row items-center justify-between px-4">
-				<View className="flex w-[85%] flex-row items-center">
-					<Ionicons name="id-card" size={38} className="text-foreground" />
-					<View>
-						<CardHeader className="pb-0">
-							<H4>Send via Pound Tag</H4>
-						</CardHeader>
-						<CardFooter>
-							<Text className="truncate text-muted-foreground text-sm">
-								Send money to someone using their pound tag.
-							</Text>
-						</CardFooter>
-					</View>
-				</View>
-				<Button variant="link" onPress={openPoundTagModal}>
-					<Ionicons name="chevron-forward-outline" size={24} className="text-foreground" />
-				</Button>
-			</Card>
+			<ForwardCard
+				ionicons="id-card"
+				title="Send via Pound Tag"
+				description="Send money to someone using their pound tag."
+				onPress={openPoundTagModal}
+			/>
 			<BottomSheetModal
 				backdropComponent={renderBackDrop}
 				ref={poundTagModalRef}

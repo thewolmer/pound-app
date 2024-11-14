@@ -6,9 +6,9 @@ import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DepositButton } from '~/components/action-buttons/DepositButton';
 import { RequestButton } from '~/components/action-buttons/RequestButton';
-import { SendButton } from '~/components/action-buttons/SendButton';
 import { LatestTransactions } from '~/components/transactions/latest-transactions';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
+import { Button } from '~/components/ui/button';
 import { Card, CardFooter, CardHeader } from '~/components/ui/card';
 import { H1 } from '~/components/ui/typography';
 import { useAccount } from '~/context/AccountContext';
@@ -95,7 +95,15 @@ export default function StartScreen() {
 
 					<CardFooter className="flex justify-between">
 						<DepositButton />
-						<SendButton />
+						<Button
+							onPress={() => router.push('/(main)/(send)')}
+							haptics="impact-light"
+							variant={'outline'}
+							size={'lg'}
+						>
+							<Ionicons name="arrow-up-circle-outline" className="text-foreground" size={24} />
+							<Text className="text-foreground text-xs">Send</Text>
+						</Button>
 						<RequestButton />
 					</CardFooter>
 				</Card>

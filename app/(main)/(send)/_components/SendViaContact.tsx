@@ -15,6 +15,7 @@ import { useCallback, useRef, useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, TextInput } from 'react-native';
 import { Image, Text, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
+import { ForwardCard } from '~/components/ui/ForwardCard';
 import { Button } from '~/components/ui/button';
 import { Card, CardFooter, CardHeader } from '~/components/ui/card';
 import { H3, H4 } from '~/components/ui/typography';
@@ -97,22 +98,12 @@ export const SendViaContact = () => {
 	const filteredContacts = contacts.filter((contact) => contact.name?.toLowerCase().includes(search.toLowerCase()));
 	return (
 		<>
-			<Card className="mb-3 flex flex-row items-center justify-between px-4">
-				<View className="flex w-[85%] flex-row items-center">
-					<Ionicons name="people" size={38} className="text-foreground" />
-					<View>
-						<CardHeader className="pb-0">
-							<H4>Send from contacts</H4>
-						</CardHeader>
-						<CardFooter>
-							<Text className="truncate text-muted-foreground text-sm">Send money to someone in your contacts.</Text>
-						</CardFooter>
-					</View>
-				</View>
-				<Button variant="link" onPress={openContactsModal}>
-					<Ionicons name="chevron-forward-outline" size={24} className="text-foreground" />
-				</Button>
-			</Card>
+			<ForwardCard
+				ionicons="people"
+				title="Send from contacts"
+				description="Send money to someone in your contacts"
+				onPress={openContactsModal}
+			/>
 			<BottomSheetModal
 				// enableContentPanningGesture={false}
 				backdropComponent={renderBackDrop}

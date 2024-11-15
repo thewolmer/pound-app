@@ -335,7 +335,7 @@ export type Database = {
 					reference: string;
 					message: string;
 				};
-				Returns: undefined;
+				Returns: string;
 			};
 		};
 		Enums: {

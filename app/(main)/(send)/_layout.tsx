@@ -7,7 +7,7 @@ export default function SendLayout() {
 	const { session } = useSession();
 
 	if (!session) {
-		return <Redirect href="/auth" />;
+		return <Redirect href="/auth/welcome" />;
 	}
 
 	return (
@@ -33,9 +33,17 @@ export default function SendLayout() {
 				}}
 			/>
 			<Stack.Screen
-				name="transfer"
+				name="amount"
 				options={{
-					title: 'Transfer',
+					title: 'Enter Amount',
+					// headerLargeTitle: true,
+					headerShadowVisible: false,
+				}}
+			/>
+			<Stack.Screen
+				name="confirm"
+				options={{
+					title: 'Confirm Payment',
 					// headerLargeTitle: true,
 					headerShadowVisible: false,
 				}}

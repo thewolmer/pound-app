@@ -52,7 +52,7 @@ export const SendViaPoundTag = () => {
 			return;
 		}
 		poundTagModalRef.current?.close();
-		router.push({ pathname: '/(send)/transfer', params: { account_details: JSON.stringify(data) } });
+		router.push({ pathname: '/(main)/(send)/transfer', params: { account_details: JSON.stringify(data) } });
 	};
 
 	const openPoundTagModal = async () => {

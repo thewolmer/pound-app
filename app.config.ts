@@ -28,6 +28,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	orientation: 'portrait',
 	icon: './assets/images/icon.png',
 	userInterfaceStyle: 'automatic',
+	newArchEnabled: true,
 	splash: {
 		image: './assets/images/splash.png',
 		resizeMode: 'contain',
@@ -67,6 +68,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			{
 				cameraPermission: `Allow ${Env.NAME} to access your camera to scan QR codes.`,
 			},
+		],
+		[
+			"expo-font"
 		],
 		[
 			'expo-notifications',

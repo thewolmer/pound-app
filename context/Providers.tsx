@@ -26,10 +26,22 @@ cssInterop(SafeAreaView, { className: 'style' });
 const LIGHT_THEME: Theme = {
 	dark: false,
 	colors: NAV_THEME.light,
+	fonts: {
+		regular: { fontFamily: 'Poppins_400Regular', fontWeight: 'normal'	 },
+		medium: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600' },
+		bold: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600' },
+		heavy: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600' },
+	},
 };
 const DARK_THEME: Theme = {
 	dark: true,
 	colors: NAV_THEME.dark,
+	fonts: {
+		regular: { fontFamily: 'Poppins_400Regular', fontWeight: 'normal' },
+		medium: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600' },
+		bold: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600' },
+		heavy: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600' },
+	},
 };
 
 export const ProvidersWrapper = ({ children }: { children: React.ReactNode }) => {

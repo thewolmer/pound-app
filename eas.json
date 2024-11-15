@@ -11,7 +11,8 @@
 				"image": "latest"
 			},
 			"ios": {
-				"image": "latest"
+				"image": "latest",
+				"enterpriseProvisioning": "universal"
 			},
 			"env": {
 				"APP_ENV": "staging",
@@ -22,6 +23,9 @@
 		"development": {
 			"developmentClient": true,
 			"distribution": "internal",
+			"ios": {
+				"enterpriseProvisioning": "universal"
+			},
 			"env": {
 				"APP_ENV": "development",
 				"APP_NAME": "Pound Dev",

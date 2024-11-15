@@ -1,0 +1,106 @@
+import { Ionicons } from '@expo/vector-icons';
+import { BottomSheetBackdrop, type BottomSheetModal } from '@gorhom/bottom-sheet';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useCallback, useRef, useState } from 'react';
+import { ActivityIndicator, Image, SafeAreaView, ScrollView, Text, View } from 'react-native';
+import { Gesture, GestureDetector, PanGestureHandler } from 'react-native-gesture-handler';
+import Animated, {
+	BounceIn,
+	BounceOut,
+	FadeIn,
+	FadeInUp,
+	FadeOut,
+	interpolate,
+	runOnJS,
+	SlideInDown,
+	useAnimatedStyle,
+	useSharedValue,
+	withSpring,
+} from 'react-native-reanimated';
+import { NumberPad } from '~/components/number-pad';
+import { Button } from '~/components/ui/button';
+import { useAccount } from '~/context/AccountContext';
+import { formatCurrency } from '~/lib/formatCurrency';
+import { supabase } from '~/lib/supabase';
+import { useHaptics } from '~/lib/useHaptics';
+import { uuid } from '~/lib/utils';
+import type { Tables } from '~/types/database.types';
+
+export default function TransferScreen() {
+	const { account_details, amount } = useLocalSearchParams<{ account_details?: string; amount?: string }>();
+	if (!account_details || !amount) return null;
+	const user = account_details ? (JSON.parse(account_details) as Tables<'account_details'>) : undefined;
+	const amountToSend = amount ? Number.parseFloat(amount) : 0;
+
+	const logoFromFile = require('~/assets/images/pound-icon.png');
+
+	const { accountId } = useAccount();
+	const { triggerHaptics } = useHaptics();
+	const [success, setSuccess] = useState<boolean | null>(null);
+
+	const handleSendSubmit = async () => {
+		if (!accountId || !user?.account_id || !amount) return;
+
+		const { error } = await supabase.rpc('make_transfer', {
+			amount: amountToSend,
+			origin_account_id: accountId,
+			destination_account_id: user.account_id,
+			reference: uuid(),
+		});
+		if (error) {
+			console.error(error);
+			triggerHaptics('notification-error');
+			return alert('Something went wrong');
+		}
+		setSuccess(true);
+		triggerHaptics('notification-success');
+	};
+
+	return (
+		<SafeAreaView style={{ flex: 1 }}>
+			<View className="relative h-full w-full flex-1 flex-col items-center justify-center gap-4">
+				{success === null && (
+					<Animated.View entering={FadeInUp} exiting={FadeOut} className="flex flex-col items-center gap-2">
+						{user?.avatar_url ? (
+							<View>
+								<Image source={{ uri: user.avatar_url }} className="h-28 w-28 rounded-full shadow" />
+								<View className="absolute right-0 bottom-0 rounded-full bg-white p-2 shadow">
+									<Image source={logoFromFile} style={{ width: 15, height: 15 }} />
+								</View>
+							</View>
+						) : (
+							<View className="flex h-28 w-28 items-center justify-center rounded-full bg-accent">
+								<Text className="text-center text-2xl text-foreground">{user?.display_name?.[0]}</Text>
+							</View>
+						)}
+					</Animated.View>
+				)}
+				{success === true && (
+					<Animated.View entering={BounceIn} className="items-center justify-center">
+						<Ionicons name="checkmark-circle" size={112} className="text-success-foreground" />
+					</Animated.View>
+				)}
+				<View className="flex flex-row items-center gap-2 rounded-xl px-2 py-1.5">
+					{success === null && (
+						<Animated.Text entering={FadeIn} exiting={FadeOut} className="font-semibold text-info-foreground">
+							Send {formatCurrency(amountToSend)} to {user?.display_name}
+						</Animated.Text>
+					)}
+					{success === true && (
+						<Animated.Text entering={SlideInDown} className="font-semibold text-success-foreground">
+							Sent {formatCurrency(amountToSend)} to {user?.display_name}
+						</Animated.Text>
+					)}
+				</View>
+
+				{success === null && (
+					<Animated.View entering={FadeIn} exiting={FadeOut}>
+						<Button size={'lg'} onPressOut={handleSendSubmit} disabled={success}>
+							<Text className="text-lg text-primary-foreground">Confirm</Text>
+						</Button>
+					</Animated.View>
+				)}
+			</View>
+		</SafeAreaView>
+	);
+}

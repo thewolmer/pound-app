@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import {
 	BottomSheetBackdrop,
 	type BottomSheetBackdropProps,
-	BottomSheetModal,
+	type BottomSheetModal,
 	BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -27,31 +27,15 @@ export default function TransferScreen() {
 	const logoFromFile = require('~/assets/images/pound-icon.png');
 	const successModal = useRef<BottomSheetModal>(null);
 	const [success, setSuccess] = useState<boolean | null>(null);
-	const [amount, setAmount] = useState<number | null>(null);
 	const { triggerHaptics } = useHaptics();
 
 	const { accountId } = useAccount();
 
 	const handleSendSubmit = async (amount: number) => {
-		if (!accountId || !user?.account_id) return;
-
-		const { error } = await supabase.rpc('make_transfer', {
-			amount,
-			origin_account_id: accountId,
-			destination_account_id: user.account_id,
-			reference: uuid(),
+		router.push({
+			pathname: '/(main)/(send)/confirm',
+			params: { account_details: JSON.stringify(user), amount: amount },
 		});
-		if (error) {
-			console.error(error);
-			triggerHaptics('notification-error');
-			return alert('Something went wrong');
-		}
-		successModal.current?.present();
-		setTimeout(() => {
-			setAmount(amount);
-			setSuccess(true);
-			triggerHaptics('notification-success');
-		}, 1000);
 	};
 
 	const renderBackDrop = useCallback(
@@ -89,49 +73,6 @@ export default function TransferScreen() {
 					</View>
 				</View>
 			</SafeAreaView>
-
-			<BottomSheetModal
-				backdropComponent={renderBackDrop}
-				ref={successModal}
-				snapPoints={['80%']}
-				enableDismissOnClose
-				handleIndicatorStyle={{ backgroundColor: '#fff' }}
-				backgroundStyle={{ backgroundColor: 'transparent' }}
-				onDismiss={() => {
-					router.dismissAll();
-				}}
-			>
-				<BottomSheetView
-					className={cn(
-						'flex h-full flex-1 flex-col items-center justify-center gap-5 rounded-t-2xl p-5 transition-all duration-700',
-						success ? 'bg-success' : 'bg-card',
-					)}
-				>
-					{success === null && <ActivityIndicator size="large" />}
-					{success === true && (
-						<Animated.View entering={BounceIn} className="items-center justify-center">
-							<Ionicons name="checkmark-circle" size={100} className="text-success-foreground" />
-						</Animated.View>
-					)}
-					{success === true && amount && (
-						<Animated.View entering={FadeInDown} exiting={FadeOut} className={'flex gap-20'}>
-							<Text className="font-semibold text-success-foreground">
-								You sent {formatCurrency(amount)} to {user?.display_name}
-							</Text>
-							<Button
-								variant={'secondary'}
-								haptics={'impact-light'}
-								onPress={() => {
-									successModal.current?.dismiss();
-									router.dismissAll();
-								}}
-							>
-								<Text className="text-secondary-foreground">Done</Text>
-							</Button>
-						</Animated.View>
-					)}
-				</BottomSheetView>
-			</BottomSheetModal>
 		</ScrollView>
 	);
 }

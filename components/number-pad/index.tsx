@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { Button } from '~/components/ui/button';
 import { Text } from '~/components/ui/text';
 import { useHaptics } from '~/lib/useHaptics';
@@ -62,7 +63,7 @@ export function NumberPad({ title, onClose, onSubmit }: NumberPadProps) {
 					<Text>Cancel</Text>
 				</Button>
 				<Button className="flex-1" variant={'secondary'} onPress={handleSubmit}>
-					<Text>OK</Text>
+					<Text className="text-secondary-foreground">OK</Text>
 				</Button>
 			</View>
 		</View>

@@ -40,6 +40,14 @@ export default function SendLayout() {
 					headerShadowVisible: false,
 				}}
 			/>
+			<Stack.Screen
+				name="confirm"
+				options={{
+					title: 'Confirm Payment',
+					// headerLargeTitle: true,
+					headerShadowVisible: false,
+				}}
+			/>
 		</Stack>
 	);
 }

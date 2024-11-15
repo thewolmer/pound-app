@@ -1,23 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import { BottomSheetBackdrop, type BottomSheetModal } from '@gorhom/bottom-sheet';
-import { router, useLocalSearchParams } from 'expo-router';
-import React, { useCallback, useRef, useState } from 'react';
-import { ActivityIndicator, Image, SafeAreaView, ScrollView, Text, View } from 'react-native';
-import { Gesture, GestureDetector, PanGestureHandler } from 'react-native-gesture-handler';
-import Animated, {
-	BounceIn,
-	BounceOut,
-	FadeIn,
-	FadeInUp,
-	FadeOut,
-	interpolate,
-	runOnJS,
-	SlideInDown,
-	useAnimatedStyle,
-	useSharedValue,
-	withSpring,
-} from 'react-native-reanimated';
-import { NumberPad } from '~/components/number-pad';
+import { useLocalSearchParams } from 'expo-router';
+import React, { useState } from 'react';
+import { Image, SafeAreaView, Text, View } from 'react-native';
+import Animated, { BounceIn, FadeIn, FadeInUp, FadeOut, SlideInDown } from 'react-native-reanimated';
 import { Button } from '~/components/ui/button';
 import { useAccount } from '~/context/AccountContext';
 import { formatCurrency } from '~/lib/formatCurrency';

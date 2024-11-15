@@ -184,6 +184,7 @@ export type Database = {
 					id: string;
 					is_flagged_fraud: boolean;
 					is_fraud: boolean;
+					message: string | null;
 					origin_account_id: string | null;
 					origin_new_balance: number;
 					origin_old_balance: number;
@@ -200,6 +201,7 @@ export type Database = {
 					id?: string;
 					is_flagged_fraud?: boolean;
 					is_fraud?: boolean;
+					message?: string | null;
 					origin_account_id?: string | null;
 					origin_new_balance?: number;
 					origin_old_balance?: number;
@@ -216,6 +218,7 @@ export type Database = {
 					id?: string;
 					is_flagged_fraud?: boolean;
 					is_fraud?: boolean;
+					message?: string | null;
 					origin_account_id?: string | null;
 					origin_new_balance?: number;
 					origin_old_balance?: number;
@@ -276,6 +279,7 @@ export type Database = {
 					destination_avatar_url: string | null;
 					destination_display_name: string | null;
 					id: string | null;
+					message: string | null;
 					origin_account_id: string | null;
 					origin_avatar_url: string | null;
 					origin_display_name: string | null;
@@ -319,6 +323,7 @@ export type Database = {
 					amount: number;
 					destination_account_id: string;
 					reference: string;
+					message: string;
 				};
 				Returns: undefined;
 			};
@@ -328,6 +333,7 @@ export type Database = {
 					origin_account_id: string;
 					destination_account_id: string;
 					reference: string;
+					message: string;
 				};
 				Returns: undefined;
 			};

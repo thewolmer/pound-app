@@ -46,6 +46,7 @@ export default function TransferScreen() {
 			origin_account_id: accountId,
 			destination_account_id: user.account_id,
 			reference: uuid(),
+			message: 'Transfer',
 		});
 		if (error) {
 			console.error(error);

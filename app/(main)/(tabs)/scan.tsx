@@ -47,6 +47,8 @@ export default function Scan() {
 			origin_account_id: accountId,
 			destination_account_id: pendingPayment.accountId,
 			reference: pendingPayment.reference,
+			// TODO: Add a reasonable message to the payment
+			message: 'Payment request',
 		});
 		if (error) console.error(error);
 		triggerHaptics('notification-success');
@@ -60,18 +62,18 @@ export default function Scan() {
 		triggerHaptics('notification-warning');
 		setPendingPayment(null);
 		setIsScannerOpen(true);
-		router.replace('/(tabs)/');
+		router.replace('/(main)/(tabs)');
 	}
 
 	function handleCloseModal() {
 		setIsSuccessful(false);
-		router.replace('/(tabs)/');
+		router.replace('/(main)/(tabs)');
 		setIsScannerOpen(true);
 	}
 
 	return (
 		<View className="h-screen w-full flex-1">
-			{isScannerOpen && <QRScanner onScan={handleScan} onCancel={() => router.replace('/(tabs)/')} />}
+			{isScannerOpen && <QRScanner onScan={handleScan} onCancel={() => router.replace('/(main)/(tabs)')} />}
 			<Modal visible={!!pendingPayment} animationType="fade" transparent onRequestClose={() => setPendingPayment(null)}>
 				<View className="flex-1 items-center justify-center bg-black/50">
 					<View className="w-[80%] max-w-sm rounded-xl bg-background p-6">

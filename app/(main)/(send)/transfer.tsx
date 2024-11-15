@@ -28,7 +28,10 @@ export default function TransferScreen() {
 	const successModal = useRef<BottomSheetModal>(null);
 	const [success, setSuccess] = useState<boolean | null>(null);
 	const [amount, setAmount] = useState<number | null>(null);
+	// TODO: Add a message to the transfer
+	const [message, setMessage] = useState('Sending money to a friend');
 	const { triggerHaptics } = useHaptics();
+
 
 	const { accountId } = useAccount();
 
@@ -40,6 +43,7 @@ export default function TransferScreen() {
 			origin_account_id: accountId,
 			destination_account_id: user.account_id,
 			reference: uuid(),
+			message,
 		});
 		if (error) {
 			console.error(error);

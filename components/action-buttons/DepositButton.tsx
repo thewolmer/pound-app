@@ -28,29 +28,23 @@ export const DepositButton = () => {
 		[],
 	);
 
-	const [requestAmount, setRequestAmount] = useState<number | null>(null);
-
-	const [reference, setReference] = useState<string | null>(null);
-
 	const handleClose = () => {
-		setReference(null);
-		setRequestAmount(null);
 		depositModal.current?.close();
 	};
 
 	function handleDeposit() {
-		setReference(uuid());
-		setRequestAmount(null);
 		depositModal.current?.present();
 	}
 
 	async function handleNumberPadSubmit(amount: number) {
 		if (!accountId) return;
-		setRequestAmount(amount);
+
 		const { data, error } = await supabase.rpc('make_deposit', {
 			amount,
 			destination_account_id: accountId,
-			reference: 'test',
+			reference: uuid(),
+			// TODO: Add a reasonable message to the deposit
+			message: 'Bank deposit',
 		});
 		if (error) console.error(error);
 		triggerHaptics('notification-success');

@@ -69,9 +69,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 				cameraPermission: `Allow ${Env.NAME} to access your camera to scan QR codes.`,
 			},
 		],
-		[
-			"expo-font"
-		],
+		['expo-font'],
 		[
 			'expo-notifications',
 			{
@@ -80,11 +78,18 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 				defaultChannel: 'default',
 			},
 		],
+
 		['app-icon-badge', appIconBadgeConfig],
 		[
 			'expo-contacts',
 			{
 				contactsPermission: `Allow ${Env.NAME} to access your contacts to make payments.`,
+			},
+		],
+		[
+			'expo-image-picker',
+			{
+				photosPermission: `Allow ${Env.NAME} to access your photos to upload a profile picture.`,
 			},
 		],
 	],

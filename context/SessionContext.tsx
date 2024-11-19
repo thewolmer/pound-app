@@ -5,9 +5,15 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import type { Tables } from '~/types/database.types';
 import { supabase } from '../lib/supabase';
 
+interface UpdatePersonProps {
+	avatar_url?: string | null;
+	identity_tag?: string | null;
+}
+
 interface SessionContextProps {
 	session: Session | null;
 	person: Tables<'person'> | null;
+	updatePerson: (props: UpdatePersonProps) => Promise<void>;
 	signIn: (email: string, password: string) => Promise<{ user: User; session: Session; weakPassword?: WeakPassword }>;
 	signUp: (email: string, password: string) => Promise<{ user: User | null; session: Session | null }>;
 	signOut: () => Promise<void>;
@@ -55,6 +61,15 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
 		getPerson();
 	}, [session]);
+
+	const updatePerson = async (props: UpdatePersonProps) => {
+		if (!person?.id) return;
+		const { data, error } = await supabase.from('person').update(props).eq('id', person.id).select('*').single();
+		if (error) {
+			throw error;
+		}
+		setPerson(data);
+	};
 
 	const clearData = async () => {
 		const pushToken = await AsyncStorage.getItem('pushToken');
@@ -118,7 +133,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 	// };
 
 	return (
-		<SessionContext.Provider value={{ session, person, setSession, signIn, signUp, signOut }}>
+		<SessionContext.Provider value={{ session, person, updatePerson, setSession, signIn, signUp, signOut }}>
 			{children}
 		</SessionContext.Provider>
 	);

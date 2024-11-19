@@ -15,35 +15,16 @@ const tagSchema = z
 	.max(15, 'Tag can be up to 15 characters');
 
 export default function UpdateTag() {
-	const { session } = useSession();
+	const { session, person, updatePerson } = useSession();
 	if (!session?.user.id) return null;
+	if (!person) return null;
 
-	const [tag, setTag] = useState('');
+	const [tag, setTag] = useState(person.identity_tag || '');
 	const [isAvailable, setIsAvailable] = useState(true);
 	const [error, setError] = useState('');
 	const [loading, setLoading] = useState(false);
-	const [initialTag, setInitialTag] = useState<string | null>(null);
+	const [initialTag, setInitialTag] = useState<string>(person.identity_tag || '');
 	const debouncedTag = useDebounce(tag, 300);
-
-	useEffect(() => {
-		const fetchData = async () => {
-			const { data, error } = await supabase
-				.from('account_details')
-				.select('identity_tag')
-				.eq('person_id', session.user.id)
-				.single();
-			if (error) {
-				alert('Something went wrong');
-				return;
-			}
-			if (data) {
-				setInitialTag(data.identity_tag || '');
-				setTag(data.identity_tag || '');
-			}
-		};
-
-		fetchData();
-	}, [session.user.id]);
 
 	const validateTag = (input: string) => {
 		const result = tagSchema.safeParse(input);
@@ -77,7 +58,7 @@ export default function UpdateTag() {
 		if (error || !isAvailable) return;
 		setLoading(true);
 		try {
-			await supabase.from('person').update({ identity_tag: tag }).eq('id', session.user.id);
+			await updatePerson({ identity_tag: tag });
 			router.back();
 		} catch (error) {
 			console.error(error);
@@ -85,14 +66,6 @@ export default function UpdateTag() {
 			setLoading(false);
 		}
 	};
-
-	if (initialTag === null) {
-		return (
-			<View className="flex-1 items-center justify-center">
-				<ActivityIndicator size="large" />
-			</View>
-		);
-	}
 
 	return (
 		<SafeAreaView className="w-full flex-1 ">

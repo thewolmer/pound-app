@@ -165,10 +165,7 @@ const renderContactItem = ({
 		disabled={!item.isPoundUser}
 		onPress={() => {
 			ref.current?.close();
-			router.navigate({
-				pathname: '/(main)/(send)/amount',
-				params: { account_details: JSON.stringify(item.account_details) },
-			});
+			router.push({ pathname: '/(main)/(send)/amount', params: { account_details: JSON.stringify(item.account_details) } });
 		}}
 		className={cn(
 			'flex-row items-center justify-start border-border border-b p-2',

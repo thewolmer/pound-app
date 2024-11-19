@@ -4,7 +4,7 @@ import { TabBarIcon } from '~/components/icons/TabBarIcon';
 
 export default function ProfileLayout() {
 	return (
-		<Stack>
+		<Stack initialRouteName="profile">
 			<Stack.Screen
 				name="profile"
 				options={{

@@ -21,33 +21,31 @@ export default function AmountScreen() {
 	};
 
 	return (
-		<ScrollView contentInsetAdjustmentBehavior="automatic" className="flex h-full w-full px-5">
-			<SafeAreaView>
-				<View className="relative h-screen w-full flex-1 flex-col items-center justify-center gap-4">
-					<View>
-						{user?.avatar_url ? (
-							<View>
-								<Image source={{ uri: user.avatar_url }} className="h-28 w-28 rounded-full shadow" />
-								<View className="absolute right-0 bottom-0 rounded-full bg-white p-2 shadow">
-									<Image source={logoFromFile} style={{ width: 15, height: 15 }} />
-								</View>
+		<SafeAreaView className="flex-1 p-10">
+			<View className="relative h-screen w-full flex-1 flex-col items-center justify-center gap-4">
+				<View>
+					{user?.avatar_url ? (
+						<View>
+							<Image source={{ uri: user.avatar_url }} className="h-28 w-28 rounded-full shadow" />
+							<View className="absolute right-0 bottom-0 rounded-full bg-white p-2 shadow">
+								<Image source={logoFromFile} style={{ width: 15, height: 15 }} />
 							</View>
-						) : (
-							<View className="flex h-28 w-28 items-center justify-center rounded-full bg-accent">
-								<Text className="text-center text-2xl text-foreground">{user?.display_name?.[0]}</Text>
-							</View>
-						)}
-					</View>
-					<View className="flex flex-row items-center gap-2 rounded-xl bg-info px-2 py-1.5">
-						<Ionicons name="information-circle" size={24} className="text-info-foreground" />
-						<Text className="font-semibold text-info-foreground">You are sending to {user?.display_name}</Text>
-					</View>
-
-					<View className="mb-16">
-						<NumberPad title="" onClose={() => router.back()} onSubmit={handleSendSubmit} />
-					</View>
+						</View>
+					) : (
+						<View className="flex h-28 w-28 items-center justify-center rounded-full bg-accent">
+							<Text className="text-center text-2xl text-foreground">{user?.display_name?.[0]}</Text>
+						</View>
+					)}
 				</View>
-			</SafeAreaView>
-		</ScrollView>
+				<View className="flex flex-row items-center gap-2 rounded-xl bg-info px-2 py-1.5">
+					<Ionicons name="information-circle" size={24} className="text-info-foreground" />
+					<Text className="font-semibold text-info-foreground">You are sending to {user?.display_name}</Text>
+				</View>
+
+				<View className="">
+					<NumberPad title="" onClose={() => router.back()} onSubmit={handleSendSubmit} />
+				</View>
+			</View>
+		</SafeAreaView>
 	);
 }

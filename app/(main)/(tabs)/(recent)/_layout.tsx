@@ -8,7 +8,7 @@ export default function RecentLayout() {
 			<Stack.Screen
 				name="index"
 				options={{
-					title: 'Transactions',
+					title: 'Recent',
 					headerShadowVisible: false,
 					headerLeft(props) {
 						return (
@@ -22,6 +22,13 @@ export default function RecentLayout() {
 							</Button>
 						);
 					},
+				}}
+			/>
+			<Stack.Screen
+				name="[transaction]"
+				options={{
+					title: 'Transaction',
+					headerShadowVisible: false,
 				}}
 			/>
 		</Stack>

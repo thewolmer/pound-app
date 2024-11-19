@@ -78,7 +78,7 @@ export default function StartScreen() {
 			<View className="flex flex-1 flex-col gap-5 px-4">
 				<View className="flex flex-row items-center justify-between px-2 text-foreground">
 					<Text className="text-foreground"> Welcome</Text>
-					<Pressable onPress={() => router.navigate('/(main)/(profile)')} className="px-5">
+					<Pressable onPress={() => router.push('/(main)/(profile)/profile')} className="px-5">
 						<Avatar alt="User avatar">
 							<AvatarImage source={{ uri: person?.avatar_url || undefined }} />
 							<AvatarFallback>
@@ -96,7 +96,7 @@ export default function StartScreen() {
 					<CardFooter className="flex justify-between">
 						<DepositButton />
 						<Button
-							onPress={() => router.push('/(main)/(send)')}
+							onPress={() => router.push('/(main)/(send)/send')}
 							haptics="impact-light"
 							variant={'outline'}
 							size={'lg'}

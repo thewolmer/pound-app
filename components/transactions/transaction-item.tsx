@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
+import { router } from 'expo-router';
 import type { ComponentProps } from 'react';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { useAccount } from '~/context/AccountContext';
 import { formatCurrency } from '~/lib/formatCurrency';
@@ -59,7 +60,10 @@ export function TransactionItem({
 	}
 
 	return (
-		<View className="flex-row items-center justify-between border-border border-b p-2">
+		<Pressable
+			onPress={() => router.navigate(`/(main)/(tabs)/(recent)/${item.id}`)}
+			className="flex-row items-center justify-between border-border border-b p-2"
+		>
 			<View className="flex-row items-center gap-4">
 				<View className="relative h-12 w-12">
 					<Avatar alt={accountDetails.displayName || ''} className="h-12 w-12 bg-muted">
@@ -91,6 +95,6 @@ export function TransactionItem({
 				{item.destination_account_id === accountId ? '+' : '-'}
 				{formatCurrency(item.amount || 0)}
 			</Text>
-		</View>
+		</Pressable>
 	);
 }

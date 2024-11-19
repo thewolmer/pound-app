@@ -33,6 +33,7 @@
 		"qrcode",
 		"SUPABASE",
 		"tailwindcss",
+		"upsert",
 		"zustand"
 	]
 }

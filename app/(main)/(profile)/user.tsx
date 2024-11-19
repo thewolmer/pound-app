@@ -1,73 +1,44 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
-import * as ImageManipulator from 'expo-image-manipulator';
-import * as ImagePicker from 'expo-image-picker';
-import React, { useCallback, useState } from 'react';
+import { SaveFormat, ImageManipulator } from 'expo-image-manipulator';
+import { launchImageLibraryAsync } from 'expo-image-picker';
+import React, { useState } from 'react';
 import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSession } from '~/context/SessionContext';
 import { supabase } from '~/lib/supabase';
-import type { Tables } from '~/types/database.types';
+import { decode } from 'base64-arraybuffer'
 
 const User = () => {
-	const { session } = useSession();
+	const { session, person, updatePerson } = useSession();
 	if (!session) return null;
+	if (!person) return null;
 
-	const [user, setUser] = useState<Tables<'person'> | null>(null);
 	const [isUploading, setIsUploading] = useState(false);
-
-	useFocusEffect(
-		useCallback(() => {
-			const fetchData = async () => {
-				if (session.user.id) {
-					const { data, error } = await supabase.from('person').select().eq('id', session.user.id).single();
-
-					if (data) {
-						setUser(data);
-					}
-					if (error) {
-						alert('Something went wrong');
-						console.error(error);
-					}
-				}
-			};
-
-			fetchData();
-		}, [session.user.id]),
-	);
 
 	const handleUploadAvatar = async () => {
 		try {
 			setIsUploading(true);
 
 			// Request image from the library
-			const result = await ImagePicker.launchImageLibraryAsync({
+			const result = await launchImageLibraryAsync({
 				mediaTypes: ['images'],
 				allowsEditing: true,
+				aspect: [1, 1],
 				quality: 1,
 			});
 
 			if (!result.canceled) {
 				const img = result.assets[0];
 
-				// Resize the image
-				const resizedImage = await ImageManipulator.manipulateAsync(
-					img.uri,
-					[{ resize: { width: 200, height: 200 } }],
-					{
-						compress: 1,
-						format: ImageManipulator.SaveFormat.JPEG,
-						base64: true,
-					},
-				);
+				const resizedImageRef = await ImageManipulator.manipulate(img.uri).resize({width: 200, height: 200}).renderAsync();
+				const resizedImage = await resizedImageRef.saveAsync({ format: SaveFormat.JPEG, base64: true, compress: 1 });
 
 				// Upload to Supabase Storage using file URI
-				const fileName = `avatar-${session.user.id}.jpg`;
+				const newAvatarFileName = `${person.id}-${Date.now()}.jpg`;
 				const { error: uploadError } = await supabase.storage
 					.from('avatar')
-					.upload(`${fileName}`, resizedImage.base64 as string, {
+					.upload(newAvatarFileName, decode(resizedImage.base64 as string), {
 						contentType: 'image/jpeg',
-						upsert: true,
 					});
 
 				if (uploadError) {
@@ -76,28 +47,22 @@ const User = () => {
 				}
 
 				// Get the public URL for the uploaded avatar
-				const { data: publicUrlData } = supabase.storage.from('avatar').getPublicUrl('${fileName}');
+				const { data: publicUrlData } = await supabase.storage.from('avatar').getPublicUrl(newAvatarFileName);
 
 				const avatarUrl = publicUrlData?.publicUrl;
-				console.log('avatarUrl', avatarUrl);
 				if (!avatarUrl) {
 					console.error('Failed to retrieve avatar URL');
 					throw new Error('Failed to retrieve avatar URL');
 				}
 
-				// Update the user's profile with the new avatar URL
-				const { error: updateError } = await supabase
-					.from('person')
-					.update({ avatar_url: avatarUrl })
-					.eq('id', session.user.id);
+				const oldAvatarFileName = person.avatar_url?.split('/').pop();
 
-				if (updateError) {
-					console.error(updateError);
-					throw new Error('Failed to update user profile');
+				if (oldAvatarFileName) {
+					await supabase.storage.from('avatar').remove([oldAvatarFileName]);
 				}
 
-				// Update local state
-				setUser((prev) => (prev ? { ...prev, avatar_url: avatarUrl } : prev));
+				await updatePerson({avatar_url: avatarUrl });
+
 				alert('Avatar uploaded successfully');
 			}
 		} catch (err) {
@@ -117,15 +82,15 @@ const User = () => {
 						className="relative flex w-40 items-center justify-center"
 						disabled={isUploading}
 					>
-						{!user && (
+						{!person && (
 							<View className="flex h-40 w-40 items-center justify-center rounded-full bg-accent text-center">
 								<ActivityIndicator size={'large'} className="absolute" color="white" />
 							</View>
 						)}
-						{user?.avatar_url && <Image source={{ uri: user.avatar_url }} className="h-40 w-40 rounded-full" />}
-						{user?.first_name && !user?.avatar_url && (
+						{person?.avatar_url && <Image source={{ uri: person.avatar_url }} className="h-40 w-40 rounded-full" />}
+						{person?.first_name && !person?.avatar_url && (
 							<View className="flex h-40 w-40 items-center justify-center rounded-full bg-accent text-center">
-								<Text className="text-6xl text-accent-foreground">{user?.first_name[0]}</Text>
+								<Text className="text-6xl text-accent-foreground">{person?.first_name[0]}</Text>
 							</View>
 						)}
 

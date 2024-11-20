@@ -2,7 +2,6 @@ import { Ionicons } from '@expo/vector-icons';
 import {
 	BottomSheetBackdrop,
 	type BottomSheetBackdropProps,
-	BottomSheetFlatList,
 	BottomSheetModal,
 	BottomSheetTextInput,
 	BottomSheetView,
@@ -12,16 +11,16 @@ import * as Contacts from 'expo-contacts';
 import { router } from 'expo-router';
 import type React from 'react';
 import { useCallback, useRef, useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, TextInput } from 'react-native';
+import { ActivityIndicator, Platform, Pressable } from 'react-native';
 import { Image, Text, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { ForwardCard } from '~/components/ui/ForwardCard';
 import { Button } from '~/components/ui/button';
-import { Card, CardFooter, CardHeader } from '~/components/ui/card';
-import { H3, H4 } from '~/components/ui/typography';
+import { H3 } from '~/components/ui/typography';
 import { supabase } from '~/lib/supabase';
 import { cn } from '~/lib/utils';
 import type { Tables } from '~/types/database.types';
+import { Input } from '../ui/input';
 
 interface ContactWithAccountDetails extends Contacts.Contact {
 	isPoundUser: boolean;
@@ -132,19 +131,7 @@ export const SendViaContact = () => {
 							className="rounded-xl border border-border bg-muted p-2 text-foreground "
 						/>
 					) : (
-						<TextInput
-							placeholder="Search by name"
-							value={search}
-							onChangeText={setSearch}
-							style={{
-								borderRadius: 8,
-								borderWidth: 1,
-								borderColor: '#ccc',
-								backgroundColor: '#f7f7f7',
-								padding: 8,
-								color: '#333',
-							}}
-						/>
+						<Input placeholder="Search by names" value={search} onChangeText={setSearch} />
 					)}
 					<FlatList
 						data={filteredContacts}
@@ -165,7 +152,10 @@ const renderContactItem = ({
 		disabled={!item.isPoundUser}
 		onPress={() => {
 			ref.current?.close();
-			router.push({ pathname: '/(main)/(send)/amount', params: { account_details: JSON.stringify(item.account_details) } });
+			router.push({
+				pathname: '/(main)/(send)/amount',
+				params: { account_details: JSON.stringify(item.account_details) },
+			});
 		}}
 		className={cn(
 			'flex-row items-center justify-start border-border border-b p-2',

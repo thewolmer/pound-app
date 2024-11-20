@@ -62,8 +62,8 @@ export default function Profile() {
 				{/*  */}
 				<ForwardCard
 					title="Pound Tag"
-					description={user.identity_tag !== null ? (user.identity_tag as string) : 'Setup your Pound Tag'}
-					descriptionClassName={user.identity_tag !== null ? 'text-muted-foreground' : 'text-'}
+					description={user.identity_tag !== null ? (user.identity_tag as string) : 'Setup your Pound Tag >'}
+					descriptionClassName={user.identity_tag !== null ? 'text-muted-foreground' : 'text-success-foreground'}
 					ionicons="id-card"
 					onPress={() => router.push('/(profile)/poundTag')}
 				/>

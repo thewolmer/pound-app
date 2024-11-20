@@ -1,28 +1,21 @@
-import { Ionicons } from '@expo/vector-icons';
 import {
 	BottomSheetBackdrop,
 	type BottomSheetBackdropProps,
-	BottomSheetFlatList,
 	BottomSheetModal,
 	BottomSheetTextInput,
 	BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import type { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import type * as Contacts from 'expo-contacts';
 import { router } from 'expo-router';
 import type React from 'react';
 import { useCallback, useRef, useState } from 'react';
-import { ActivityIndicator, Platform, Pressable } from 'react-native';
-import { Image, Text, View } from 'react-native';
-import { TextInput } from 'react-native-gesture-handler';
+import { Platform } from 'react-native';
+import { Text, View } from 'react-native';
 import { ForwardCard } from '~/components/ui/ForwardCard';
 import { Button } from '~/components/ui/button';
-import { Card, CardFooter, CardHeader } from '~/components/ui/card';
 import { H3, H4 } from '~/components/ui/typography';
 import { useSession } from '~/context/SessionContext';
 import { supabase } from '~/lib/supabase';
-import { cn } from '~/lib/utils';
-import type { Tables } from '~/types/database.types';
+import { Input } from '../ui/input';
 
 export const SendViaPoundTag = () => {
 	const poundTagModalRef = useRef<BottomSheetModal>(null);
@@ -93,14 +86,13 @@ export const SendViaPoundTag = () => {
 							className="rounded-xl border border-border bg-muted p-2 text-foreground"
 						/>
 					) : (
-						<TextInput
+						<Input
 							placeholder="poundtag"
 							value={poundTag}
 							onChangeText={setPoundTag}
 							autoCapitalize="none"
 							returnKeyType="next"
 							onSubmitEditing={handleVerifyTag}
-							className="rounded-xl border border-border bg-muted p-2 text-foreground"
 						/>
 					)}
 					<Button disabled={poundTag.length < 3} onPress={handleVerifyTag} className="mt-5">

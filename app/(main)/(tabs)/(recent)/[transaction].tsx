@@ -3,11 +3,10 @@ import { format } from 'date-fns';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
-import { ActivityIndicatorComponent, Image, Text, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Card, CardContent, CardFooter, CardHeader } from '~/components/ui/card';
 import { useAccount } from '~/context/AccountContext';
-import { useSession } from '~/context/SessionContext';
 import { formatCurrency } from '~/lib/formatCurrency';
 import { supabase } from '~/lib/supabase';
 import type { Tables } from '~/types/database.types';
@@ -51,8 +50,6 @@ function Transaction() {
 		};
 		fetchData();
 	}, [id]);
-
-	console.log(transaction);
 
 	const isDeposit = transaction?.destination_account_id === accountId;
 

@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import { Image, SafeAreaView, Text, View } from 'react-native';
 import Animated, { BounceIn, FadeIn, FadeInUp, FadeOut, SlideInDown } from 'react-native-reanimated';
@@ -80,7 +80,15 @@ export default function TransferScreen() {
 				</View>
 
 				{success === null && (
-					<Animated.View entering={FadeIn} exiting={FadeOut}>
+					<Animated.View entering={FadeIn} exiting={FadeOut} className="flex flex-row gap-2">
+						<Button
+							size={'lg'}
+							variant={'secondary'}
+							onPressOut={() => (router.canDismiss() ? router.dismissAll() : router.replace('/(main)/(tabs)/'))}
+							disabled={success}
+						>
+							<Text className="text-lg text-secondary-foreground">Cancel</Text>
+						</Button>
 						<Button size={'lg'} onPressOut={handleSendSubmit} disabled={success}>
 							<Text className="text-lg text-primary-foreground">Confirm</Text>
 						</Button>

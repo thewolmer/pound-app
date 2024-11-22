@@ -46,6 +46,18 @@ export default function SendLayout() {
 					title: 'Confirm Payment',
 					// headerLargeTitle: true,
 					headerShadowVisible: false,
+					headerLeft(props) {
+						return (
+							<Button
+								haptics="impact-light"
+								variant={'link'}
+								onPress={() => (router.canDismiss() ? router.dismissAll() : router.replace('/(main)/(tabs)/'))}
+								className="flex-row items-center px-5"
+							>
+								<TabBarIcon name="arrow-back" className="text-foreground" />
+							</Button>
+						);
+					},
 				}}
 			/>
 		</Stack>

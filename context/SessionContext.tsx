@@ -8,6 +8,8 @@ import { supabase } from '../lib/supabase';
 interface UpdatePersonProps {
 	avatar_url?: string | null;
 	identity_tag?: string | null;
+	fist_name?: string | null;
+	last_name?: string | null;
 }
 
 interface SessionContextProps {

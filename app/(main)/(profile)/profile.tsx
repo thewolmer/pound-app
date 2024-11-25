@@ -1,6 +1,6 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ForwardCard } from '~/components/ui/ForwardCard';
 
@@ -44,22 +44,35 @@ export default function Profile() {
 	return (
 		<SafeAreaView className="w-full flex-1">
 			<ScrollView contentInsetAdjustmentBehavior="automatic" className="flex w-full flex-1 p-6">
+				<TouchableOpacity
+					onPress={() => router.push('/(profile)/user')}
+					className="flex w-full items-center justify-center gap-1 py-6"
+				>
+					{user.avatar_url ? (
+						<Image
+							source={{ uri: user.avatar_url?.toString() }}
+							style={{ width: 100, height: 100, borderRadius: 50 }}
+							resizeMode="cover"
+						/>
+					) : (
+						<View className="flex h-[100px] w-[100px] items-center justify-center rounded-full bg-accent text-center">
+							<View className="font-extrabold text-foreground text-xl">{user.first_name?.[0]}</View>
+						</View>
+					)}
+					{user.first_name && user.last_name && (
+						<Text className={'font-bold text-foreground text-lg'}>
+							{user.first_name} {user.last_name}
+						</Text>
+					)}
+					<Text className={' text-muted-foreground '}> @{user.identity_tag || ''}</Text>
+				</TouchableOpacity>
+
 				<ForwardCard
-					title={user.first_name || 'You'}
-					description={user.email}
-					ionicons={user.avatar_url ? undefined : 'person-circle'}
-					IconLeft={
-						user.avatar_url && (
-							<Image
-								source={{ uri: user.avatar_url?.toString() }}
-								style={{ width: 38, height: 38, borderRadius: 19 }}
-								resizeMode="cover"
-							/>
-						)
-					}
+					title="Account"
+					description={'Manage your account details'}
+					ionicons="person-circle"
 					onPress={() => router.push('/(profile)/user')}
 				/>
-				{/*  */}
 				<ForwardCard
 					title="Pound Tag"
 					description={user.identity_tag !== null ? (user.identity_tag as string) : 'Setup your Pound Tag >'}

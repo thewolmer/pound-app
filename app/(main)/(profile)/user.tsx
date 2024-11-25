@@ -1,12 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
-import { SaveFormat, ImageManipulator } from 'expo-image-manipulator';
+import { decode } from 'base64-arraybuffer';
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { launchImageLibraryAsync } from 'expo-image-picker';
 import React, { useState } from 'react';
 import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { UserDetailsForm } from '~/components/forms/user-details';
 import { useSession } from '~/context/SessionContext';
 import { supabase } from '~/lib/supabase';
-import { decode } from 'base64-arraybuffer'
 
 const User = () => {
 	const { session, person, updatePerson } = useSession();
@@ -30,7 +31,9 @@ const User = () => {
 			if (!result.canceled) {
 				const img = result.assets[0];
 
-				const resizedImageRef = await ImageManipulator.manipulate(img.uri).resize({width: 200, height: 200}).renderAsync();
+				const resizedImageRef = await ImageManipulator.manipulate(img.uri)
+					.resize({ width: 200, height: 200 })
+					.renderAsync();
 				const resizedImage = await resizedImageRef.saveAsync({ format: SaveFormat.JPEG, base64: true, compress: 1 });
 
 				// Upload to Supabase Storage using file URI
@@ -61,7 +64,7 @@ const User = () => {
 					await supabase.storage.from('avatar').remove([oldAvatarFileName]);
 				}
 
-				await updatePerson({avatar_url: avatarUrl });
+				await updatePerson({ avatar_url: avatarUrl });
 
 				alert('Avatar uploaded successfully');
 			}
@@ -101,7 +104,7 @@ const User = () => {
 					</Pressable>
 				</View>
 
-				<Text className="mt-6 text-foreground">Todo: ability to update name, phone, email, profile picture, etc</Text>
+				<UserDetailsForm />
 			</ScrollView>
 		</SafeAreaView>
 	);

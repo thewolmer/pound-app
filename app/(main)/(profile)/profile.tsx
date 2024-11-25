@@ -1,6 +1,6 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ForwardCard } from '~/components/ui/ForwardCard';
 
@@ -44,7 +44,7 @@ export default function Profile() {
 	return (
 		<SafeAreaView className="w-full flex-1">
 			<ScrollView contentInsetAdjustmentBehavior="automatic" className="flex w-full flex-1 p-6">
-				<TouchableOpacity
+				<Pressable
 					onPress={() => router.push('/(profile)/user')}
 					className="flex w-full items-center justify-center gap-1 py-6"
 				>
@@ -65,7 +65,7 @@ export default function Profile() {
 						</Text>
 					)}
 					<Text className={' text-muted-foreground '}> @{user.identity_tag || ''}</Text>
-				</TouchableOpacity>
+				</Pressable>
 
 				<ForwardCard
 					title="Account"

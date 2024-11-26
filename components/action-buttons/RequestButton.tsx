@@ -7,8 +7,9 @@ import {
 } from '@gorhom/bottom-sheet';
 import React, { useCallback, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
-import QRCode from 'react-native-qrcode-svg';
-import Animated, { SlideInDown, SlideInRight, SlideOutDown, SlideOutLeft, SlideOutUp } from 'react-native-reanimated';
+import QRCodeStyled from 'react-native-qrcode-styled';
+import Animated, { SlideInDown, SlideOutDown, SlideOutUp } from 'react-native-reanimated';
+import { NAV_THEME } from '~/constants/theme';
 import { useAccount } from '~/context/AccountContext';
 import { supabase } from '~/lib/supabase';
 import { useHaptics } from '~/lib/useHaptics';
@@ -63,7 +64,7 @@ export const RequestButton = () => {
 		.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transaction' }, handleTransactionInsert)
 		.subscribe();
 
-	const logoFromFile = require('~/assets/images/icon.png');
+	const logoFromFile = require('~/assets/images/icon-for-qr-code.png');
 
 	return (
 		<>
@@ -107,16 +108,32 @@ export const RequestButton = () => {
 								>
 									£{requestAmount}
 								</Text>
-								<QRCode
-									value={JSON.stringify({
-										type: 'payment_request',
-										accountId,
-										amount: requestAmount,
-										reference: reference,
-									})}
-									logo={logoFromFile}
-									size={300}
-								/>
+								<View className="">
+									<QRCodeStyled
+										data={JSON.stringify({
+											type: 'payment_request',
+											accountId,
+											amount: requestAmount,
+											reference: reference,
+										})}
+										padding={5}
+										pieceSize={6}
+										pieceCornerType="rounded"
+										isPiecesGlued
+										pieceBorderRadius={2}
+										outerEyesOptions={{
+											borderRadius: 10,
+											color: NAV_THEME.dark.primary,
+											strokeWidth: 2,
+											stroke: NAV_THEME.dark.primary,
+										}}
+										logo={{
+											href: logoFromFile,
+											hidePieces: false,
+											scale: 1.1,
+										}}
+									/>
+								</View>
 								<Button
 									className="mt-20 w-full max-w-sm"
 									variant={'default'}

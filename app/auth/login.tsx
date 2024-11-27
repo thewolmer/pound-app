@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { AuthApiError } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
@@ -59,12 +60,13 @@ export default function Login() {
 					}
 				}
 				setErrors(fieldErrors);
-				triggerHaptics('notification-error');
+			} else if (err instanceof AuthApiError) {
+				setErrors({ password: err.message });
 			} else {
 				// Handle other errors (e.g., network errors)
 				setErrors({ password: 'Invalid email or password' });
-				triggerHaptics('notification-error');
 			}
+			triggerHaptics('notification-error');
 		} finally {
 			setIsSubmitting(false);
 		}

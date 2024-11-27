@@ -18,6 +18,7 @@ export default function RootLayout() {
 			>
 				<Stack.Screen name="auth" />
 				<Stack.Screen name="(main)" />
+				<Stack.Screen name="offline" />
 			</Stack>
 		</ProvidersWrapper>
 	);

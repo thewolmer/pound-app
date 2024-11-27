@@ -1,7 +1,16 @@
-import { Redirect, Stack } from 'expo-router';
+import { Redirect, Stack, router } from 'expo-router';
+import { useEffect } from 'react';
 import { useSession } from '~/context/SessionContext';
+import { useIsOffline } from '~/hooks/useIsOffline';
 
 export default function AuthLayout() {
+	const isOffline = useIsOffline();
+
+	useEffect(() => {
+		if (isOffline) {
+			router.replace('/offline');
+		}
+	}, [isOffline]);
 	const { session } = useSession();
 
 	if (session) {

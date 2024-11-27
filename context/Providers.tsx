@@ -17,6 +17,7 @@ import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { usePushNotifications } from '~/lib/usePushNotifications';
 import { AccountProvider } from './AccountContext';
+import { NetworkProvider } from './NetworkContext';
 import { PreferenceSettingsProvider } from './PreferenceContext';
 import { SessionProvider } from './SessionContext';
 
@@ -27,7 +28,7 @@ const LIGHT_THEME: Theme = {
 	dark: false,
 	colors: NAV_THEME.light,
 	fonts: {
-		regular: { fontFamily: 'Poppins_400Regular', fontWeight: 'normal'	 },
+		regular: { fontFamily: 'Poppins_400Regular', fontWeight: 'normal' },
 		medium: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600' },
 		bold: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600' },
 		heavy: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600' },
@@ -104,9 +105,11 @@ export const ProvidersWrapper = ({ children }: { children: React.ReactNode }) =>
 					<BottomSheetModalProvider>
 						<StatusBar style={isDarkColorScheme ? 'light' : 'dark'} />
 						<SafeAreaProvider onLayout={onLayoutRootView}>
-							<SessionProvider>
-								<AccountProvider>{children}</AccountProvider>
-							</SessionProvider>
+							<NetworkProvider>
+								<SessionProvider>
+									<AccountProvider>{children}</AccountProvider>
+								</SessionProvider>
+							</NetworkProvider>
 						</SafeAreaProvider>
 						<PortalHost />
 					</BottomSheetModalProvider>

@@ -4,13 +4,6 @@ import { useSession } from '~/context/SessionContext';
 import { useIsOffline } from '~/hooks/useIsOffline';
 
 export default function AuthLayout() {
-	const isOffline = useIsOffline();
-
-	useEffect(() => {
-		if (isOffline) {
-			router.replace('/offline');
-		}
-	}, [isOffline]);
 	const { session } = useSession();
 
 	if (session) {

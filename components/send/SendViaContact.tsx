@@ -3,14 +3,13 @@ import {
 	BottomSheetBackdrop,
 	type BottomSheetBackdropProps,
 	BottomSheetModal,
-	BottomSheetTextInput,
 	BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import type { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import * as Contacts from 'expo-contacts';
 import { router } from 'expo-router';
-import type React from 'react';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useDeferredValue, useEffect, useRef, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { ActivityIndicator, Platform, Pressable } from 'react-native';
 import { Image, Text, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
@@ -30,7 +29,14 @@ interface ContactWithAccountDetails extends Contacts.Contact {
 export const SendViaContact = () => {
 	const contactsModalRef = useRef<BottomSheetModal>(null);
 	const [contacts, setContacts] = useState<ContactWithAccountDetails[]>([]);
-	const [search, setSearch] = useState('');
+	const { control, watch } = useForm({
+		defaultValues: {
+			search: '',
+		},
+	});
+
+	const search = watch('search');
+	const deferredSearch = useDeferredValue(search);
 
 	const renderBackDrop = useCallback(
 		(backdropProps: BottomSheetBackdropProps) => (
@@ -46,12 +52,10 @@ export const SendViaContact = () => {
 				fields: [Contacts.Fields.Name, Contacts.Fields.Image, Contacts.Fields.PhoneNumbers, Contacts.Fields.Emails],
 			});
 
-			// Extract emails from contacts
 			const emails = contactData
 				.flatMap((contact) => contact.emails?.map((email) => email.email) || [])
-				.filter((email): email is string => !!email); // Filter out any undefined emails
+				.filter((email): email is string => !!email);
 
-			// Query account details for these emails
 			const { data: accountDetails, error } = await supabase.from('account_details').select('*').in('email', emails);
 
 			if (error) {
@@ -59,13 +63,11 @@ export const SendViaContact = () => {
 				return;
 			}
 
-			// Create a map for quick lookup of account details by email
 			const accountDetailsMap = new Map();
 			for (const detail of accountDetails || []) {
 				if (detail.email) accountDetailsMap.set(detail.email, detail);
 			}
 
-			// Update contacts with account details
 			const updatedContacts = contactData.map((contact) => {
 				const contactEmail = contact.emails?.[0]?.email;
 				const accountInfo = contactEmail ? accountDetailsMap.get(contactEmail) : undefined;
@@ -86,15 +88,10 @@ export const SendViaContact = () => {
 		await fetchContacts();
 	};
 
-	if (!contacts) {
-		return (
-			<View className="flex-1 items-center justify-center">
-				<ActivityIndicator size="large" />
-			</View>
-		);
-	}
+	const filteredContacts = contacts.filter((contact) =>
+		contact.name?.toLowerCase().includes(deferredSearch.toLowerCase()),
+	);
 
-	const filteredContacts = contacts.filter((contact) => contact.name?.toLowerCase().includes(search.toLowerCase()));
 	return (
 		<>
 			<ForwardCard
@@ -104,16 +101,13 @@ export const SendViaContact = () => {
 				onPress={openContactsModal}
 			/>
 			<BottomSheetModal
-				// enableContentPanningGesture={false}
 				backdropComponent={renderBackDrop}
 				ref={contactsModalRef}
 				snapPoints={['85%']}
 				enableDismissOnClose
 				handleIndicatorStyle={{ backgroundColor: '#fff' }}
 				backgroundStyle={{ backgroundColor: 'transparent' }}
-				onDismiss={() => {
-					setSearch('');
-				}}
+				onDismiss={() => {}}
 			>
 				<BottomSheetView className="h-full flex-1 gap-5 rounded-t-2xl bg-card p-5">
 					<View className="flex flex-row items-center justify-between">
@@ -123,20 +117,37 @@ export const SendViaContact = () => {
 						</Button>
 					</View>
 
-					{Platform.OS === 'ios' ? (
-						<BottomSheetTextInput
-							placeholder="Search by name"
-							value={search}
-							onChangeText={setSearch}
-							className="rounded-xl border border-border bg-muted p-2 text-foreground "
-						/>
-					) : (
-						<Input placeholder="Search by names" value={search} onChangeText={setSearch} />
-					)}
+					<Controller
+						name="search"
+						control={control}
+						render={({ field: { onChange, value } }) =>
+							Platform.OS === 'ios' ? (
+								<Input
+									placeholder="Search by name"
+									value={value}
+									onChangeText={onChange}
+									className="rounded-xl border border-border bg-muted p-2 text-foreground"
+								/>
+							) : (
+								<Input
+									placeholder="Search by name"
+									value={value}
+									onChangeText={onChange}
+									className="rounded-xl border border-border bg-muted p-2 text-foreground"
+								/>
+							)
+						}
+					/>
+
 					<FlatList
 						data={filteredContacts}
 						keyExtractor={(item) => item.id || ''}
 						renderItem={(props) => renderContactItem({ ...props, ref: contactsModalRef })}
+						ListEmptyComponent={
+							<View className="flex-1 items-center justify-center">
+								<Text className="text-muted-foreground">No contacts found</Text>
+							</View>
+						}
 					/>
 				</BottomSheetView>
 			</BottomSheetModal>
@@ -147,7 +158,10 @@ export const SendViaContact = () => {
 const renderContactItem = ({
 	item,
 	ref,
-}: { item: ContactWithAccountDetails; ref: React.RefObject<BottomSheetModalMethods> }) => (
+}: {
+	item: ContactWithAccountDetails;
+	ref: React.RefObject<BottomSheetModalMethods>;
+}) => (
 	<Pressable
 		disabled={!item.isPoundUser}
 		onPress={() => {

@@ -24,7 +24,7 @@ export default function SendLayout() {
 								haptics="impact-light"
 								variant={'link'}
 								hitSlop={20}
-								onPress={() => router.back()}
+								onPressIn={() => router.back()}
 								className="flex-row items-center px-5"
 							>
 								<TabBarIcon name="arrow-back" className="text-foreground" />
@@ -53,7 +53,7 @@ export default function SendLayout() {
 								haptics="impact-light"
 								variant={'link'}
 								hitSlop={20}
-								onPress={() => (router.canDismiss() ? router.dismissAll() : router.replace('/(main)/(tabs)/'))}
+								onPressIn={() => (router.canDismiss() ? router.dismissAll() : router.replace('/(main)/(tabs)/'))}
 								className="flex-row items-center px-5"
 							>
 								<TabBarIcon name="arrow-back" className="text-foreground" />

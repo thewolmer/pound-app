@@ -11,7 +11,9 @@ export default function ProfileLayout() {
 					title: 'Profile',
 					headerLargeTitle: true,
 					headerRight: ({ tintColor }) => (
-						<Pressable hitSlop={20} onPress={() => router.push('/(profile)/settings')}>
+						<Pressable hitSlop={20} onPressIn={() => {
+							router.push('/(profile)/settings');
+						}}>
 							<TabBarIcon name="settings-outline" color={tintColor} />
 						</Pressable>
 					),

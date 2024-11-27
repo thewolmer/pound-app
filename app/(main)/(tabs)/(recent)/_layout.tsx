@@ -16,7 +16,7 @@ export default function RecentLayout() {
 								haptics="impact-light"
 								variant={'link'}
 								hitSlop={20}
-								onPress={() => router.back()}
+								onPressIn={() => router.back()}
 								className="flex-row items-center px-5"
 							>
 								<TabBarIcon name="arrow-back" className="text-foreground" />

@@ -15,6 +15,7 @@ export default function RecentLayout() {
 							<Button
 								haptics="impact-light"
 								variant={'link'}
+								hitSlop={20}
 								onPress={() => router.back()}
 								className="flex-row items-center px-5"
 							>

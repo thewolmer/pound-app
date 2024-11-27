@@ -1,51 +1,132 @@
-import { Ionicons } from '@expo/vector-icons';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { router, useLocalSearchParams } from 'expo-router';
-import type React from 'react';
-import { Image, SafeAreaView, ScrollView, View } from 'react-native';
-import { Text } from 'react-native';
-import { NumberPad } from '~/components/number-pad';
-
+import React from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { Image, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
+import { z } from 'zod';
+import { Button } from '~/components/ui/button';
+import { Card, CardContent, CardHeader } from '~/components/ui/card';
+import { Input } from '~/components/ui/input';
 import type { Tables } from '~/types/database.types';
+
+const AmountSchema = z.object({
+	amount: z.preprocess(
+		(val) => Number.parseFloat(val as string),
+		z.number().positive('Amount must be greater than 0').min(0.01, 'Amount must be at least 0.01'),
+	),
+	message: z.string().max(30, 'Message is too long').nullable().optional(),
+});
+
+type AmountFormValues = z.infer<typeof AmountSchema>;
 
 export default function AmountScreen() {
 	const { account_details } = useLocalSearchParams<{ account_details?: string }>();
 	if (!account_details) return null;
-	const user = account_details ? (JSON.parse(account_details) as Tables<'account_details'>) : undefined;
-	const logoFromFile = require('~/assets/images/pound-icon.png');
 
-	const handleSendSubmit = async (amount: number) => {
+	const user = account_details ? (JSON.parse(account_details) as Tables<'account_details'>) : undefined;
+
+	const {
+		control,
+		handleSubmit,
+		formState: { errors, isSubmitting, isDirty },
+	} = useForm<AmountFormValues>({
+		resolver: zodResolver(AmountSchema),
+		defaultValues: {
+			amount: 0,
+			message: null,
+		},
+	});
+	const onSubmit = (data: AmountFormValues) => {
 		router.push({
 			pathname: '/(main)/(send)/confirm',
-			params: { account_details: JSON.stringify(user), amount: amount },
+			params: {
+				account_details: JSON.stringify(user),
+				amount: data.amount.toString(),
+				message: data.message || '',
+			},
 		});
 	};
 
 	return (
-		<SafeAreaView className="flex-1 p-10">
-			<View className="relative h-screen w-full flex-1 flex-col items-center justify-center gap-4">
-				<View>
-					{user?.avatar_url ? (
-						<View>
-							<Image source={{ uri: user.avatar_url }} className="h-28 w-28 rounded-full shadow" />
-							<View className="absolute right-0 bottom-0 rounded-full bg-white p-2 shadow">
-								<Image source={logoFromFile} style={{ width: 15, height: 15 }} />
+		<SafeAreaView className="flex-1">
+			<KeyboardAvoidingView
+				keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+				className="flex-1"
+			>
+				<ScrollView contentContainerStyle={{ padding: 16 }}>
+					<Card>
+						<CardHeader>
+							<View className="flex flex-row items-center gap-2">
+								<View>
+									{user?.avatar_url ? (
+										<View>
+											<Image source={{ uri: user.avatar_url }} className="h-12 w-12 rounded-full shadow" />
+										</View>
+									) : (
+										<View className="flex h-12 w-12 items-center justify-center rounded-full bg-accent">
+											<Text className="text-center text-2xl text-foreground">{user?.display_name?.[0]}</Text>
+										</View>
+									)}
+								</View>
+								<View className="flex flex-col">
+									<Text className="line-clamp-2 font-semibold text-foreground text-lg"> {user?.display_name}</Text>
+									<Text className="line-clamp-1 text-muted-foreground text-sm">
+										{user?.identity_tag ? `@${user.identity_tag}` : ''}
+									</Text>
+								</View>
 							</View>
-						</View>
-					) : (
-						<View className="flex h-28 w-28 items-center justify-center rounded-full bg-accent">
-							<Text className="text-center text-2xl text-foreground">{user?.display_name?.[0]}</Text>
-						</View>
-					)}
-				</View>
-				<View className="flex flex-row items-center gap-2 rounded-xl bg-info px-2 py-1.5">
-					<Ionicons name="information-circle" size={24} className="text-info-foreground" />
-					<Text className="font-semibold text-info-foreground">You are sending to {user?.display_name}</Text>
-				</View>
+						</CardHeader>
+						<CardContent>
+							{/* Amount Field */}
+							<View className="mb-4">
+								<Controller
+									name="amount"
+									control={control}
+									render={({ field: { onChange, value } }) => (
+										<View className="flex flex-row items-center justify-between gap-1">
+											<Text className="w-[10%] font-semibold text-2xl text-muted-foreground">£</Text>
+											<Input
+												keyboardType="numeric"
+												className="w-[90%] text-2xl placeholder:font-extrabold placeholder:text-muted-foreground"
+												value={value > 0 ? value?.toString() : ''}
+												onChangeText={onChange}
+												autoFocus
+												placeholder="Enter amount"
+											/>
+										</View>
+									)}
+								/>
+								{errors.amount && <Text className="text-red-500">{errors.amount.message}</Text>}
+							</View>
 
-				<View className="">
-					<NumberPad title="" onClose={() => router.back()} onSubmit={handleSendSubmit} />
+							{/* Message Field */}
+							<View className="mb-4">
+								<Controller
+									name="message"
+									control={control}
+									render={({ field: { onChange, value } }) => (
+										<Input
+											value={value || ''}
+											onChangeText={onChange}
+											className="placeholder:font-semibold placeholder:text-muted-foreground placeholder:text-sm"
+											placeholder="Add a note  (optional)"
+										/>
+									)}
+								/>
+								{errors.message && <Text className="text-red-500">{errors.message.message}</Text>}
+							</View>
+						</CardContent>
+					</Card>
+				</ScrollView>
+
+				{/* Submit Button */}
+				<View className="p-4">
+					<Button disabled={isSubmitting || !isDirty} onPress={handleSubmit(onSubmit)} className="bg-primary">
+						<Text className="text-primary-foreground">{isSubmitting ? 'Submitting...' : 'Next'}</Text>
+					</Button>
 				</View>
-			</View>
+			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);
 }

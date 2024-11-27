@@ -5,22 +5,39 @@ import {
 	BottomSheetTextInput,
 	BottomSheetView,
 } from '@gorhom/bottom-sheet';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
-import type React from 'react';
-import { useCallback, useRef, useState } from 'react';
-import { Platform } from 'react-native';
-import { Text, View } from 'react-native';
+import React, { useCallback, useRef } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
+import { z } from 'zod';
 import { ForwardCard } from '~/components/ui/ForwardCard';
 import { Button } from '~/components/ui/button';
-import { H3, H4 } from '~/components/ui/typography';
+import { H3 } from '~/components/ui/typography';
 import { useSession } from '~/context/SessionContext';
 import { supabase } from '~/lib/supabase';
 import { Input } from '../ui/input';
 
+// Zod Schema
+const PoundTagSchema = z.object({
+	poundTag: z.string().nonempty('Pound tag is required').min(3, 'Pound tag must be at least 3 characters long'),
+});
+
+type PoundTagFormValues = z.infer<typeof PoundTagSchema>;
+
 export const SendViaPoundTag = () => {
 	const poundTagModalRef = useRef<BottomSheetModal>(null);
 	const { session } = useSession();
-	const [poundTag, setPoundTag] = useState<string>('');
+
+	const {
+		control,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<PoundTagFormValues>({
+		resolver: zodResolver(PoundTagSchema),
+		defaultValues: { poundTag: '' },
+	});
+
 	const renderBackDrop = useCallback(
 		(backdropProps: BottomSheetBackdropProps) => (
 			<BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...backdropProps} />
@@ -28,9 +45,16 @@ export const SendViaPoundTag = () => {
 		[],
 	);
 
-	const handleVerifyTag = async () => {
-		const { data, error } = await supabase.from('account_details').select().eq('identity_tag', poundTag).single();
-		if (!data) {
+	const handleVerifyTag = async (data: PoundTagFormValues) => {
+		const { poundTag } = data;
+
+		const { data: userData, error } = await supabase
+			.from('account_details')
+			.select()
+			.eq('identity_tag', poundTag)
+			.single();
+
+		if (!userData) {
 			alert(`${poundTag} is not a valid PoundTag`);
 			return;
 		}
@@ -40,15 +64,16 @@ export const SendViaPoundTag = () => {
 			return;
 		}
 
-		if (data.person_id === session?.user.id) {
+		if (userData.person_id === session?.user.id) {
 			alert('You cannot send money to yourself');
 			return;
 		}
+
 		poundTagModalRef.current?.close();
-		router.push({ pathname: '/(main)/(send)/amount', params: { account_details: JSON.stringify(data) } });
+		router.push({ pathname: '/(main)/(send)/amount', params: { account_details: JSON.stringify(userData) } });
 	};
 
-	const openPoundTagModal = async () => {
+	const openPoundTagModal = () => {
 		poundTagModalRef.current?.present();
 	};
 
@@ -69,42 +94,60 @@ export const SendViaPoundTag = () => {
 				handleIndicatorStyle={{ backgroundColor: '#fff' }}
 				backgroundStyle={{ backgroundColor: 'transparent' }}
 				onDismiss={() => {
-					setPoundTag('');
+					console.log('Modal closed');
 				}}
 			>
-				<BottomSheetView className="flex-1 gap-5 rounded-t-2xl bg-card p-5 py-10">
-					<H3>Send Via Pound tag</H3>
+				<KeyboardAvoidingView
+					keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+					className="flex-1"
+				>
+					<BottomSheetView className="flex-1 gap-5 rounded-t-2xl bg-card p-5 py-10">
+						<H3>Send Via Pound Tag</H3>
 
-					{Platform.OS === 'ios' ? (
-						<BottomSheetTextInput
-							placeholder="poundtag"
-							value={poundTag}
-							onChangeText={setPoundTag}
-							autoCapitalize="none"
-							returnKeyType="next"
-							onSubmitEditing={handleVerifyTag}
-							className="rounded-xl border border-border bg-muted p-2 text-foreground"
+						{/* Form Input */}
+						<Controller
+							name="poundTag"
+							control={control}
+							render={({ field: { onChange, value } }) =>
+								Platform.OS === 'ios' ? (
+									<BottomSheetTextInput
+										placeholder="poundtag"
+										value={value}
+										onChangeText={onChange}
+										autoCapitalize="none"
+										returnKeyType="next"
+										className={`rounded-xl border border-border bg-muted p-2 text-foreground ${
+											errors.poundTag ? 'border-destructive-foreground' : ''
+										}`}
+									/>
+								) : (
+									<Input
+										placeholder="poundtag"
+										value={value}
+										onChangeText={onChange}
+										autoCapitalize="none"
+										returnKeyType="next"
+										className={errors.poundTag ? 'border-destructive-foreground' : ''}
+									/>
+								)
+							}
 						/>
-					) : (
-						<Input
-							placeholder="poundtag"
-							value={poundTag}
-							onChangeText={setPoundTag}
-							autoCapitalize="none"
-							returnKeyType="next"
-							onSubmitEditing={handleVerifyTag}
-						/>
-					)}
-					<Button disabled={poundTag.length < 3} onPress={handleVerifyTag} className="mt-5">
-						<Text className="text-white">Next</Text>
-					</Button>
-					{/*  */}
-					<View>
-						<Text className="text-center text-muted-foreground text-sm">
-							TODO: a section here to explain what a pound tag is
-						</Text>
-					</View>
-				</BottomSheetView>
+						{errors.poundTag && <Text className="text-destructive-foreground">{errors.poundTag.message}</Text>}
+
+						{/* Submit Button */}
+						<Button onPress={handleSubmit(handleVerifyTag)} className="mt-5">
+							<Text className="text-white">Next</Text>
+						</Button>
+
+						{/* Info Section */}
+						<View>
+							<Text className="text-center text-muted-foreground text-sm">
+								TODO: a section here to explain what a pound tag is
+							</Text>
+						</View>
+					</BottomSheetView>
+				</KeyboardAvoidingView>
 			</BottomSheetModal>
 		</>
 	);

@@ -23,6 +23,7 @@ export default function SendLayout() {
 							<Button
 								haptics="impact-light"
 								variant={'link'}
+								hitSlop={20}
 								onPress={() => router.back()}
 								className="flex-row items-center px-5"
 							>
@@ -51,6 +52,7 @@ export default function SendLayout() {
 							<Button
 								haptics="impact-light"
 								variant={'link'}
+								hitSlop={20}
 								onPress={() => (router.canDismiss() ? router.dismissAll() : router.replace('/(main)/(tabs)/'))}
 								className="flex-row items-center px-5"
 							>

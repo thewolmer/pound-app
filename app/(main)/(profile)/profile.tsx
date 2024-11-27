@@ -56,7 +56,9 @@ export default function Profile() {
 						/>
 					) : (
 						<View className="flex h-[100px] w-[100px] items-center justify-center rounded-full bg-accent text-center">
-							<View className="font-extrabold text-foreground text-xl">{user.first_name?.[0]}</View>
+							<View className="font-extrabold text-foreground text-xl">
+								<Text>{user.first_name?.[0]}</Text>
+							</View>
 						</View>
 					)}
 					{user.first_name && user.last_name && (
@@ -64,7 +66,7 @@ export default function Profile() {
 							{user.first_name} {user.last_name}
 						</Text>
 					)}
-					<Text className={' text-muted-foreground '}> @{user.identity_tag || ''}</Text>
+					{user.identity_tag && <Text className={'text-muted-foreground'}>{`@${user.identity_tag}`}</Text>}
 				</Pressable>
 
 				<ForwardCard

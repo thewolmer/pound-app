@@ -1,20 +1,15 @@
-import * as Network from 'expo-network';
+import NetInfo from '@react-native-community/netinfo';
 import { useEffect, useState } from 'react';
 
 export const useIsOffline = () => {
 	const [isOffline, setIsOffline] = useState(false);
 
 	useEffect(() => {
-		const checkConnectivity = async () => {
-			const networkState = await Network.getNetworkStateAsync();
-			setIsOffline(!networkState.isConnected || networkState.type === Network.NetworkStateType.NONE);
-		};
+		const unsubscribe = NetInfo.addEventListener((state) => {
+			setIsOffline(!state.isConnected || state.type === 'none');
+		});
 
-		checkConnectivity();
-
-		const interval = setInterval(checkConnectivity, 5000);
-
-		return () => clearInterval(interval);
+		return () => unsubscribe();
 	}, []);
 
 	return isOffline;

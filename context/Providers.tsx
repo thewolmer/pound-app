@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { type Theme, ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
 import { useFonts } from 'expo-font';
-import { SplashScreen } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { cssInterop } from 'nativewind';
 import { useCallback, useEffect, useState } from 'react';
@@ -27,7 +27,7 @@ const LIGHT_THEME: Theme = {
 	dark: false,
 	colors: NAV_THEME.light,
 	fonts: {
-		regular: { fontFamily: 'Poppins_400Regular', fontWeight: 'normal'	 },
+		regular: { fontFamily: 'Poppins_400Regular', fontWeight: 'normal' },
 		medium: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600' },
 		bold: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600' },
 		heavy: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600' },

@@ -29,12 +29,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	icon: './assets/images/icon.png',
 	userInterfaceStyle: 'automatic',
 	newArchEnabled: true,
-	splash: {
-		image: './assets/images/splash.png',
-		resizeMode: 'contain',
-		backgroundColor: '#0d103f',
-		animation: 'fade',
-	},
+	// splash: {
+	// 	image: './assets/images/splash.png',
+	// 	resizeMode: 'contain',
+	// 	backgroundColor: '#0d103f',
+	// 	animation: 'fade',
+	// },
 	// updates: {
 	// 	fallbackToCacheTimeout: 0,
 	// },
@@ -62,14 +62,26 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		typedRoutes: true,
 	},
 	plugins: [
-		'expo-router',
+		['app-icon-badge', appIconBadgeConfig],
 		[
 			'expo-camera',
 			{
 				cameraPermission: `Allow ${Env.NAME} to access your camera to scan QR codes.`,
 			},
 		],
+		[
+			'expo-contacts',
+			{
+				contactsPermission: `Allow ${Env.NAME} to access your contacts to make payments.`,
+			},
+		],
 		['expo-font'],
+		[
+			'expo-image-picker',
+			{
+				photosPermission: `Allow ${Env.NAME} to access your photos to upload a profile picture.`,
+			},
+		],
 		[
 			'expo-notifications',
 			{
@@ -78,20 +90,19 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 				defaultChannel: 'default',
 			},
 		],
-
-		['app-icon-badge', appIconBadgeConfig],
+		'expo-router',
 		[
-			'expo-contacts',
-			{
-				contactsPermission: `Allow ${Env.NAME} to access your contacts to make payments.`,
-			},
-		],
-		[
-			'expo-image-picker',
-			{
-				photosPermission: `Allow ${Env.NAME} to access your photos to upload a profile picture.`,
-			},
-		],
+        "expo-splash-screen",
+        {
+          image: './assets/images/pound-white.png',
+          backgroundColor: '#0d103f',
+					imageWidth: 200,
+					"dark": {
+            "image": "./assets/images/pound-white.png",
+            "backgroundColor": "#0d103f"
+          },
+        }
+      ],
 	],
 	extra: {
 		...ClientEnv,

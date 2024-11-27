@@ -12,7 +12,11 @@ import { uuid } from '~/lib/utils';
 import type { Tables } from '~/types/database.types';
 
 export default function TransferScreen() {
-	const { account_details, amount } = useLocalSearchParams<{ account_details?: string; amount?: string }>();
+	const { account_details, amount, message } = useLocalSearchParams<{
+		account_details?: string;
+		amount?: string;
+		message?: string;
+	}>();
 	if (!account_details || !amount) return null;
 	const user = account_details ? (JSON.parse(account_details) as Tables<'account_details'>) : undefined;
 	const amountToSend = amount ? Number.parseFloat(amount) : 0;
@@ -31,7 +35,7 @@ export default function TransferScreen() {
 			origin_account_id: accountId,
 			destination_account_id: user.account_id,
 			reference: uuid(),
-			message: 'Transfer',
+			message: message || '',
 		});
 		if (error) {
 			console.error(error);

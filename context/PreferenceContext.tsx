@@ -1,6 +1,6 @@
+import { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useColorScheme as useNativewindColorScheme } from 'nativewind';
-import { createContext, useContext, useEffect, useState } from 'react';
 
 type ThemePreference = 'light' | 'dark';
 
@@ -23,7 +23,7 @@ const defaultPreferenceSettings: PreferenceSettings = {
 	theme: 'light',
 };
 
-export const PreferenceSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const PreferenceSettingsProvider = ({ children }: { children: React.ReactNode }) => {
 	const { colorScheme, setColorScheme } = useNativewindColorScheme();
 	const [preferenceSettings, setPreferenceSettings] = useState<PreferenceSettings>({
 		...defaultPreferenceSettings,

@@ -1,14 +1,15 @@
+import React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import React, { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
+
+import { Button } from '../ui/button';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { useSession } from '~/context/SessionContext';
 import { cn } from '~/lib/utils';
-import { Button } from '../ui/button';
 
 const UserSchema = z.object({
 	first_name: z.string().min(1, 'First name is required').max(15, 'First name must be at most 10 characters'),
@@ -20,12 +21,9 @@ type UserFormValues = z.infer<typeof UserSchema>;
 export const UserDetailsForm = () => {
 	const { person, updatePerson } = useSession();
 
-	if (!person) return null;
-
 	const {
 		control,
 		handleSubmit,
-		setValue,
 		formState: { errors, isSubmitting, dirtyFields, isSubmitSuccessful },
 	} = useForm<UserFormValues>({
 		resolver: zodResolver(UserSchema),
@@ -51,7 +49,7 @@ export const UserDetailsForm = () => {
 	return (
 		<SafeAreaView className="flex-1 p-4">
 			<ScrollView>
-				<Text className="mb-4 font-semibold text-muted-foreground text-xl">Edit Profile Details</Text>
+				<Text className="mb-4 text-xl font-semibold text-muted-foreground">Edit Profile Details</Text>
 
 				{/* First Name */}
 				<View className="mb-4">

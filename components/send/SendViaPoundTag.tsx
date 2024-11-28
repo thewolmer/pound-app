@@ -1,3 +1,4 @@
+import React, { useCallback, useRef } from 'react';
 import {
 	BottomSheetBackdrop,
 	type BottomSheetBackdropProps,
@@ -7,16 +8,16 @@ import {
 } from '@gorhom/bottom-sheet';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
-import React, { useCallback, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
 import { z } from 'zod';
-import { ForwardCard } from '~/components/ui/ForwardCard';
+
+import { Input } from '../ui/input';
 import { Button } from '~/components/ui/button';
+import { ForwardCard } from '~/components/ui/ForwardCard';
 import { H3 } from '~/components/ui/typography';
 import { useSession } from '~/context/SessionContext';
 import { supabase } from '~/lib/supabase';
-import { Input } from '../ui/input';
 
 // Zod Schema
 const PoundTagSchema = z.object({
@@ -42,7 +43,7 @@ export const SendViaPoundTag = () => {
 		(backdropProps: BottomSheetBackdropProps) => (
 			<BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...backdropProps} />
 		),
-		[],
+		[]
 	);
 
 	const handleVerifyTag = async (data: PoundTagFormValues) => {
@@ -142,7 +143,7 @@ export const SendViaPoundTag = () => {
 
 						{/* Info Section */}
 						<View>
-							<Text className="text-center text-muted-foreground text-sm">
+							<Text className="text-center text-sm text-muted-foreground">
 								TODO: a section here to explain what a pound tag is
 							</Text>
 						</View>

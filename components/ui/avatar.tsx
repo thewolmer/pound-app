@@ -1,10 +1,11 @@
-import * as AvatarPrimitive from '@rn-primitives/avatar';
 import * as React from 'react';
+import { Fallback, Image, Root } from '@rn-primitives/avatar';
+
 import { cn } from '~/lib/utils';
 
-const AvatarPrimitiveRoot = AvatarPrimitive.Root;
-const AvatarPrimitiveImage = AvatarPrimitive.Image;
-const AvatarPrimitiveFallback = AvatarPrimitive.Fallback;
+const AvatarPrimitiveRoot = Root;
+const AvatarPrimitiveImage = Image;
+const AvatarPrimitiveFallback = Fallback;
 
 const Avatar = React.forwardRef<
 	React.ElementRef<typeof AvatarPrimitiveRoot>,

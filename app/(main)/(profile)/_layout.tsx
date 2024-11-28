@@ -1,5 +1,6 @@
-import { Stack, router } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { Pressable } from 'react-native';
+
 import { TabBarIcon } from '~/components/icons/TabBarIcon';
 
 export default function ProfileLayout() {
@@ -11,9 +12,12 @@ export default function ProfileLayout() {
 					title: 'Profile',
 					headerLargeTitle: true,
 					headerRight: ({ tintColor }) => (
-						<Pressable hitSlop={20} onPressIn={() => {
-							router.push('/(profile)/settings');
-						}}>
+						<Pressable
+							hitSlop={20}
+							onPressIn={() => {
+								router.push('/(profile)/settings');
+							}}
+						>
 							<TabBarIcon name="settings-outline" color={tintColor} />
 						</Pressable>
 					),

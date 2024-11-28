@@ -1,5 +1,6 @@
-import { Poppins_400Regular, Poppins_600SemiBold } from '@expo-google-fonts/poppins';
+import { useCallback, useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { Poppins_400Regular, Poppins_600SemiBold } from '@expo-google-fonts/poppins';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { type Theme, ThemeProvider } from '@react-navigation/native';
@@ -8,14 +9,15 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { cssInterop } from 'nativewind';
-import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+
 import { NAV_THEME } from '~/constants/theme';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { usePushNotifications } from '~/lib/usePushNotifications';
+
 import { AccountProvider } from './AccountContext';
 import { NetworkProvider } from './NetworkContext';
 import { PreferenceSettingsProvider } from './PreferenceContext';

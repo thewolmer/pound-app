@@ -1,5 +1,6 @@
 import { View } from 'react-native';
 import { Defs, G, LinearGradient, Path, Stop, Svg } from 'react-native-svg';
+
 import { useColorScheme } from '~/lib/useColorScheme';
 
 export const PoundIcon = () => {

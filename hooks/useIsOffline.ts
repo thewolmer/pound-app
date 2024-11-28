@@ -1,5 +1,5 @@
-import NetInfo from '@react-native-community/netinfo';
 import { useEffect, useState } from 'react';
+import NetInfo from '@react-native-community/netinfo';
 
 export const useIsOffline = () => {
 	const [isOffline, setIsOffline] = useState(false);

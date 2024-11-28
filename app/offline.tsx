@@ -7,9 +7,9 @@ export default function OfflineScreen() {
 			<View className="rounded-full bg-destructive p-2">
 				<Ionicons name="wifi-outline" className="text-destructive-foreground" size={60} />
 			</View>
-			<View className="rounded-lg p-2 ">
-				<Text className="text-center font-bold text-destructive-foreground text-lg"> Looks like you're Offline.</Text>
-				<Text className="text-center font-semibold text-muted-foreground text-sm">Check your Network connection.</Text>
+			<View className="rounded-lg p-2">
+				<Text className="text-center text-lg font-bold text-destructive-foreground">{`Looks like you're Offline.`}</Text>
+				<Text className="text-center text-sm font-semibold text-muted-foreground">Check your Network connection.</Text>
 			</View>
 		</View>
 	);

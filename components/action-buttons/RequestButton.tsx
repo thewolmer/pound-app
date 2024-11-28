@@ -1,3 +1,4 @@
+import React, { useCallback, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import {
 	BottomSheetBackdrop,
@@ -5,18 +6,18 @@ import {
 	BottomSheetModal,
 	BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import React, { useCallback, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 import QRCodeStyled from 'react-native-qrcode-styled';
 import Animated, { SlideInDown, SlideOutDown, SlideOutUp } from 'react-native-reanimated';
+
+import { NumberPad } from '../number-pad';
+import { Button } from '../ui/button';
+import { H3 } from '../ui/typography';
 import { NAV_THEME } from '~/constants/theme';
 import { useAccount } from '~/context/AccountContext';
 import { supabase } from '~/lib/supabase';
 import { useHaptics } from '~/lib/useHaptics';
 import { cn, uuid } from '~/lib/utils';
-import { NumberPad } from '../number-pad';
-import { Button } from '../ui/button';
-import { H3 } from '../ui/typography';
 
 export const RequestButton = () => {
 	const { accountId } = useAccount();
@@ -27,7 +28,7 @@ export const RequestButton = () => {
 		(backdropProps: BottomSheetBackdropProps) => (
 			<BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...backdropProps} />
 		),
-		[],
+		[]
 	);
 
 	const [requestAmount, setRequestAmount] = useState<number | null>(null);
@@ -70,7 +71,7 @@ export const RequestButton = () => {
 		<>
 			<Button onPress={handleRequest} haptics="impact-light" variant={'outline'} size={'lg'}>
 				<Ionicons name="arrow-down-circle-outline" className="text-foreground" size={24} />
-				<Text className="text-foreground text-xs">Request</Text>
+				<Text className="text-xs text-foreground">Request</Text>
 			</Button>
 			<BottomSheetModal
 				backdropComponent={renderBackDrop}
@@ -87,7 +88,7 @@ export const RequestButton = () => {
 				<BottomSheetView
 					className={cn(
 						'flex-1 gap-5 rounded-t-2xl p-5 transition-all duration-700',
-						requestAmount ? 'bg-cyan-50' : 'bg-card',
+						requestAmount ? 'bg-cyan-50' : 'bg-card'
 					)}
 				>
 					{!requestAmount && (
@@ -102,8 +103,8 @@ export const RequestButton = () => {
 							<View className="items-center rounded-xl p-6">
 								<Text
 									className={cn(
-										'mb-6 font-bold text-2xl ',
-										requestAmount ? 'text-neutral-800' : 'text-accent-foreground',
+										'mb-6 text-2xl font-bold',
+										requestAmount ? 'text-neutral-800' : 'text-accent-foreground'
 									)}
 								>
 									£{requestAmount}

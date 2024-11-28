@@ -1,9 +1,10 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { BottomSheetBackdrop, type BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { Link } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import { Dimensions, FlatList, Image, StyleSheet, View } from 'react-native';
+
 import { Button } from '~/components/ui/button';
 import { Text } from '~/components/ui/text';
 
@@ -30,7 +31,7 @@ export default function Welcome() {
 		(backdropProps: BottomSheetBackdropProps) => (
 			<BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...backdropProps} />
 		),
-		[],
+		[]
 	);
 
 	const startAutoplay = () => {
@@ -68,7 +69,7 @@ export default function Welcome() {
 				data={placeholderImages}
 				horizontal
 				pagingEnabled
-				className="absolute top-0 left-0"
+				className="absolute left-0 top-0"
 				style={StyleSheet.absoluteFillObject}
 				showsHorizontalScrollIndicator={false}
 				keyExtractor={(item, index) => index.toString()}

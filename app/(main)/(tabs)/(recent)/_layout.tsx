@@ -1,4 +1,5 @@
-import { Stack, router } from 'expo-router';
+import { router, Stack } from 'expo-router';
+
 import { TabBarIcon } from '~/components/icons/TabBarIcon';
 import { Button } from '~/components/ui/button';
 

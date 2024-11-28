@@ -1,3 +1,4 @@
+import React, { useCallback, useRef } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import {
 	BottomSheetBackdrop,
@@ -5,16 +6,15 @@ import {
 	BottomSheetModal,
 	BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import React, { useCallback, useRef, useState } from 'react';
 import { Text } from 'react-native';
 import Animated, { SlideOutLeft } from 'react-native-reanimated';
 
+import { NumberPad } from '../number-pad';
+import { Button } from '../ui/button';
 import { useAccount } from '~/context/AccountContext';
 import { supabase } from '~/lib/supabase';
 import { useHaptics } from '~/lib/useHaptics';
 import { uuid } from '~/lib/utils';
-import { NumberPad } from '../number-pad';
-import { Button } from '../ui/button';
 
 export const DepositButton = () => {
 	const { accountId } = useAccount();
@@ -25,7 +25,7 @@ export const DepositButton = () => {
 		(backdropProps: BottomSheetBackdropProps) => (
 			<BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...backdropProps} />
 		),
-		[],
+		[]
 	);
 
 	const handleClose = () => {
@@ -39,7 +39,7 @@ export const DepositButton = () => {
 	async function handleNumberPadSubmit(amount: number) {
 		if (!accountId) return;
 
-		const { data, error } = await supabase.rpc('make_deposit', {
+		const { error } = await supabase.rpc('make_deposit', {
 			amount,
 			destination_account_id: accountId,
 			reference: uuid(),
@@ -55,7 +55,7 @@ export const DepositButton = () => {
 		<>
 			<Button onPress={handleDeposit} variant={'outline'} haptics="impact-light" size={'lg'}>
 				<Ionicons name="business-outline" className="text-foreground" size={22} />
-				<Text className="text-foreground text-xs">Deposit</Text>
+				<Text className="text-xs text-foreground">Deposit</Text>
 			</Button>
 			<BottomSheetModal
 				backdropComponent={renderBackDrop}

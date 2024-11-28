@@ -1,5 +1,7 @@
-import { type ReactNode, createContext, useContext, useEffect, useState } from 'react';
+import { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
+
 import { supabase } from '~/lib/supabase';
+
 import { useSession } from './SessionContext';
 
 interface AccountContextType {
@@ -8,13 +10,6 @@ interface AccountContextType {
 	isLoading: boolean;
 	error: string | null;
 }
-
-const initialState: AccountContextType = {
-	accountId: null,
-	balance: 0,
-	isLoading: false,
-	error: null,
-};
 
 const AccountContext = createContext<AccountContextType | undefined>(undefined);
 

@@ -1,6 +1,7 @@
 import type React from 'react';
 import { ScrollView, Switch, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { ThemeToggle } from '~/components/ThemeToggle';
 import { Button } from '~/components/ui/button';
 import { Text } from '~/components/ui/text';
@@ -54,8 +55,8 @@ const SettingsCard = ({ title, description, children, settingsKey }: SettingsCar
 	return (
 		<View className="my-4 w-full flex-row items-center justify-between gap-3">
 			<View className="w-[70%]">
-				<Text className="font-bold text-lg">{title}</Text>
-				<P className="text-muted-foreground text-sm">{description}</P>
+				<Text className="text-lg font-bold">{title}</Text>
+				<P className="text-sm text-muted-foreground">{description}</P>
 			</View>
 			{children ? (
 				children

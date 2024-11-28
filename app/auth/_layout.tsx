@@ -1,7 +1,6 @@
-import { Redirect, Stack, router } from 'expo-router';
-import { useEffect } from 'react';
+import { Redirect, Stack } from 'expo-router';
+
 import { useSession } from '~/context/SessionContext';
-import { useIsOffline } from '~/hooks/useIsOffline';
 
 export default function AuthLayout() {
 	const { session } = useSession();

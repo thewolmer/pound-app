@@ -1,18 +1,17 @@
+import React, { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { decode } from 'base64-arraybuffer';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { launchImageLibraryAsync } from 'expo-image-picker';
-import React, { useState } from 'react';
 import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { UserDetailsForm } from '~/components/forms/user-details';
 import { useSession } from '~/context/SessionContext';
 import { supabase } from '~/lib/supabase';
 
 const User = () => {
-	const { session, person, updatePerson } = useSession();
-	if (!session) return null;
-	if (!person) return null;
+	const { person, updatePerson } = useSession();
 
 	const [isUploading, setIsUploading] = useState(false);
 
@@ -37,7 +36,7 @@ const User = () => {
 				const resizedImage = await resizedImageRef.saveAsync({ format: SaveFormat.JPEG, base64: true, compress: 1 });
 
 				// Upload to Supabase Storage using file URI
-				const newAvatarFileName = `${person.id}-${Date.now()}.jpg`;
+				const newAvatarFileName = `${person?.id}-${Date.now()}.jpg`;
 				const { error: uploadError } = await supabase.storage
 					.from('avatar')
 					.upload(newAvatarFileName, decode(resizedImage.base64 as string), {
@@ -58,7 +57,7 @@ const User = () => {
 					throw new Error('Failed to retrieve avatar URL');
 				}
 
-				const oldAvatarFileName = person.avatar_url?.split('/').pop();
+				const oldAvatarFileName = person?.avatar_url?.split('/').pop();
 
 				if (oldAvatarFileName) {
 					await supabase.storage.from('avatar').remove([oldAvatarFileName]);
@@ -98,7 +97,7 @@ const User = () => {
 						)}
 
 						{isUploading && <ActivityIndicator size={'large'} className="absolute" color="white" />}
-						<View className="absolute right-0 bottom-0 rounded-full bg-secondary p-2 shadow">
+						<View className="absolute bottom-0 right-0 rounded-full bg-secondary p-2 shadow">
 							<Ionicons name="create-outline" size={24} className="text-secondary-foreground" />
 						</View>
 					</Pressable>

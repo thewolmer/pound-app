@@ -1,6 +1,7 @@
-import { type VariantProps, cva } from 'class-variance-authority';
 import * as React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { Pressable } from 'react-native';
+
 import { TextClassContext } from '~/components/ui/text';
 import { useHaptics } from '~/lib/useHaptics';
 import { cn } from '~/lib/utils';
@@ -29,7 +30,7 @@ const buttonVariants = cva(
 			variant: 'default',
 			size: 'default',
 		},
-	},
+	}
 );
 
 const buttonTextVariants = cva(
@@ -55,7 +56,7 @@ const buttonTextVariants = cva(
 			variant: 'default',
 			size: 'default',
 		},
-	},
+	}
 );
 
 type ButtonProps = React.ComponentPropsWithoutRef<typeof Pressable> &
@@ -85,8 +86,8 @@ const Button = React.forwardRef<React.ElementRef<typeof Pressable>, ButtonProps>
 						}
 					}}
 					className={cn(
-						props.disabled && 'web:pointer-events-none opacity-50',
-						buttonVariants({ variant, size, className }),
+						props.disabled && 'opacity-50 web:pointer-events-none',
+						buttonVariants({ variant, size, className })
 					)}
 					ref={ref}
 					role="button"
@@ -94,7 +95,7 @@ const Button = React.forwardRef<React.ElementRef<typeof Pressable>, ButtonProps>
 				/>
 			</TextClassContext.Provider>
 		);
-	},
+	}
 );
 Button.displayName = 'Button';
 

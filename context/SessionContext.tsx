@@ -1,9 +1,10 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { type Session, type User, type WeakPassword, isAuthApiError } from '@supabase/supabase-js';
-import type React from 'react';
 import { createContext, useContext, useEffect, useState } from 'react';
-import type { Tables } from '~/types/database.types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { type Session, type User, type WeakPassword } from '@supabase/supabase-js';
+import type React from 'react';
+
 import { supabase } from '../lib/supabase';
+import type { Tables } from '~/types/database.types';
 
 interface UpdatePersonProps {
 	avatar_url?: string | null;

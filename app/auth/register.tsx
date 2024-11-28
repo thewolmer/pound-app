@@ -1,11 +1,12 @@
+import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { isAuthApiError } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import Animated, { FadeIn, FadeOut, SlideInRight, SlideOutLeft } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
+
 import { PoundIcon } from '~/components/icons/PoundIcon';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
@@ -158,7 +159,7 @@ export default function Register() {
 				<View className="gap-4">
 					{step === 1 && (
 						<Animated.View entering={SlideInRight} exiting={SlideOutLeft}>
-							<P className={cn('px-1 text-red-500 text-sm', errors.email ? 'opacity-100' : 'opacity-0')}>
+							<P className={cn('px-1 text-sm text-red-500', errors.email ? 'opacity-100' : 'opacity-0')}>
 								{errors.email ? errors.email : 'Email'}
 							</P>
 							<Input
@@ -209,7 +210,7 @@ export default function Register() {
 
 					{step === 3 && (
 						<Animated.View entering={SlideInRight} exiting={SlideOutLeft}>
-							<P className={cn('px-1 text-red-500 text-sm', errors.confirmPassword ? 'opacity-100' : 'opacity-0')}>
+							<P className={cn('px-1 text-sm text-red-500', errors.confirmPassword ? 'opacity-100' : 'opacity-0')}>
 								{errors.confirmPassword ? errors.confirmPassword : 'Password'}
 							</P>
 							<View className="flex flex-row items-center justify-between gap-1">
@@ -244,7 +245,7 @@ export default function Register() {
 				</View>
 
 				{/* incase of user already exists */}
-				{step >= 3 && errors.email && <P className="text-center text-red-500 text-xs">{errors.email}</P>}
+				{step >= 3 && errors.email && <P className="text-center text-xs text-red-500">{errors.email}</P>}
 
 				<Button
 					onPress={step < 3 ? handleNextStep : handleRegister}

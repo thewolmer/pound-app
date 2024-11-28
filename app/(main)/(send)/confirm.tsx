@@ -1,8 +1,9 @@
+import React, { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useState } from 'react';
 import { Image, SafeAreaView, Text, View } from 'react-native';
 import Animated, { BounceIn, FadeIn, FadeInUp, FadeOut, SlideInDown } from 'react-native-reanimated';
+
 import { Button } from '~/components/ui/button';
 import { useAccount } from '~/context/AccountContext';
 import { formatCurrency } from '~/lib/formatCurrency';
@@ -17,7 +18,7 @@ export default function TransferScreen() {
 		amount?: string;
 		message?: string;
 	}>();
-	if (!account_details || !amount) return null;
+
 	const user = account_details ? (JSON.parse(account_details) as Tables<'account_details'>) : undefined;
 	const amountToSend = amount ? Number.parseFloat(amount) : 0;
 
@@ -26,6 +27,8 @@ export default function TransferScreen() {
 	const { accountId } = useAccount();
 	const { triggerHaptics } = useHaptics();
 	const [success, setSuccess] = useState<boolean | null>(null);
+
+	if (!account_details || !amount) return null;
 
 	const handleSendSubmit = async () => {
 		if (!accountId || !user?.account_id || !amount) return;
@@ -54,7 +57,7 @@ export default function TransferScreen() {
 						{user?.avatar_url ? (
 							<View>
 								<Image source={{ uri: user.avatar_url }} className="h-28 w-28 rounded-full shadow" />
-								<View className="absolute right-0 bottom-0 rounded-full bg-white p-2 shadow">
+								<View className="absolute bottom-0 right-0 rounded-full bg-white p-2 shadow">
 									<Image source={logoFromFile} style={{ width: 15, height: 15 }} />
 								</View>
 							</View>

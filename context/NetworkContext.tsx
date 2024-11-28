@@ -1,7 +1,7 @@
+import { createContext, useContext, useEffect, useState } from 'react';
 import NetInfo from '@react-native-community/netinfo';
 import { router } from 'expo-router';
 import type React from 'react';
-import { createContext, useContext, useEffect, useState } from 'react';
 
 interface NetworkContextValue {
 	isOffline: boolean;

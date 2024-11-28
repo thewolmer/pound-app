@@ -1,10 +1,8 @@
-import { set } from 'date-fns';
-import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
 import { ActivityIndicator, Modal, View } from 'react-native';
 
 import { QRScanner } from '~/components/qr-scanner';
-
 import { supabase } from '~/lib/supabase';
 import { useHaptics } from '~/lib/useHaptics';
 
@@ -17,7 +15,7 @@ export default function Scan() {
 		useCallback(() => {
 			return () => setTimeout(() => setScanOpen(true), 1000);
 			// 1s timeout is set to prevent multiple scans from happening
-		}, []),
+		}, [])
 	);
 
 	interface PaymentRequest {

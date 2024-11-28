@@ -1,6 +1,7 @@
 import '~/global.css';
 
 import { Stack } from 'expo-router';
+
 import { ProvidersWrapper } from '~/context/Providers';
 export {
 	// Catch any errors thrown by the Layout component.

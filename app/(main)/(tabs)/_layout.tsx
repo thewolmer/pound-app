@@ -1,6 +1,7 @@
-import { Tabs, router } from 'expo-router';
 import React from 'react';
-import { Text, View } from 'react-native';
+import { router, Tabs } from 'expo-router';
+import { View } from 'react-native';
+
 import { TabBarIcon } from '~/components/icons/TabBarIcon';
 import { Button } from '~/components/ui/button';
 

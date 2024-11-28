@@ -1,9 +1,10 @@
+import { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { Camera, CameraView } from 'expo-camera';
 import * as Linking from 'expo-linking';
-import { useEffect, useState } from 'react';
 import { Alert, Image, StyleSheet, View } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing } from 'react-native-reanimated';
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
+
 import { Button } from '../ui/button';
 interface QRScannerProps {
 	onScan: (data: string) => void;
@@ -78,10 +79,10 @@ export function QRScanner({ onScan, onCancel }: QRScannerProps) {
 
 			<View className="mb-32 flex items-center justify-center">
 				<Animated.View style={[animatedBorderStyle, { height: 288, width: 288 }]} className="relative bg-transparent">
-					<View className="absolute top-0 left-0 h-10 w-10 rounded-tl-lg border-primary border-t-4 border-l-4" />
-					<View className="absolute top-0 right-0 h-10 w-10 rounded-tr-lg border-primary border-t-4 border-r-4" />
-					<View className="absolute bottom-0 left-0 h-10 w-10 rounded-bl-lg border-primary border-b-4 border-l-4" />
-					<View className="absolute right-0 bottom-0 h-10 w-10 rounded-br-lg border-primary border-r-4 border-b-4" />
+					<View className="absolute left-0 top-0 h-10 w-10 rounded-tl-lg border-l-4 border-t-4 border-primary" />
+					<View className="absolute right-0 top-0 h-10 w-10 rounded-tr-lg border-r-4 border-t-4 border-primary" />
+					<View className="absolute bottom-0 left-0 h-10 w-10 rounded-bl-lg border-b-4 border-l-4 border-primary" />
+					<View className="absolute bottom-0 right-0 h-10 w-10 rounded-br-lg border-b-4 border-r-4 border-primary" />
 				</Animated.View>
 			</View>
 
@@ -96,7 +97,7 @@ export function QRScanner({ onScan, onCancel }: QRScannerProps) {
 				}}
 			/>
 
-			<Button haptics="impact-light" variant={'link'} onPress={toggleFlashlight} className="absolute top-[5%] right-2">
+			<Button haptics="impact-light" variant={'link'} onPress={toggleFlashlight} className="absolute right-2 top-[5%]">
 				{flashEnabled ? (
 					<Ionicons name="flash-off-outline" size={24} className="text-white" />
 				) : (

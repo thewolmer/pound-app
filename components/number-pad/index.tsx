@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
-import Animated from 'react-native-reanimated';
+
 import { Button } from '~/components/ui/button';
 import { Text } from '~/components/ui/text';
 import { useHaptics } from '~/lib/useHaptics';
@@ -39,7 +39,7 @@ export function NumberPad({ title, onClose, onSubmit }: NumberPadProps) {
 		<View className="bg-transparent p-4">
 			<View className="mb-4 items-center">
 				<Text className="text-2xl text-muted-foreground">{title}</Text>
-				<Text className="mt-2 font-bold text-3xl">£{amount || '0'}</Text>
+				<Text className="mt-2 text-3xl font-bold">£{amount || '0'}</Text>
 			</View>
 
 			<View className="flex h-[40vh] flex-row flex-wrap justify-between gap-y-4">

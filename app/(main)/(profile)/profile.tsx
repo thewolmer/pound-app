@@ -1,23 +1,22 @@
-import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Image, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { router, useFocusEffect } from 'expo-router';
+import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ForwardCard } from '~/components/ui/ForwardCard';
 
+import { ForwardCard } from '~/components/ui/ForwardCard';
 import { useSession } from '~/context/SessionContext';
 import { supabase } from '~/lib/supabase';
 import type { Tables } from '~/types/database.types';
 
 export default function Profile() {
 	const { session } = useSession();
-	if (!session) return null;
 
 	const [user, setUser] = useState<Tables<'person'> | null>(null);
 
 	useFocusEffect(
 		useCallback(() => {
 			const fetchData = async () => {
-				if (session.user.id) {
+				if (session?.user.id) {
 					const { data, error } = await supabase.from('person').select().eq('id', session.user.id).single();
 					if (data) {
 						setUser(data);
@@ -30,7 +29,7 @@ export default function Profile() {
 			};
 
 			fetchData();
-		}, [session.user.id]),
+		}, [session?.user.id])
 	);
 
 	if (user === null) {
@@ -56,13 +55,13 @@ export default function Profile() {
 						/>
 					) : (
 						<View className="flex h-[100px] w-[100px] items-center justify-center rounded-full bg-accent text-center">
-							<View className="font-extrabold text-foreground text-xl">
+							<View className="text-xl font-extrabold text-foreground">
 								<Text>{user.first_name?.[0]}</Text>
 							</View>
 						</View>
 					)}
 					{user.first_name && user.last_name && (
-						<Text className={'font-bold text-foreground text-lg'}>
+						<Text className={'text-lg font-bold text-foreground'}>
 							{user.first_name} {user.last_name}
 						</Text>
 					)}

@@ -1,3 +1,4 @@
+import { useCallback, useDeferredValue, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import {
 	BottomSheetBackdrop,
@@ -6,22 +7,21 @@ import {
 	BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import type { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import * as Contacts from 'expo-contacts';
+import { Contact, Fields, getContactsAsync, requestPermissionsAsync } from 'expo-contacts';
 import { router } from 'expo-router';
-import { useCallback, useDeferredValue, useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { ActivityIndicator, Platform, Pressable } from 'react-native';
-import { Image, Text, View } from 'react-native';
+import { Image, Platform, Pressable, Text, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
-import { ForwardCard } from '~/components/ui/ForwardCard';
+
+import { Input } from '../ui/input';
 import { Button } from '~/components/ui/button';
+import { ForwardCard } from '~/components/ui/ForwardCard';
 import { H3 } from '~/components/ui/typography';
 import { supabase } from '~/lib/supabase';
 import { cn } from '~/lib/utils';
 import type { Tables } from '~/types/database.types';
-import { Input } from '../ui/input';
 
-interface ContactWithAccountDetails extends Contacts.Contact {
+interface ContactWithAccountDetails extends Contact {
 	isPoundUser: boolean;
 	account_details?: Tables<'account_details'>;
 }
@@ -42,14 +42,14 @@ export const SendViaContact = () => {
 		(backdropProps: BottomSheetBackdropProps) => (
 			<BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...backdropProps} />
 		),
-		[],
+		[]
 	);
 
 	const fetchContacts = async () => {
-		const { status } = await Contacts.requestPermissionsAsync();
+		const { status } = await requestPermissionsAsync();
 		if (status === 'granted') {
-			const { data: contactData } = await Contacts.getContactsAsync({
-				fields: [Contacts.Fields.Name, Contacts.Fields.Image, Contacts.Fields.PhoneNumbers, Contacts.Fields.Emails],
+			const { data: contactData } = await getContactsAsync({
+				fields: [Fields.Name, Fields.Image, Fields.PhoneNumbers, Fields.Emails],
 			});
 
 			const emails = contactData
@@ -89,7 +89,7 @@ export const SendViaContact = () => {
 	};
 
 	const filteredContacts = contacts.filter((contact) =>
-		contact.name?.toLowerCase().includes(deferredSearch.toLowerCase()),
+		contact.name?.toLowerCase().includes(deferredSearch.toLowerCase())
 	);
 
 	return (
@@ -172,8 +172,8 @@ const renderContactItem = ({
 			});
 		}}
 		className={cn(
-			'flex-row items-center justify-start border-border border-b p-2',
-			item.isPoundUser ? 'opacity-100' : 'opacity-60',
+			'flex-row items-center justify-start border-b border-border p-2',
+			item.isPoundUser ? 'opacity-100' : 'opacity-60'
 		)}
 	>
 		{item.imageAvailable && item.image ? (
@@ -187,15 +187,15 @@ const renderContactItem = ({
 			<Text className="font-semibold text-foreground">{item.name}</Text>
 			{item.isPoundUser &&
 				(item.account_details?.identity_tag ? (
-					<Text className="text-muted-foreground text-xs">@{item.account_details?.identity_tag}</Text>
+					<Text className="text-xs text-muted-foreground">@{item.account_details?.identity_tag}</Text>
 				) : (
-					<Text className="text-muted-foreground text-xs">{item.account_details?.email}</Text>
+					<Text className="text-xs text-muted-foreground">{item.account_details?.email}</Text>
 				))}
 			{!item.isPoundUser &&
 				(item.emails?.length ? (
-					<Text className="text-muted-foreground text-xs">{item.emails[0].email}</Text>
+					<Text className="text-xs text-muted-foreground">{item.emails[0].email}</Text>
 				) : (
-					<Text className="text-muted-foreground text-xs">{item.phoneNumbers?.[0].number}</Text>
+					<Text className="text-xs text-muted-foreground">{item.phoneNumbers?.[0].number}</Text>
 				))}
 		</View>
 	</Pressable>

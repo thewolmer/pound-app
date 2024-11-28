@@ -1,18 +1,17 @@
+import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthApiError } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
+
 import { PoundIcon } from '~/components/icons/PoundIcon';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
-
 import { useSession } from '~/context/SessionContext';
-
 import { useHaptics } from '~/lib/useHaptics';
 import { cn } from '~/lib/utils';
 
@@ -93,7 +92,7 @@ export default function Login() {
 						onSubmitEditing={handleLogin}
 						className={cn(errors.email && 'border-red-500')}
 					/>
-					{errors.email && <Text className="text-red-500 text-sm">{errors.email}</Text>}
+					{errors.email && <Text className="text-sm text-red-500">{errors.email}</Text>}
 					<View className="flex flex-row items-center justify-between gap-1">
 						<Input
 							placeholder="Password"
@@ -117,7 +116,7 @@ export default function Login() {
 							</AnimatedPressable>
 						)}
 					</View>
-					{errors.password && <Text className="text-red-500 text-sm">{errors.password}</Text>}
+					{errors.password && <Text className="text-sm text-red-500">{errors.password}</Text>}
 				</View>
 
 				<Button onPress={handleLogin} disabled={isSubmitting} className="flex-row items-center">
@@ -126,9 +125,9 @@ export default function Login() {
 				</Button>
 
 				<View className="flex-row justify-center">
-					<Text>Don't have an account? </Text>
+					<Text>{`Don't have an account? `}</Text>
 					<Pressable onPress={() => router.push('/auth/register')}>
-						<Text className="font-semibold text-primary">Sign Up</Text>
+						<Text className="font-semibold text-primary">{`Sign Up`}</Text>
 					</Pressable>
 				</View>
 			</View>

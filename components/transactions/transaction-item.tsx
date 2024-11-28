@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { router } from 'expo-router';
 import type { ComponentProps } from 'react';
 import { Pressable, Text, View } from 'react-native';
+
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { useAccount } from '~/context/AccountContext';
 import { formatCurrency } from '~/lib/formatCurrency';
@@ -22,7 +23,10 @@ function getInitials(name: string | null) {
 export function TransactionItem({
 	item,
 	onlyShowTime = false,
-}: { item: Tables<'account_transactions'>; onlyShowTime?: boolean }) {
+}: {
+	item: Tables<'account_transactions'>;
+	onlyShowTime?: boolean;
+}) {
 	const { accountId } = useAccount();
 
 	let accountDetails: {
@@ -62,7 +66,7 @@ export function TransactionItem({
 	return (
 		<Pressable
 			onPress={() => router.navigate(`/(main)/(tabs)/(recent)/${item.id}`)}
-			className="flex-row items-center justify-between border-border border-b p-2"
+			className="flex-row items-center justify-between border-b border-border p-2"
 		>
 			<View className="flex-row items-center gap-4">
 				<View className="relative h-12 w-12">
@@ -72,24 +76,24 @@ export function TransactionItem({
 							<Text className="text-foreground">{getInitials(accountDetails.displayName || '')}</Text>
 						</AvatarFallback>
 					</Avatar>
-					<View className="absolute right-0 bottom-0 h-4 w-4 items-center justify-center rounded-full bg-primary">
+					<View className="absolute bottom-0 right-0 h-4 w-4 items-center justify-center rounded-full bg-primary">
 						<Ionicons name={accountDetails.icon} size={10} className="text-primary-foreground" />
 					</View>
 				</View>
 
 				<View>
-					<Text className="font-bold text-foreground text-md">{accountDetails.displayName}</Text>
+					<Text className="text-md font-bold text-foreground">{accountDetails.displayName}</Text>
 					{onlyShowTime ? (
-						<Text className="text-muted-foreground text-sm">{format(new Date(item.created_at || ''), 'h:mm a')}</Text>
+						<Text className="text-sm text-muted-foreground">{format(new Date(item.created_at || ''), 'h:mm a')}</Text>
 					) : (
-						<Text className="text-muted-foreground text-sm">{formatTransactionDate(item.created_at || '')}</Text>
+						<Text className="text-sm text-muted-foreground">{formatTransactionDate(item.created_at || '')}</Text>
 					)}
 				</View>
 			</View>
 			<Text
 				className={cn(
 					item.destination_account_id === accountId ? 'text-success-foreground' : 'text-destructive-foreground',
-					'font-semibold',
+					'font-semibold'
 				)}
 			>
 				{item.destination_account_id === accountId ? '+' : '-'}

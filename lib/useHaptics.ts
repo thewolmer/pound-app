@@ -1,4 +1,5 @@
 import * as Haptics from 'expo-haptics';
+
 import { usePreferenceSettings } from '~/context/PreferenceContext';
 
 type HapticType =

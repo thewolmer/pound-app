@@ -1,4 +1,5 @@
-import { Redirect, Stack, router } from 'expo-router';
+import { Redirect, router, Stack } from 'expo-router';
+
 import { TabBarIcon } from '~/components/icons/TabBarIcon';
 import { Button } from '~/components/ui/button';
 import { useSession } from '~/context/SessionContext';

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { FlatList } from 'react-native';
-import { useAccount } from '~/context/AccountContext';
 
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
+import { useAccount } from '~/context/AccountContext';
 import { supabase } from '~/lib/supabase';
 import type { Tables } from '~/types/database.types';
 

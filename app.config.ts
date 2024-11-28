@@ -1,6 +1,6 @@
 import type { ConfigContext, ExpoConfig } from '@expo/config';
-
 import type { AppIconBadgeConfig } from 'app-icon-badge/types';
+
 import { ClientEnv, Env } from './env';
 
 const appIconBadgeConfig: AppIconBadgeConfig = {
@@ -92,17 +92,17 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		],
 		'expo-router',
 		[
-        "expo-splash-screen",
-        {
-          image: './assets/images/pound-white.png',
-          backgroundColor: '#0d103f',
-					imageWidth: 200,
-					"dark": {
-            "image": "./assets/images/pound-white.png",
-            "backgroundColor": "#0d103f"
-          },
-        }
-      ],
+			'expo-splash-screen',
+			{
+				image: './assets/images/pound-white.png',
+				backgroundColor: '#0d103f',
+				imageWidth: 200,
+				dark: {
+					image: './assets/images/pound-white.png',
+					backgroundColor: '#0d103f',
+				},
+			},
+		],
 	],
 	extra: {
 		...ClientEnv,

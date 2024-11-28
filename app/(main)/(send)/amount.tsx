@@ -1,9 +1,10 @@
+import React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router, useLocalSearchParams } from 'expo-router';
-import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Image, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { z } from 'zod';
+
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
@@ -12,7 +13,7 @@ import type { Tables } from '~/types/database.types';
 const AmountSchema = z.object({
 	amount: z.preprocess(
 		(val) => Number.parseFloat(val as string),
-		z.number().positive('Amount must be greater than 0').min(0.01, 'Amount must be at least 0.01'),
+		z.number().positive('Amount must be greater than 0').min(0.01, 'Amount must be at least 0.01')
 	),
 	message: z.string().max(30, 'Message is too long').nullable().optional(),
 });
@@ -21,7 +22,6 @@ type AmountFormValues = z.infer<typeof AmountSchema>;
 
 export default function AmountScreen() {
 	const { account_details } = useLocalSearchParams<{ account_details?: string }>();
-	if (!account_details) return null;
 
 	const user = account_details ? (JSON.parse(account_details) as Tables<'account_details'>) : undefined;
 
@@ -36,6 +36,9 @@ export default function AmountScreen() {
 			message: null,
 		},
 	});
+
+	if (!account_details) return null;
+
 	const onSubmit = (data: AmountFormValues) => {
 		router.push({
 			pathname: '/(main)/(send)/confirm',
@@ -70,8 +73,8 @@ export default function AmountScreen() {
 									)}
 								</View>
 								<View className="flex flex-col">
-									<Text className="line-clamp-2 font-semibold text-foreground text-lg"> {user?.display_name}</Text>
-									<Text className="line-clamp-1 text-muted-foreground text-sm">
+									<Text className="line-clamp-2 text-lg font-semibold text-foreground"> {user?.display_name}</Text>
+									<Text className="line-clamp-1 text-sm text-muted-foreground">
 										{user?.identity_tag ? `@${user.identity_tag}` : ''}
 									</Text>
 								</View>
@@ -85,7 +88,7 @@ export default function AmountScreen() {
 									control={control}
 									render={({ field: { onChange, value } }) => (
 										<View className="flex flex-row items-center justify-between gap-1">
-											<Text className="w-[10%] font-semibold text-2xl text-muted-foreground">£</Text>
+											<Text className="w-[10%] text-2xl font-semibold text-muted-foreground">£</Text>
 											<Input
 												keyboardType="numeric"
 												className="w-[90%] text-2xl placeholder:font-extrabold placeholder:text-muted-foreground"
@@ -109,7 +112,7 @@ export default function AmountScreen() {
 										<Input
 											value={value || ''}
 											onChangeText={onChange}
-											className="placeholder:font-semibold placeholder:text-muted-foreground placeholder:text-sm"
+											className="placeholder:text-sm placeholder:font-semibold placeholder:text-muted-foreground"
 											placeholder="Add a note  (optional)"
 										/>
 									)}

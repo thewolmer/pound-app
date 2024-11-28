@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
-import type { ClassValue } from 'clsx';
 import type React from 'react';
 import { Pressable, Text, View } from 'react-native';
+
 import { useHaptics } from '~/lib/useHaptics';
 import { cn } from '~/lib/utils';
+
 import { Button } from './button';
 import { Card, CardFooter, CardHeader } from './card';
 import { H4 } from './typography';
@@ -49,7 +50,7 @@ export const ForwardCard: React.FC<ForwardCardProps> = ({
 							<H4 className={cn(titleClassName)}>{title}</H4>
 						</CardHeader>
 						<CardFooter>
-							<Text className={cn('w-[95%] truncate text-muted-foreground text-sm', descriptionClassName)}>
+							<Text className={cn('w-[95%] truncate text-sm text-muted-foreground', descriptionClassName)}>
 								{description}
 							</Text>
 						</CardFooter>

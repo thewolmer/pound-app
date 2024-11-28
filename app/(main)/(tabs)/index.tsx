@@ -1,9 +1,10 @@
+import { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { DepositButton } from '~/components/action-buttons/DepositButton';
 import { RequestButton } from '~/components/action-buttons/RequestButton';
 import { LatestTransactions } from '~/components/transactions/latest-transactions';
@@ -19,7 +20,6 @@ import { registerForPushNotificationsAsync } from '~/lib/usePushNotifications';
 
 export default function StartScreen() {
 	const { session, person } = useSession();
-	if (!session) return null;
 
 	const { balance, isLoading } = useAccount();
 	const [previousBalance, setPreviousBalance] = useState<number | null>(null);
@@ -31,11 +31,11 @@ export default function StartScreen() {
 			if (token) {
 				const tokenFromLocalStorage = await AsyncStorage.getItem('pushToken');
 				if (tokenFromLocalStorage !== token) {
-					const { data, error } = await supabase
+					const { data } = await supabase
 						.from('expo_push_token')
 						.insert({
 							expo_push_token: token,
-							person_id: session.user.id,
+							person_id: session?.user.id,
 						})
 						.select();
 					if (data) {
@@ -46,7 +46,7 @@ export default function StartScreen() {
 		};
 
 		registerForPushNotifications();
-	}, [session.user.id]);
+	}, [session?.user.id]);
 
 	useEffect(() => {
 		if (isLoading) return;
@@ -102,7 +102,7 @@ export default function StartScreen() {
 							size={'lg'}
 						>
 							<Ionicons name="arrow-up-circle-outline" className="text-foreground" size={24} />
-							<Text className="text-foreground text-xs">Send</Text>
+							<Text className="text-xs text-foreground">Send</Text>
 						</Button>
 						<RequestButton />
 					</CardFooter>

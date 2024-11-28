@@ -1,7 +1,8 @@
-import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
+import { router } from 'expo-router';
+import { Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { z } from 'zod';
+
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { useSession } from '~/context/SessionContext';
@@ -15,16 +16,15 @@ const tagSchema = z
 	.max(15, 'Tag can be up to 15 characters');
 
 export default function UpdateTag() {
-	const { session, person, updatePerson } = useSession();
-	if (!session?.user.id) return null;
-	if (!person) return null;
+	const { person, updatePerson } = useSession();
 
-	const [tag, setTag] = useState(person.identity_tag || '');
+	const [tag, setTag] = useState(person?.identity_tag || '');
 	const [isAvailable, setIsAvailable] = useState(true);
 	const [error, setError] = useState('');
 	const [loading, setLoading] = useState(false);
-	const [initialTag, setInitialTag] = useState<string>(person.identity_tag || '');
 	const debouncedTag = useDebounce(tag, 300);
+
+	const initialTag = person?.identity_tag || '';
 
 	const validateTag = (input: string) => {
 		const result = tagSchema.safeParse(input);
@@ -68,10 +68,10 @@ export default function UpdateTag() {
 	};
 
 	return (
-		<SafeAreaView className="w-full flex-1 ">
+		<SafeAreaView className="w-full flex-1">
 			<ScrollView contentInsetAdjustmentBehavior="automatic" className="flex w-full flex-1 p-6">
 				<View className="mb-10 flex flex-1">
-					<Text className="mb-4 text-foreground text-lg">
+					<Text className="mb-4 text-lg text-foreground">
 						{initialTag
 							? `Your Pound Tag is @${initialTag},\nYou can change it here if you want`
 							: 'Pound tag is used to send you money,\nAdd a New Tag'}

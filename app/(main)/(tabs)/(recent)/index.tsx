@@ -1,9 +1,8 @@
+import { type SetStateAction, useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { format, isToday, isYesterday, parseISO } from 'date-fns';
-import { type SetStateAction, useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { ActivityIndicator } from 'react-native';
-import { SectionList } from 'react-native';
-import { RefreshControl, Text, View } from 'react-native';
+import { ActivityIndicator, RefreshControl, SectionList, Text, View } from 'react-native';
+
 import { TransactionItem } from '~/components/transactions/transaction-item';
 import { useAccount } from '~/context/AccountContext';
 import { formatCurrency } from '~/lib/formatCurrency';
@@ -65,8 +64,6 @@ export default function Recent() {
 		}, []);
 	};
 
-	// Update filtered data based on search query
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		const filteredData = allTransactions.filter((transaction) => {
 			const displayNameMatches = transaction.destination_display_name
@@ -91,7 +88,6 @@ export default function Recent() {
 		});
 	}, [navigation]);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	const onRefresh = useCallback(async () => {
 		setRefreshing(true);
 		await fetchTransactions();
@@ -99,7 +95,6 @@ export default function Recent() {
 	}, []);
 
 	// Initial Fetch
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		fetchTransactions();
 	}, [accountId]);
@@ -125,8 +120,8 @@ export default function Recent() {
 
 		return (
 			<View className="flex-row items-center justify-between bg-card px-5 py-6">
-				<Text className="font-bold text-card-foreground text-xl">{section.title}</Text>
-				<Text className="font-bold text-muted-foreground text-xl">{formattedAmount}</Text>
+				<Text className="text-xl font-bold text-card-foreground">{section.title}</Text>
+				<Text className="text-xl font-bold text-muted-foreground">{formattedAmount}</Text>
 			</View>
 		);
 	};

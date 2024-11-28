@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Pressable, View } from 'react-native';
+
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { cn } from '~/lib/utils';
@@ -19,7 +20,7 @@ export function ThemeToggle() {
 		>
 			{({ pressed }) => (
 				<View
-					className={cn('aspect-square flex-1 items-start justify-center web:px-5 pt-0.5', pressed && 'opacity-70')}
+					className={cn('aspect-square flex-1 items-start justify-center pt-0.5 web:px-5', pressed && 'opacity-70')}
 				>
 					{isDarkColorScheme ? (
 						<Ionicons name="sunny-outline" className="text-foreground" size={24} strokeWidth={1.25} />

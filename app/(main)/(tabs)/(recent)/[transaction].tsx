@@ -1,10 +1,10 @@
+import React, { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator } from 'react-native';
-import { Image, Text, View } from 'react-native';
+import { ActivityIndicator, Image, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { Card, CardContent, CardFooter, CardHeader } from '~/components/ui/card';
 import { useAccount } from '~/context/AccountContext';
 import { formatCurrency } from '~/lib/formatCurrency';
@@ -31,7 +31,7 @@ function Transaction() {
           *,
           destination_account:account_details!transaction_destination_account_id_fkey (*),
           origin_account:account_details!transaction_origin_account_id_fkey (*)
-        `,
+        `
 				)
 				.eq('id', id)
 				.single();
@@ -66,7 +66,7 @@ function Transaction() {
 			<View className="p-6">
 				<Card>
 					<CardHeader>
-						<Text className="font-bold text-foreground text-lg">{isDeposit ? 'Received from ' : 'Sent to'}</Text>
+						<Text className="text-lg font-bold text-foreground">{isDeposit ? 'Received from ' : 'Sent to'}</Text>
 					</CardHeader>
 					<CardContent className="flex w-full flex-row justify-between gap-4">
 						<View className="flex w-[60%] flex-row items-center gap-4">
@@ -79,7 +79,7 @@ function Transaction() {
 											resizeMode="cover"
 										/>
 									) : (
-										<Text className="font-black text-accent-foreground text-lg">
+										<Text className="text-lg font-black text-accent-foreground">
 											{transaction?.origin_account_details?.display_name?.[0]}
 										</Text>
 									)}
@@ -93,7 +93,7 @@ function Transaction() {
 											resizeMode="cover"
 										/>
 									) : (
-										<Text className="font-black text-accent-foreground text-lg">
+										<Text className="text-lg font-black text-accent-foreground">
 											{transaction?.destination_account_details?.display_name?.[0]}
 										</Text>
 									)}
@@ -105,7 +105,7 @@ function Transaction() {
 										{transaction?.origin_account_details?.display_name}
 									</Text>
 									{transaction?.destination_account_details?.identity_tag && (
-										<Text className="text-muted-foreground text-sm">
+										<Text className="text-sm text-muted-foreground">
 											@{transaction?.origin_account_details?.identity_tag}
 										</Text>
 									)}
@@ -116,7 +116,7 @@ function Transaction() {
 										{transaction?.destination_account_details?.display_name}
 									</Text>
 									{transaction?.destination_account_details?.identity_tag && (
-										<Text className="text-muted-foreground text-sm">
+										<Text className="text-sm text-muted-foreground">
 											@{transaction?.destination_account_details?.identity_tag}
 										</Text>
 									)}
@@ -130,25 +130,25 @@ function Transaction() {
 
 					{transaction.message && (
 						<CardFooter className="flex flex-col items-start justify-start">
-							<Text className="font-semibold text-muted-foreground text-sm">Message : {transaction.message} </Text>
+							<Text className="text-sm font-semibold text-muted-foreground">Message : {transaction.message} </Text>
 						</CardFooter>
 					)}
 
-					<View className="w-full gap-2 border-border border-t-2 p-4">
+					<View className="w-full gap-2 border-t-2 border-border p-4">
 						<View className="flex flex-row items-center gap-2 py-3">
 							<Ionicons name="reader-outline" size={18} className="text-muted-foreground" />
-							<Text className="text-muted-foreground text-sm">Details</Text>
+							<Text className="text-sm text-muted-foreground">Details</Text>
 						</View>
 						<View className="gap-1">
-							<Text className="text-muted-foreground text-sm">Status</Text>
+							<Text className="text-sm text-muted-foreground">Status</Text>
 							<Text>
 								{transaction?.status && (
-									<Text className="font-semibold text-foreground capitalize">{transaction.status}</Text>
+									<Text className="font-semibold capitalize text-foreground">{transaction.status}</Text>
 								)}
 							</Text>
 						</View>
 						<View className="gap-1">
-							<Text className="text-muted-foreground text-sm">Transaction Time</Text>
+							<Text className="text-sm text-muted-foreground">Transaction Time</Text>
 							<Text>
 								{transaction?.created_at && (
 									<Text className="font-semibold text-foreground">
@@ -158,11 +158,11 @@ function Transaction() {
 							</Text>
 						</View>
 						<View className="gap-1">
-							<Text className="text-muted-foreground text-sm">Transaction ID</Text>
+							<Text className="text-sm text-muted-foreground">Transaction ID</Text>
 							<Text>{transaction?.id && <Text className="font-semibold text-foreground">{transaction.id}</Text>}</Text>
 						</View>
 						<View className="gap-1">
-							<Text className="text-muted-foreground text-sm">Reference</Text>
+							<Text className="text-sm text-muted-foreground">Reference</Text>
 							<Text>
 								{transaction?.reference && (
 									<Text className="font-semibold text-foreground">{transaction.reference}</Text>

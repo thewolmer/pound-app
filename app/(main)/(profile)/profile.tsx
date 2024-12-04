@@ -81,6 +81,12 @@ export default function Profile() {
 					ionicons="id-card"
 					onPress={() => router.push('/(profile)/poundTag')}
 				/>
+				<ForwardCard
+					title="Kyc"
+					description={'Verify your identity'}
+					ionicons="id-card"
+					onPress={() => router.push('/(profile)/kyc')}
+				/>
 			</ScrollView>
 		</SafeAreaView>
 	);

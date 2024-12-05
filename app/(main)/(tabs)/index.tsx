@@ -94,7 +94,16 @@ export default function StartScreen() {
 					</CardHeader>
 
 					<CardFooter className="flex justify-between">
-						<DepositButton />
+						{/* <DepositButton /> */}
+						<Button
+							onPress={() => router.push('/(main)/(deposit)/deposit')}
+							haptics="impact-light"
+							variant={'outline'}
+							size={'lg'}
+						>
+							<Ionicons name="business-outline" className="text-foreground" size={24} />
+							<Text className="text-xs text-foreground">Deposit</Text>
+						</Button>
 						<Button
 							onPress={() => router.push('/(main)/(send)/send')}
 							haptics="impact-light"

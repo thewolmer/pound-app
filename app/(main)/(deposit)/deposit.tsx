@@ -126,7 +126,7 @@ export default function Deposit() {
 						<Button
 							variant="outline"
 							size={'lg'}
-							onPress={() => router.push('/(main)/(deposit)/addcard')}
+							onPress={() => router.push('/(main)/(deposit)/add-card')}
 							className={'flex flex-row items-center justify-start gap-2 px-4 py-2'}
 						>
 							<Ionicons name={'add-circle-outline'} size={24} />

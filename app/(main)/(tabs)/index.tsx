@@ -5,7 +5,6 @@ import { router } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { DepositButton } from '~/components/action-buttons/DepositButton';
 import { RequestButton } from '~/components/action-buttons/RequestButton';
 import { LatestTransactions } from '~/components/transactions/latest-transactions';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
@@ -94,7 +93,15 @@ export default function StartScreen() {
 					</CardHeader>
 
 					<CardFooter className="flex justify-between">
-						<DepositButton />
+						<Button
+							onPress={() => router.push('/(main)/(deposit)/deposit')}
+							variant={'outline'}
+							haptics="impact-light"
+							size={'lg'}
+						>
+							<Ionicons name="business-outline" className="text-foreground" size={22} />
+							<Text className="text-xs text-foreground">Deposit</Text>
+						</Button>
 						<Button
 							onPress={() => router.push('/(main)/(send)/send')}
 							haptics="impact-light"

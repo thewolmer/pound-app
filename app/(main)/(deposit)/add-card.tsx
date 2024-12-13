@@ -127,7 +127,6 @@ export default function AddCard() {
 						control={control}
 						render={({ field: { onChange, value } }) => (
 							<Input
-								keyboardType="numeric"
 								placeholder="MM/YY"
 								value={value}
 								onChangeText={onChange}

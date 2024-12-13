@@ -4,6 +4,7 @@ import { type Session, type User, type WeakPassword } from '@supabase/supabase-j
 import type React from 'react';
 
 import { supabase } from '../lib/supabase';
+import { addAuthHeaderToPoundApi } from '~/api/common/pound-api.config';
 import type { Tables } from '~/types/database.types';
 
 interface UpdatePersonProps {
@@ -39,10 +40,12 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
 	useEffect(() => {
 		supabase.auth.getSession().then(({ data: { session } }) => {
+			addAuthHeaderToPoundApi(session);
 			setSession(session);
 		});
 
 		supabase.auth.onAuthStateChange((_event, session) => {
+			addAuthHeaderToPoundApi(session);
 			setSession(session);
 		});
 	}, []);

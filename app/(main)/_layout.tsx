@@ -29,6 +29,12 @@ export default function MainLayout() {
 					headerShown: false,
 				}}
 			/>
+			<Stack.Screen
+				name="(deposit)"
+				options={{
+					headerShown: false,
+				}}
+			/>
 		</Stack>
 	);
 }

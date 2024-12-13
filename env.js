@@ -79,6 +79,8 @@ const client = z.object({
 	VERSION: z.string(),
 
 	// ADD YOUR CLIENT ENV VARS HERE
+	EXPO_PUBLIC_POUND_API: z.string(),
+	EXPO_PUBLIC_POUND_WEB_URL: z.string(),
 	EXPO_PUBLIC_SUPABASE_URL: z.string(),
 	EXPO_PUBLIC_SUPABASE_ANON_KEY: z.string(),
 });
@@ -96,12 +98,14 @@ const buildTime = z.object({
 const _clientEnv = {
 	APP_ENV,
 	NAME: NAME,
-	SCHEME: SCHEME,
+	SCHEME: withEnvSuffix(SCHEME),
 	BUNDLE_ID: withEnvSuffix(BUNDLE_ID),
 	PACKAGE: withEnvSuffix(PACKAGE),
 	VERSION: packageJSON.version,
 
 	// ADD YOUR ENV VARS HERE TOO
+	EXPO_PUBLIC_POUND_API: process.env.EXPO_PUBLIC_POUND_API,
+	EXPO_PUBLIC_POUND_WEB_URL: process.env.EXPO_PUBLIC_POUND_WEB_URL,
 	EXPO_PUBLIC_SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL,
 	EXPO_PUBLIC_SUPABASE_ANON_KEY: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
 };

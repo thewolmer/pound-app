@@ -13,6 +13,7 @@ import { Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
+import { APIProvider } from '~/api/common/api-provider';
 import { NAV_THEME } from '~/constants/theme';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
 import { useColorScheme } from '~/lib/useColorScheme';
@@ -101,22 +102,24 @@ export const ProvidersWrapper = ({ children }: { children: React.ReactNode }) =>
 	}
 
 	return (
-		<ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-			<PreferenceSettingsProvider>
-				<GestureHandlerRootView>
-					<BottomSheetModalProvider>
-						<StatusBar style={isDarkColorScheme ? 'light' : 'dark'} />
-						<SafeAreaProvider onLayout={onLayoutRootView}>
-							<NetworkProvider>
-								<SessionProvider>
-									<AccountProvider>{children}</AccountProvider>
-								</SessionProvider>
-							</NetworkProvider>
-						</SafeAreaProvider>
-						<PortalHost />
-					</BottomSheetModalProvider>
-				</GestureHandlerRootView>
-			</PreferenceSettingsProvider>
-		</ThemeProvider>
+		<APIProvider>
+			<ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
+				<PreferenceSettingsProvider>
+					<GestureHandlerRootView>
+						<BottomSheetModalProvider>
+							<StatusBar style={isDarkColorScheme ? 'light' : 'dark'} />
+							<SafeAreaProvider onLayout={onLayoutRootView}>
+								<NetworkProvider>
+									<SessionProvider>
+										<AccountProvider>{children}</AccountProvider>
+									</SessionProvider>
+								</NetworkProvider>
+							</SafeAreaProvider>
+							<PortalHost />
+						</BottomSheetModalProvider>
+					</GestureHandlerRootView>
+				</PreferenceSettingsProvider>
+			</ThemeProvider>
+		</APIProvider>
 	);
 };

@@ -44,6 +44,13 @@ export default function ProfileLayout() {
 					headerLargeTitle: true,
 				}}
 			/>
+			<Stack.Screen
+				name="(kyc)"
+				options={{
+					title: 'KYC',
+					headerShown: false,
+				}}
+			/>
 		</Stack>
 	);
 }

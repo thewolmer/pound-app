@@ -30,6 +30,13 @@ module.exports = {
 				],
 			},
 		],
+		'prefer-const': [
+			'error',
+			{
+				destructuring: 'any',
+				ignoreReadBeforeAssign: false,
+			},
+		],
 		'react/react-in-jsx-scope': 'off',
 		'react/prop-types': [
 			'error',

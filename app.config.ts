@@ -50,6 +50,26 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			foregroundImage: './assets/images/adaptive-icon.png',
 			backgroundColor: '#ffffff',
 		},
+		intentFilters: [
+			{
+				action: 'VIEW',
+				autoVerify: true,
+				data: [
+					{
+						scheme: 'https',
+						host: 'pound.im.stg.manx.tech',
+						pathPrefix: '/app',
+					},
+					{
+						scheme: 'http',
+						host: '192.168.68.100',
+						port: '3000',
+						pathPrefix: '/app',
+					},
+				],
+				category: ['BROWSABLE', 'DEFAULT'],
+			},
+		],
 		package: Env.PACKAGE,
 		googleServicesFile: './google-services.json',
 	},

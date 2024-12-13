@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
+import { openBrowserAsync } from 'expo-web-browser';
 import { Controller, useForm } from 'react-hook-form';
 import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { z } from 'zod';
@@ -9,8 +10,11 @@ import { z } from 'zod';
 import { Button } from '~/components/ui/button';
 import { Card, CardFooter, CardHeader } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
+import { Env } from '~/config/env';
 import { getCardIcon } from '~/lib/CardIcons';
-import { cn } from '~/lib/utils';
+import { useListCards } from '~/lib/pound/use-list-cards';
+import { useMakePayment } from '~/lib/pound/use-make-payment';
+import { cn, uuid } from '~/lib/utils';
 
 const AmountSchema = z.object({
 	amount: z.preprocess(
@@ -21,42 +25,12 @@ const AmountSchema = z.object({
 
 type AmountFormValues = z.infer<typeof AmountSchema>;
 
-const predefinedAmounts = [10, 50, 100, 200, 500];
-
-const cards = [
-	{
-		active: true,
-		card: {
-			last_4_digits: '0001',
-			type: 'VISA',
-		},
-		created_at: '2021-03-30T10:06:07.000+00:00',
-		mandate: {
-			merchant_code: 'MDASYTPD',
-			status: 'active',
-			type: 'recurrent',
-		},
-		token: 'bcfc8e5f-3b47-4cb9-854b-3b7a4cce7be3',
-		type: 'card',
-	},
-	{
-		active: true,
-		card: {
-			last_4_digits: '4206',
-			type: 'american-express',
-		},
-		created_at: '2021-03-30T10:06:07.000+00:00',
-		mandate: {
-			merchant_code: 'MDASYTPD',
-			status: 'active',
-			type: 'recurrent',
-		},
-		token: 'bcfc8e5f-3b47-4cs9-854b-3b7asade7be3',
-		type: 'card',
-	},
-];
+const predefinedAmounts = [0.01, 10, 25, 50, 100];
 
 export default function Deposit() {
+	const { data: cards } = useListCards();
+	const { mutate: makePayment } = useMakePayment();
+
 	const {
 		control,
 		handleSubmit,
@@ -77,7 +51,26 @@ export default function Deposit() {
 			alert('Please select a card.');
 			return;
 		}
-		alert(`Amount: £${data.amount}, Selected Card ID: ${selectedCard}`);
+		//maybe redirect should also go to the same success screen on successful 3ds?
+		const redirectUrl = `${Env.EXPO_PUBLIC_POUND_WEB_URL}/app/home?env=${Env.APP_ENV}`;
+		makePayment(
+			{ amount: data.amount, token: selectedCard, reference: uuid(), redirectUrl },
+			{
+				onSuccess: async (data) => {
+					if (data.nextStepUrl) {
+						await openBrowserAsync(data.nextStepUrl, {
+							showInRecents: true,
+							createTask: false,
+						});
+					} else {
+						//TODO: show deposit success screen and redirect (button) to home?
+					}
+				},
+				onError: (error) => {
+					console.log(error);
+				},
+			}
+		);
 	};
 
 	return (
@@ -132,7 +125,7 @@ export default function Deposit() {
 							<Ionicons name={'add-circle-outline'} size={24} />
 							<Text className={'text-base font-semibold'}>Add new card</Text>
 						</Button>
-						{cards.map((card) => {
+						{cards?.map((card) => {
 							const isSelectedCard = selectedCard === card.token;
 							return (
 								<Button

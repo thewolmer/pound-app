@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import creditCardType from 'credit-card-type';
+import { openBrowserAsync } from 'expo-web-browser';
 import { Controller, useForm } from 'react-hook-form';
-import { Alert, SafeAreaView, ScrollView, Text, View } from 'react-native';
+import { SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { z } from 'zod';
 
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
+import { Env } from '~/config/env';
+import { useCreateCard } from '~/lib/pound/use-create-card';
+import { uuid } from '~/lib/utils';
 
 const AddCardSchema = z.object({
 	cardNumber: z
@@ -14,7 +18,7 @@ const AddCardSchema = z.object({
 		.min(13, 'Card number must be at least 13 digits.')
 		.max(19, 'Card number must not exceed 19 digits.')
 		.regex(/^\d+$/, 'Card number must contain only numbers.'),
-	expiryDate: z.string().regex(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Expiry date must be in MM/YY format.'),
+	expiryDate: z.string().regex(/^(0[1-9]|1[0-2])\/\d{4}$/, 'Expiry date must be in MM/YYYY format.'),
 	cvv: z
 		.string()
 		.min(3, 'CVV must be at least 3 digits.')
@@ -28,10 +32,12 @@ type AddCardFormValues = z.infer<typeof AddCardSchema>;
 export default function AddCard() {
 	const [cardType, setCardType] = useState<string | null>(null);
 
+	const { mutate: createCard, isPending } = useCreateCard();
+
 	const {
 		control,
 		handleSubmit,
-		formState: { errors, isSubmitting },
+		formState: { errors },
 		watch,
 	} = useForm<AddCardFormValues>({
 		resolver: zodResolver(AddCardSchema),
@@ -44,7 +50,7 @@ export default function AddCard() {
 	});
 
 	const cardNumber = watch('cardNumber');
-	React.useEffect(() => {
+	useEffect(() => {
 		if (cardNumber) {
 			const detectedCard = creditCardType(cardNumber.replace(/\s+/g, ''))[0];
 			setCardType(detectedCard?.type || null);
@@ -54,7 +60,37 @@ export default function AddCard() {
 	}, [cardNumber]);
 
 	const onSubmit = (data: AddCardFormValues) => {
-		Alert.alert('Card Added', JSON.stringify({ ...data, cardType }, null, 2));
+		//maybe redirect should also go to the same success screen on successful card adding after 3ds?
+		const redirectUrl = `${Env.EXPO_PUBLIC_POUND_WEB_URL}/app/deposit?env=${Env.APP_ENV}`;
+		const variables = {
+			card: {
+				cvv: data.cvv,
+				expiry_month: data.expiryDate.split('/')[0],
+				expiry_year: data.expiryDate.split('/')[1],
+				last_4_digits: data.cardNumber.slice(-4),
+				name: data.cardHolderName,
+				number: data.cardNumber,
+				type: cardType?.toUpperCase() || 'UNKNOWN',
+			},
+			reference: uuid(),
+			redirectUrl,
+		};
+
+		createCard(variables, {
+			onSuccess: async (data) => {
+				if (data.nextStepUrl) {
+					await openBrowserAsync(data.nextStepUrl, {
+						showInRecents: true,
+						createTask: false,
+					});
+				} else {
+					//TODO: show success screen and redirect (button) to deposit?
+				}
+			},
+			onError: (error) => {
+				console.log(error);
+			},
+		});
 	};
 
 	return (
@@ -95,7 +131,7 @@ export default function AddCard() {
 								placeholder="MM/YY"
 								value={value}
 								onChangeText={onChange}
-								maxLength={5}
+								maxLength={7}
 								className="rounded-md border p-3"
 							/>
 						)}
@@ -140,8 +176,8 @@ export default function AddCard() {
 				</View>
 
 				{/* Submit Button */}
-				<Button disabled={isSubmitting} onPress={handleSubmit(onSubmit)}>
-					<Text className="text-primary-foreground">{isSubmitting ? 'Submitting...' : 'Add Card'}</Text>
+				<Button disabled={isPending} onPress={handleSubmit(onSubmit)}>
+					<Text className="text-primary-foreground">{isPending ? 'Submitting...' : 'Add Card'}</Text>
 				</Button>
 			</ScrollView>
 		</SafeAreaView>

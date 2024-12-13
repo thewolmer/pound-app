@@ -5,9 +5,9 @@ import { Button } from '~/components/ui/button';
 
 export default function RecentLayout() {
 	return (
-		<Stack>
+		<Stack initialRouteName="transactions">
 			<Stack.Screen
-				name="index"
+				name="transactions"
 				options={{
 					title: 'Recent',
 					headerShadowVisible: false,

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
 import { openBrowserAsync } from 'expo-web-browser';
@@ -7,13 +8,16 @@ import { Controller, useForm } from 'react-hook-form';
 import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { z } from 'zod';
 
+import { Card as CardType } from '~/api/deposit/card.types';
 import { Button } from '~/components/ui/button';
 import { Card, CardFooter, CardHeader } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
+import { H2, H3 } from '~/components/ui/typography';
 import { Env } from '~/config/env';
 import { getCardIcon } from '~/lib/CardIcons';
 import { useListCards } from '~/lib/pound/use-list-cards';
 import { useMakePayment } from '~/lib/pound/use-make-payment';
+import { useHaptics } from '~/lib/useHaptics';
 import { cn, uuid } from '~/lib/utils';
 
 const AmountSchema = z.object({
@@ -30,6 +34,15 @@ const predefinedAmounts = [0.01, 10, 25, 50, 100];
 export default function Deposit() {
 	const { data: cards } = useListCards();
 	const { mutate: makePayment } = useMakePayment();
+	const cardSelectModal = useRef<BottomSheetModal>(null);
+	const { triggerHaptics } = useHaptics();
+
+	const renderBackDrop = useCallback(
+		(backdropProps: BottomSheetBackdropProps) => (
+			<BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...backdropProps} />
+		),
+		[]
+	);
 
 	const {
 		control,
@@ -44,7 +57,7 @@ export default function Deposit() {
 		},
 	});
 
-	const [selectedCard, setSelectedCard] = useState<string | null>(null);
+	const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
 
 	const onSubmit = (data: AmountFormValues) => {
 		if (!selectedCard) {
@@ -54,7 +67,7 @@ export default function Deposit() {
 		//maybe redirect should also go to the same success screen on successful 3ds?
 		const redirectUrl = `${Env.EXPO_PUBLIC_POUND_WEB_URL}/app/home?env=${Env.APP_ENV}`;
 		makePayment(
-			{ amount: data.amount, token: selectedCard, reference: uuid(), redirectUrl },
+			{ amount: data.amount, token: selectedCard.token, reference: uuid(), redirectUrl },
 			{
 				onSuccess: async (data) => {
 					if (data.nextStepUrl) {
@@ -116,55 +129,99 @@ export default function Deposit() {
 				{/* Bottom Buttons */}
 				<View className="gap-4 p-4">
 					<View className="gap-2">
-						<Button
-							variant="outline"
-							size={'lg'}
-							onPress={() => router.push('/(main)/(deposit)/add-card')}
-							className={'flex flex-row items-center justify-start gap-2 px-4 py-2'}
-						>
-							<Ionicons name={'add-circle-outline'} size={24} />
-							<Text className={'text-base font-semibold'}>Add new card</Text>
-						</Button>
-						{cards?.map((card) => {
-							const isSelectedCard = selectedCard === card.token;
-							return (
-								<Button
-									key={card.token}
-									size={'lg'}
-									disabled={!card.active}
-									onPress={() => setSelectedCard(card.token)}
-									variant={isSelectedCard ? 'default' : 'outline'}
-									className={cn(
-										'flex flex-row items-center justify-start gap-2 px-4 py-2',
-										isSelectedCard ? 'text-secondary-foreground' : 'text-primary-foreground'
-									)}
-								>
-									<Ionicons
-										name={isSelectedCard ? 'radio-button-on' : 'radio-button-off'}
-										size={24}
-										className={cn(isSelectedCard ? 'text-primary-foreground' : 'text-foreground')}
-									/>
-									{getCardIcon(card.card.type)}
-									<Text
-										className={cn(
-											'text-base font-semibold',
-											isSelectedCard ? 'text-secondary-foreground' : 'text-foreground'
-										)}
-									>
-										Ending in {card.card.last_4_digits}
-									</Text>
-								</Button>
-							);
-						})}
+						{selectedCard ? (
+							<Button
+								variant="outline"
+								size={'lg'}
+								onPress={() => cardSelectModal.current?.present()}
+								className="flex flex-row items-center justify-start gap-4 border-success px-4 py-2"
+							>
+								<Ionicons name="checkmark-circle" size={24} className={'text-success-foreground'} />
+								<View>
+									<View className="flex flex-row items-center justify-center gap-2">
+										{getCardIcon(selectedCard.card.type)}
+										<Text className={'text-base font-semibold text-foreground'}>
+											Ending in {selectedCard.card.last_4_digits}
+										</Text>
+										<Ionicons name="chevron-up" size={16} className={'text-foreground'} />
+									</View>
+								</View>
+							</Button>
+						) : (
+							<Button
+								variant="outline"
+								size={'lg'}
+								onPress={() => cardSelectModal.current?.present()}
+								className={'flex flex-row items-center justify-start gap-2 px-4 py-2'}
+							>
+								<Ionicons name={'add-circle-outline'} size={24} />
+								<Text className={'text-base font-semibold'}>Select a Card</Text>
+							</Button>
+						)}
 					</View>
-					<Button
-						disabled={isSubmitting || !selectedCard || getValues('amount') === 0}
-						onPress={handleSubmit(onSubmit)}
-						className="bg-primary"
-					>
+					<Button disabled={isSubmitting || !selectedCard} onPress={handleSubmit(onSubmit)} className="bg-primary">
 						<Text className="text-primary-foreground">{isSubmitting ? 'Submitting...' : 'Next'}</Text>
 					</Button>
 				</View>
+				<BottomSheetModal
+					backdropComponent={renderBackDrop}
+					ref={cardSelectModal}
+					snapPoints={['80']}
+					enableDismissOnClose
+					handleIndicatorStyle={{ backgroundColor: '#fff' }}
+					backgroundStyle={{ backgroundColor: 'transparent' }}
+					onDismiss={() => {
+						cardSelectModal.current?.close();
+					}}
+				>
+					<BottomSheetView className={cn('flex-1 gap-5 rounded-t-2xl bg-card p-5 transition-all duration-700')}>
+						<H3 className="text-card-foreground">Select A Card</H3>
+						<View className="gap-2">
+							{cards?.map((card) => {
+								const isSelectedCard = selectedCard === card;
+								return (
+									<Button
+										key={card.token}
+										size={'lg'}
+										disabled={!card.active}
+										onPress={() => {
+											setSelectedCard(card);
+											cardSelectModal.current?.close();
+										}}
+										variant={'outline'}
+										className={cn(
+											'flex flex-row items-center justify-start gap-2 px-4 py-2',
+											'text-primary-foreground',
+											isSelectedCard && 'border-primary'
+										)}
+									>
+										<Ionicons
+											name={isSelectedCard ? 'radio-button-on' : 'radio-button-off'}
+											size={24}
+											className={cn(isSelectedCard ? 'text-primary' : 'text-foreground')}
+										/>
+										{getCardIcon(card.card.type)}
+										<Text className={cn('text-base font-semibold text-foreground')}>
+											Ending in {card.card.last_4_digits}
+										</Text>
+									</Button>
+								);
+							})}
+							<Button
+								variant="outline"
+								size={'lg'}
+								onPress={() => {
+									cardSelectModal.current?.close();
+									router.push('/(main)/(deposit)/add-card');
+								}}
+								className={'flex flex-row items-center justify-start gap-2 px-4 py-2'}
+							>
+								<Ionicons name={'add-circle-outline'} size={24} />
+								<Text className={'text-base font-semibold'}>Add a new Card</Text>
+							</Button>
+						</View>
+					</BottomSheetView>
+				</BottomSheetModal>
 			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);

@@ -9,7 +9,7 @@ export default function DepositLayout() {
 			<Stack.Screen
 				name="deposit"
 				options={{
-					title: 'deposit',
+					title: 'Deposit',
 					// headerLargeTitle: true,
 					headerShadowVisible: false,
 					headerLeft(props) {
@@ -25,6 +25,14 @@ export default function DepositLayout() {
 							</Button>
 						);
 					},
+				}}
+			/>
+			<Stack.Screen
+				name="add-card"
+				options={{
+					title: 'Add New Card',
+					// headerLargeTitle: true,
+					headerShadowVisible: false,
 				}}
 			/>
 		</Stack>

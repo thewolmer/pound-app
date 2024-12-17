@@ -5,19 +5,18 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
 import { openBrowserAsync } from 'expo-web-browser';
 import { Controller, useForm } from 'react-hook-form';
-import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { z } from 'zod';
 
 import { Card as CardType } from '~/api/deposit/card.types';
 import { Button } from '~/components/ui/button';
 import { Card, CardFooter, CardHeader } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
-import { H2, H3 } from '~/components/ui/typography';
+import { H3 } from '~/components/ui/typography';
 import { Env } from '~/config/env';
 import { getCardIcon } from '~/lib/CardIcons';
 import { useListCards } from '~/lib/pound/use-list-cards';
 import { useMakePayment } from '~/lib/pound/use-make-payment';
-import { useHaptics } from '~/lib/useHaptics';
 import { cn, uuid } from '~/lib/utils';
 
 const AmountSchema = z.object({
@@ -35,7 +34,6 @@ export default function Deposit() {
 	const { data: cards } = useListCards();
 	const { mutate: makePayment } = useMakePayment();
 	const cardSelectModal = useRef<BottomSheetModal>(null);
-	const { triggerHaptics } = useHaptics();
 
 	const renderBackDrop = useCallback(
 		(backdropProps: BottomSheetBackdropProps) => (
@@ -48,7 +46,6 @@ export default function Deposit() {
 		control,
 		handleSubmit,
 		setValue,
-		getValues,
 		formState: { errors, isSubmitting },
 	} = useForm<AmountFormValues>({
 		resolver: zodResolver(AmountSchema),
@@ -103,7 +100,7 @@ export default function Deposit() {
 									<View className="flex flex-row items-center justify-between gap-1">
 										<Text className="w-[10%] text-2xl font-semibold text-muted-foreground">£</Text>
 										<Input
-											keyboardType="numeric"
+											keyboardType="decimal-pad"
 											className="w-[90%] text-2xl placeholder:font-extrabold placeholder:text-muted-foreground"
 											value={value > 0 ? value?.toString() : ''}
 											onChangeText={(text) => onChange(Number(text))}
@@ -133,29 +130,36 @@ export default function Deposit() {
 							<Button
 								variant="outline"
 								size={'lg'}
-								onPress={() => cardSelectModal.current?.present()}
-								className="flex flex-row items-center justify-start gap-4 border-success px-4 py-2"
+								haptics="impact-light"
+								onPress={() => {
+									Keyboard.dismiss();
+									cardSelectModal.current?.present();
+								}}
+								className="flex flex-row items-center justify-start gap-4 border-primary px-4 py-2"
 							>
-								<Ionicons name="checkmark-circle" size={24} className={'text-success-foreground'} />
-								<View>
-									<View className="flex flex-row items-center justify-center gap-2">
-										{getCardIcon(selectedCard.card.type)}
-										<Text className={'text-base font-semibold text-foreground'}>
-											Ending in {selectedCard.card.last_4_digits}
-										</Text>
-										<Ionicons name="chevron-up" size={16} className={'text-foreground'} />
-									</View>
+								<Ionicons name="checkmark-circle" size={24} className={'text-primary'} />
+								<View className="flex flex-row items-center justify-center gap-2">
+									{getCardIcon(selectedCard.card.type)}
+									<Text className={'text-base font-semibold text-foreground'}>
+										Ending in {selectedCard.card.last_4_digits}
+									</Text>
+									<Ionicons name="chevron-up" size={14} className={'text-foreground'} />
 								</View>
 							</Button>
 						) : (
 							<Button
 								variant="outline"
 								size={'lg'}
-								onPress={() => cardSelectModal.current?.present()}
+								haptics="impact-light"
+								onPress={() => {
+									Keyboard.dismiss();
+									cardSelectModal.current?.present();
+								}}
 								className={'flex flex-row items-center justify-start gap-2 px-4 py-2'}
 							>
-								<Ionicons name={'add-circle-outline'} size={24} />
-								<Text className={'text-base font-semibold'}>Select a Card</Text>
+								<Ionicons name={'card-outline'} className="text-foreground" size={24} />
+								<Text className={'text-base font-semibold text-foreground'}>Select a Card</Text>
+								<Ionicons name="chevron-up" size={12} className={'text-foreground'} />
 							</Button>
 						)}
 					</View>
@@ -216,8 +220,8 @@ export default function Deposit() {
 								}}
 								className={'flex flex-row items-center justify-start gap-2 px-4 py-2'}
 							>
-								<Ionicons name={'add-circle-outline'} size={24} />
-								<Text className={'text-base font-semibold'}>Add a new Card</Text>
+								<Ionicons name={'add-circle-outline'} className="text-foreground" size={24} />
+								<Text className={'text-base font-semibold text-foreground'}>Add a new Card</Text>
 							</Button>
 						</View>
 					</BottomSheetView>

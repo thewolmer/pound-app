@@ -22,7 +22,7 @@
 		"format:fix": "prettier --write --list-different .",
 		"commit": "git-cz",
 		"release": "commit-and-tag-version --no-verify",
-		"prepare": "husky install"
+		"prepare": "husky"
 	},
 	"dependencies": {
 		"@expo-google-fonts/poppins": "^0.2.3",
@@ -101,7 +101,7 @@
 		"eslint-plugin-react": "^7.37.2",
 		"eslint-plugin-react-hooks": "^5.0.0",
 		"eslint-plugin-simple-import-sort": "^12.1.1",
-		"husky": "^8.0.0",
+		"husky": "^9.1.7",
 		"lint-staged": "^15.2.10",
 		"prettier": "^3.4.2",
 		"prettier-plugin-tailwindcss": "^0.6.9",

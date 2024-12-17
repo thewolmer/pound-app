@@ -48,6 +48,54 @@ export type Database = {
 					},
 				];
 			};
+			deposit: {
+				Row: {
+					account_id: string;
+					amount: number;
+					created_at: string;
+					gateway: string;
+					gateway_response: Json | null;
+					id: string;
+					status: Database['public']['Enums']['transaction_status'];
+					updated_at: string | null;
+				};
+				Insert: {
+					account_id?: string;
+					amount?: number;
+					created_at?: string;
+					gateway: string;
+					gateway_response?: Json | null;
+					id?: string;
+					status?: Database['public']['Enums']['transaction_status'];
+					updated_at?: string | null;
+				};
+				Update: {
+					account_id?: string;
+					amount?: number;
+					created_at?: string;
+					gateway?: string;
+					gateway_response?: Json | null;
+					id?: string;
+					status?: Database['public']['Enums']['transaction_status'];
+					updated_at?: string | null;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'deposit_account_id_fkey';
+						columns: ['account_id'];
+						isOneToOne: false;
+						referencedRelation: 'account';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'deposit_account_id_fkey';
+						columns: ['account_id'];
+						isOneToOne: false;
+						referencedRelation: 'account_details';
+						referencedColumns: ['account_id'];
+					},
+				];
+			};
 			expo_push_token: {
 				Row: {
 					created_at: string;
@@ -318,15 +366,6 @@ export type Database = {
 			};
 		};
 		Functions: {
-			make_deposit: {
-				Args: {
-					amount: number;
-					destination_account_id: string;
-					reference: string;
-					message: string;
-				};
-				Returns: string;
-			};
 			make_transfer: {
 				Args: {
 					amount: number;

@@ -5,7 +5,7 @@ import { atomWithStorage, createJSONStorage } from 'jotai/utils';
 const asyncStorage = createJSONStorage(() => AsyncStorage);
 
 // Atom with explicit type
-export const countAtom = atomWithStorage<number>('counter', 0, asyncStorage);
+export const defaultCardAtom = atomWithStorage<any>('default-card', null, asyncStorage);
 export const addressAtom = atomWithStorage(
 	'address',
 	{

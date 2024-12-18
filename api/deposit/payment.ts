@@ -6,7 +6,11 @@ const ENDPOINT = '/deposit/payment';
 
 export const makePayment = async (paymentData: MakePaymentProps, options?: { signal?: AbortSignal }) => {
 	try {
-		const { data } = await poundApi.post<{ nextStepUrl?: string }>(ENDPOINT, paymentData, options);
+		const { data } = await poundApi.post<{ nextStepUrl?: string; status?: 'PAID' | 'FAILED' | 'PENDING' }>(
+			ENDPOINT,
+			paymentData,
+			options
+		);
 		return data;
 	} catch (error) {
 		console.log(error);

@@ -35,6 +35,7 @@
 		"@rn-primitives/label": "^1.1.0",
 		"@rn-primitives/portal": "~1.1.0",
 		"@rn-primitives/slot": "~1.1.0",
+		"@rn-primitives/switch": "^1.1.0",
 		"@rn-primitives/types": "~1.1.0",
 		"@supabase/supabase-js": "^2.46.2",
 		"@tanstack/react-query": "^5.62.3",

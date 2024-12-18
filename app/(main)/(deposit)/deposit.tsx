@@ -1,20 +1,35 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
 import { openBrowserAsync } from 'expo-web-browser';
+import { useAtomValue } from 'jotai/react';
 import { Controller, useForm } from 'react-hook-form';
-import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
+import {
+	ActivityIndicator,
+	Keyboard,
+	KeyboardAvoidingView,
+	Platform,
+	SafeAreaView,
+	ScrollView,
+	Text,
+	View,
+} from 'react-native';
 import { z } from 'zod';
 
+import { Card as CardType } from '~/api/deposit/card.types';
 import { Button } from '~/components/ui/button';
 import { Card, CardFooter, CardHeader } from '~/components/ui/card';
+import { HintBox } from '~/components/ui/hint-box';
 import { Input } from '~/components/ui/input';
+import { H3 } from '~/components/ui/typography';
 import { Env } from '~/config/env';
+import { defaultCardAtom } from '~/lib/atoms';
 import { getCardIcon } from '~/lib/CardIcons';
 import { useListCards } from '~/lib/pound/use-list-cards';
 import { useMakePayment } from '~/lib/pound/use-make-payment';
-import { cn, uuid } from '~/lib/utils';
+import { cn } from '~/lib/utils';
 
 const AmountSchema = z.object({
 	amount: z.preprocess(
@@ -28,14 +43,25 @@ type AmountFormValues = z.infer<typeof AmountSchema>;
 const predefinedAmounts = [0.01, 10, 25, 50, 100];
 
 export default function Deposit() {
-	const { data: cards } = useListCards();
+	const { data: cards, isLoading } = useListCards();
 	const { mutate: makePayment } = useMakePayment();
+
+	const cardSelectModal = useRef<BottomSheetModal>(null);
+
+	const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
+	const defaultCard = useAtomValue(defaultCardAtom);
+
+	const renderBackDrop = useCallback(
+		(backdropProps: BottomSheetBackdropProps) => (
+			<BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...backdropProps} />
+		),
+		[]
+	);
 
 	const {
 		control,
 		handleSubmit,
 		setValue,
-		getValues,
 		formState: { errors, isSubmitting },
 	} = useForm<AmountFormValues>({
 		resolver: zodResolver(AmountSchema),
@@ -43,8 +69,6 @@ export default function Deposit() {
 			amount: 0,
 		},
 	});
-
-	const [selectedCard, setSelectedCard] = useState<string | null>(null);
 
 	const onSubmit = (data: AmountFormValues) => {
 		if (!selectedCard) {
@@ -54,7 +78,7 @@ export default function Deposit() {
 		//maybe redirect should also go to the same success screen on successful 3ds?
 		const redirectUrl = `${Env.EXPO_PUBLIC_POUND_WEB_URL}/app/home?env=${Env.APP_ENV}`;
 		makePayment(
-			{ amount: data.amount, token: selectedCard, reference: uuid(), redirectUrl },
+			{ amount: data.amount, token: selectedCard.token, redirectUrl },
 			{
 				onSuccess: async (data) => {
 					if (data.nextStepUrl) {
@@ -63,7 +87,8 @@ export default function Deposit() {
 							createTask: false,
 						});
 					} else {
-						//TODO: show deposit success screen and redirect (button) to home?
+						//TODO: you can check for status PAID and do something here
+						router.dismissAll();
 					}
 				},
 				onError: (error) => {
@@ -72,6 +97,17 @@ export default function Deposit() {
 			}
 		);
 	};
+
+	useEffect(() => {
+		if (defaultCard && cards && cards?.length > 0) {
+			const matchedCard = cards.find((card) => card.token === defaultCard.token);
+			if (matchedCard) {
+				setSelectedCard(matchedCard);
+			} else {
+				setSelectedCard(null);
+			}
+		}
+	}, [defaultCard, cards]);
 
 	return (
 		<SafeAreaView className="flex-1">
@@ -90,7 +126,7 @@ export default function Deposit() {
 									<View className="flex flex-row items-center justify-between gap-1">
 										<Text className="w-[10%] text-2xl font-semibold text-muted-foreground">£</Text>
 										<Input
-											keyboardType="numeric"
+											keyboardType="decimal-pad"
 											className="w-[90%] text-2xl placeholder:font-extrabold placeholder:text-muted-foreground"
 											value={value > 0 ? value?.toString() : ''}
 											onChangeText={(text) => onChange(Number(text))}
@@ -116,55 +152,131 @@ export default function Deposit() {
 				{/* Bottom Buttons */}
 				<View className="gap-4 p-4">
 					<View className="gap-2">
-						<Button
-							variant="outline"
-							size={'lg'}
-							onPress={() => router.push('/(main)/(deposit)/add-card')}
-							className={'flex flex-row items-center justify-start gap-2 px-4 py-2'}
-						>
-							<Ionicons name={'add-circle-outline'} size={24} />
-							<Text className={'text-base font-semibold'}>Add new card</Text>
-						</Button>
-						{cards?.map((card) => {
-							const isSelectedCard = selectedCard === card.token;
-							return (
-								<Button
-									key={card.token}
-									size={'lg'}
-									disabled={!card.active}
-									onPress={() => setSelectedCard(card.token)}
-									variant={isSelectedCard ? 'default' : 'outline'}
-									className={cn(
-										'flex flex-row items-center justify-start gap-2 px-4 py-2',
-										isSelectedCard ? 'text-secondary-foreground' : 'text-primary-foreground'
-									)}
-								>
-									<Ionicons
-										name={isSelectedCard ? 'radio-button-on' : 'radio-button-off'}
-										size={24}
-										className={cn(isSelectedCard ? 'text-primary-foreground' : 'text-foreground')}
-									/>
-									{getCardIcon(card.card.type)}
-									<Text
-										className={cn(
-											'text-base font-semibold',
-											isSelectedCard ? 'text-secondary-foreground' : 'text-foreground'
-										)}
-									>
-										Ending in {card.card.last_4_digits}
+						{selectedCard ? (
+							<Button
+								variant="outline"
+								size={'lg'}
+								haptics="impact-light"
+								onPress={() => {
+									Keyboard.dismiss();
+									cardSelectModal.current?.present();
+								}}
+								className="flex flex-row items-center justify-start gap-4 border-primary px-4 py-2"
+							>
+								<Ionicons name="checkmark-circle" size={24} className={'text-primary'} />
+								<View className="flex flex-row items-center justify-center gap-2">
+									{getCardIcon(selectedCard.card.type)}
+									<Text className={'text-base font-semibold text-foreground'}>
+										Ending in {selectedCard.card.last_4_digits}
 									</Text>
-								</Button>
-							);
-						})}
+									<Ionicons name="chevron-up" size={14} className={'text-foreground'} />
+								</View>
+							</Button>
+						) : (
+							<Button
+								variant="outline"
+								size={'lg'}
+								haptics="impact-light"
+								onPress={() => {
+									Keyboard.dismiss();
+									cardSelectModal.current?.present();
+								}}
+								className={'flex flex-row items-center justify-start gap-2 px-4 py-2'}
+							>
+								<Ionicons name={'card-outline'} className="text-foreground" size={24} />
+								<Text className={'text-base font-semibold text-foreground'}>Select a Card</Text>
+								<Ionicons name="chevron-up" size={12} className={'text-foreground'} />
+							</Button>
+						)}
 					</View>
-					<Button
-						disabled={isSubmitting || !selectedCard || getValues('amount') === 0}
-						onPress={handleSubmit(onSubmit)}
-						className="bg-primary"
-					>
-						<Text className="text-primary-foreground">{isSubmitting ? 'Submitting...' : 'Next'}</Text>
+					<Button disabled={isSubmitting || !selectedCard} onPress={handleSubmit(onSubmit)} className="bg-primary">
+						{isSubmitting ? (
+							<ActivityIndicator color={'white'} />
+						) : (
+							<Text className="text-primary-foreground">Next</Text>
+						)}
 					</Button>
 				</View>
+				{/* Card Select Modal */}
+				<BottomSheetModal
+					backdropComponent={renderBackDrop}
+					ref={cardSelectModal}
+					snapPoints={['80']}
+					enableDismissOnClose
+					handleIndicatorStyle={{ backgroundColor: '#fff' }}
+					backgroundStyle={{ backgroundColor: 'transparent' }}
+					onDismiss={() => {
+						cardSelectModal.current?.close();
+					}}
+				>
+					<BottomSheetView className={cn('flex-1 gap-5 rounded-t-2xl bg-card p-5 transition-all duration-700')}>
+						<H3 className="text-card-foreground">Select A Card</H3>
+						<View className="gap-2">
+							{isLoading && <ActivityIndicator color={'white'} />}
+							{cards?.map((card) => {
+								const isSelectedCard = selectedCard?.token === card.token;
+								return (
+									<Button
+										key={card.token}
+										size={'lg'}
+										disabled={!card.active}
+										onPress={() => {
+											setSelectedCard(card);
+											cardSelectModal.current?.close();
+										}}
+										variant={'outline'}
+										className={cn(
+											'flex flex-row items-center justify-start gap-2 px-4 py-2',
+											'text-primary-foreground',
+											isSelectedCard && 'border-primary'
+										)}
+									>
+										<Ionicons
+											name={isSelectedCard ? 'radio-button-on' : 'radio-button-off'}
+											size={24}
+											className={cn(isSelectedCard ? 'text-primary' : 'text-foreground')}
+										/>
+										{getCardIcon(card.card.type)}
+										<Text className={cn('text-base font-semibold text-foreground')}>
+											Ending in {card.card.last_4_digits}
+										</Text>
+									</Button>
+								);
+							})}
+							{cards?.length !== 0 && (
+								<Button
+									variant="outline"
+									size={'lg'}
+									onPress={() => {
+										cardSelectModal.current?.close();
+										router.push('/(main)/(deposit)/manage-cards');
+									}}
+									className={'flex flex-row items-center justify-start gap-2 px-4 py-2'}
+								>
+									<Ionicons name={'settings-outline'} className="text-foreground" size={24} />
+									<Text className={'text-base font-semibold text-foreground'}>Manage Cards</Text>
+								</Button>
+							)}
+							<Button
+								variant="outline"
+								size={'lg'}
+								onPress={() => {
+									cardSelectModal.current?.close();
+									router.push('/(main)/(deposit)/add-card');
+								}}
+								className={'flex flex-row items-center justify-start gap-2 px-4 py-2'}
+							>
+								<Ionicons name={'add-circle-outline'} className="text-foreground" size={24} />
+								<Text className={'text-base font-semibold text-foreground'}>Add a new Card</Text>
+							</Button>
+							<HintBox
+								className="my-2"
+								text="Tip: You can enable a card to be auto selected by setting up a Primary Card in the manage cards."
+								when={!defaultCard && cards?.length !== 0}
+							/>
+						</View>
+					</BottomSheetView>
+				</BottomSheetModal>
 			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);

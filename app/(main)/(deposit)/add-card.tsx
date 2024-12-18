@@ -1,42 +1,55 @@
 import { useEffect, useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import creditCardType from 'credit-card-type';
+import { CreditCardType } from 'credit-card-type/dist/types';
+import { endOfMonth, isBefore } from 'date-fns';
+import { router } from 'expo-router';
 import { openBrowserAsync } from 'expo-web-browser';
 import { Controller, useForm } from 'react-hook-form';
-import { SafeAreaView, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { z } from 'zod';
 
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Env } from '~/config/env';
+import { getCardIcon } from '~/lib/CardIcons';
 import { useCreateCard } from '~/lib/pound/use-create-card';
 import { uuid } from '~/lib/utils';
 
-const AddCardSchema = z.object({
-	cardNumber: z
-		.string()
-		.min(13, 'Card number must be at least 13 digits.')
-		.max(19, 'Card number must not exceed 19 digits.')
-		.regex(/^\d+$/, 'Card number must contain only numbers.'),
-	expiryDate: z.string().regex(/^(0[1-9]|1[0-2])\/\d{4}$/, 'Expiry date must be in MM/YYYY format.'),
-	cvv: z
-		.string()
-		.min(3, 'CVV must be at least 3 digits.')
-		.max(4, 'CVV must not exceed 4 digits.')
-		.regex(/^\d+$/, 'CVV must contain only numbers.'),
-	cardHolderName: z.string().min(2, 'Name must be at least 2 characters long.'),
-});
-
-type AddCardFormValues = z.infer<typeof AddCardSchema>;
+type AddCardFormValues = {
+	cardNumber: string;
+	expiryDate: string;
+	cvv: string;
+	cardHolderName: string;
+};
 
 export default function AddCard() {
-	const [cardType, setCardType] = useState<string | null>(null);
-
+	const [cardType, setCardType] = useState<CreditCardType | null>(null);
 	const { mutate: createCard, isPending } = useCreateCard();
+
+	const AddCardSchema = z.object({
+		cardNumber: z
+			.string()
+			.refine((value) => cardType?.lengths.includes(value.replace(/\s+/g, '').length), 'Invalid card number.'),
+		expiryDate: z
+			.string()
+			.regex(/^(0[1-9]|1[0-2])\/\d{4}$/, 'Invalid Expiry Date.')
+			.refine((value) => {
+				const [month, year] = value.split('/');
+				const expiry = endOfMonth(new Date(Number(year), Number(month) - 1));
+				return !isBefore(expiry, new Date());
+			}, 'Your Card has expired.'),
+		cvv: z
+			.string()
+			.refine((value) => cardType?.code?.size === value.length, `CVV must be ${cardType?.code?.size || 3} digits.`),
+		cardHolderName: z.string().min(2, 'Name must be at least 2 characters long.'),
+	});
 
 	const {
 		control,
 		handleSubmit,
+		setValue,
 		formState: { errors },
 		watch,
 	} = useForm<AddCardFormValues>({
@@ -50,14 +63,46 @@ export default function AddCard() {
 	});
 
 	const cardNumber = watch('cardNumber');
+
 	useEffect(() => {
 		if (cardNumber) {
-			const detectedCard = creditCardType(cardNumber.replace(/\s+/g, ''))[0];
-			setCardType(detectedCard?.type || null);
+			const sanitizedNumber = cardNumber.replace(/\s+/g, '');
+			const detectedCard = creditCardType(sanitizedNumber)[0];
+			setCardType(detectedCard || null);
+			// Format card number dynamically based on detected gaps
+			const gaps = detectedCard?.gaps || [4, 8, 12];
+			let formatted = '';
+			let currentIndex = 0;
+
+			gaps.forEach((gap) => {
+				if (sanitizedNumber.length > gap) {
+					formatted += sanitizedNumber.slice(currentIndex, gap) + ' ';
+					currentIndex = gap;
+				}
+			});
+			formatted += sanitizedNumber.slice(currentIndex);
+
+			setValue('cardNumber', formatted.trim());
 		} else {
 			setCardType(null);
 		}
-	}, [cardNumber]);
+	}, [cardNumber, setValue]);
+
+	const expiryDate = watch('expiryDate');
+	useEffect(() => {
+		if (expiryDate) {
+			const sanitizedExpiry = expiryDate.replace(/\D/g, '');
+			let formatted = '';
+
+			if (sanitizedExpiry.length > 2) {
+				formatted = sanitizedExpiry.slice(0, 2) + '/' + sanitizedExpiry.slice(2, 6);
+			} else {
+				formatted = sanitizedExpiry;
+			}
+
+			setValue('expiryDate', formatted);
+		}
+	}, [expiryDate, setValue]);
 
 	const onSubmit = (data: AddCardFormValues) => {
 		//maybe redirect should also go to the same success screen on successful card adding after 3ds?
@@ -70,7 +115,7 @@ export default function AddCard() {
 				last_4_digits: data.cardNumber.slice(-4),
 				name: data.cardHolderName,
 				number: data.cardNumber,
-				type: cardType?.toUpperCase() || 'UNKNOWN',
+				type: cardType?.type.toUpperCase() || 'UNKNOWN',
 			},
 			reference: uuid(),
 			redirectUrl,
@@ -84,7 +129,7 @@ export default function AddCard() {
 						createTask: false,
 					});
 				} else {
-					//TODO: show success screen and redirect (button) to deposit?
+					router.navigate('/(main)/(deposit)/manage-cards');
 				}
 			},
 			onError: (error) => {
@@ -96,28 +141,47 @@ export default function AddCard() {
 	return (
 		<SafeAreaView className="flex-1">
 			<ScrollView contentContainerStyle={{ padding: 16 }}>
-				<Text className="mb-4 text-lg font-bold text-foreground">Add a New Card</Text>
-
 				{/* Card Number */}
 				<View className="mb-4">
 					<Controller
 						name="cardNumber"
 						control={control}
 						render={({ field: { onChange, value } }) => (
-							<Input
-								keyboardType="numeric"
-								placeholder="Card Number"
-								value={value}
-								onChangeText={onChange}
-								maxLength={19}
-								className="rounded-md border p-3"
-							/>
+							<View className="relative">
+								{cardType?.type ? (
+									<View
+										style={{ position: 'absolute', left: 12, top: 12, zIndex: 10 }}
+										className="text-muted-foreground"
+									>
+										{getCardIcon(cardType.type)}
+									</View>
+								) : (
+									<Ionicons
+										name={'card-outline'}
+										size={24}
+										className="text-muted-foreground"
+										style={{ position: 'absolute', left: 12, top: 12, zIndex: 10 }}
+									/>
+								)}
+								<Input
+									keyboardType="numeric"
+									placeholder="Card Number"
+									textContentType="creditCardNumber"
+									value={value}
+									onChangeText={onChange}
+									maxLength={19}
+									className="border-border"
+									style={{
+										paddingLeft: 50,
+										borderWidth: 1,
+										borderRadius: 8,
+										height: 48,
+									}}
+								/>
+							</View>
 						)}
 					/>
 					{errors.cardNumber && <Text className="mt-1 text-sm text-red-500">{errors.cardNumber.message}</Text>}
-					{cardType && (
-						<Text className="mt-1 text-sm text-muted-foreground">Detected Type: {cardType.toUpperCase()}</Text>
-					)}
 				</View>
 
 				{/* Expiry Date */}
@@ -127,11 +191,12 @@ export default function AddCard() {
 						control={control}
 						render={({ field: { onChange, value } }) => (
 							<Input
-								placeholder="MM/YY"
+								textContentType="creditCardExpiration"
+								placeholder="MM/YYYY"
 								value={value}
+								keyboardType="numeric"
 								onChangeText={onChange}
 								maxLength={7}
-								className="rounded-md border p-3"
 							/>
 						)}
 					/>
@@ -146,10 +211,12 @@ export default function AddCard() {
 						render={({ field: { onChange, value } }) => (
 							<Input
 								keyboardType="numeric"
-								placeholder="CVV"
+								placeholder={`CVV (${cardType?.code?.size || 3} digits)`}
 								value={value}
 								onChangeText={onChange}
-								maxLength={4}
+								textContentType="creditCardSecurityCode"
+								secureTextEntry
+								maxLength={cardType?.code?.size || 3}
 								className="rounded-md border p-3"
 							/>
 						)}
@@ -166,6 +233,7 @@ export default function AddCard() {
 							<Input
 								placeholder="Cardholder Name"
 								value={value}
+								textContentType="name"
 								onChangeText={onChange}
 								className="rounded-md border p-3"
 							/>
@@ -176,7 +244,11 @@ export default function AddCard() {
 
 				{/* Submit Button */}
 				<Button disabled={isPending} onPress={handleSubmit(onSubmit)}>
-					<Text className="text-primary-foreground">{isPending ? 'Submitting...' : 'Add Card'}</Text>
+					{isPending ? (
+						<ActivityIndicator color={'white'} />
+					) : (
+						<Text className="text-primary-foreground">Add Card</Text>
+					)}
 				</Button>
 			</ScrollView>
 		</SafeAreaView>

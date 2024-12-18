@@ -42,8 +42,8 @@ export function TransactionItem({
 	if (item.type === 'deposit') {
 		accountDetails = {
 			icon: 'business-outline',
-			displayName: 'Bank Deposit',
-			avatarUrl: 'https://d2q79iu7y748jz.cloudfront.net/s/_squarelogo/256x256/0bf98c1639be507e9d352dbcd046efca', // TODO: Add actual logo
+			displayName: 'Account Credit',
+			avatarUrl: 'https://cdn.cosmos.so/f531f954-7835-43bc-a41e-a51ab8e38d12?format=jpeg', // TODO: Add actual logo
 		};
 	}
 

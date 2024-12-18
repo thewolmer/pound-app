@@ -138,7 +138,7 @@ export default function ManageCards() {
 									<View>
 										<CardHeader className="flex items-center justify-center">
 											<H4 className="font-semibold text-destructive-foreground">Are you sure?</H4>
-											<Text className="font-semibold">
+											<Text className="text-center font-semibold text-muted-foreground">
 												You are about to delete your card that ends with {selectedCard.card.last_4_digits}, This action
 												can&apos;t be undone.
 											</Text>

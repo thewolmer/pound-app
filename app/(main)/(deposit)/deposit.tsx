@@ -44,7 +44,7 @@ const predefinedAmounts = [0.01, 10, 25, 50, 100];
 
 export default function Deposit() {
 	const { data: cards, isLoading } = useListCards();
-	const { mutate: makePayment } = useMakePayment();
+	const { mutate: makePayment, isPending } = useMakePayment();
 
 	const cardSelectModal = useRef<BottomSheetModal>(null);
 
@@ -190,7 +190,7 @@ export default function Deposit() {
 						)}
 					</View>
 					<Button disabled={isSubmitting || !selectedCard} onPress={handleSubmit(onSubmit)} className="bg-primary">
-						{isSubmitting ? (
+						{isSubmitting || isPending ? (
 							<ActivityIndicator color={'white'} />
 						) : (
 							<Text className="text-primary-foreground">Next</Text>
@@ -253,7 +253,7 @@ export default function Deposit() {
 									}}
 									className={'flex flex-row items-center justify-start gap-2 px-4 py-2'}
 								>
-									<Ionicons name={'settings-outline'} className="text-foreground" size={24} />
+									<Ionicons name={'card-outline'} className="text-foreground" size={24} />
 									<Text className={'text-base font-semibold text-foreground'}>Manage Cards</Text>
 								</Button>
 							)}

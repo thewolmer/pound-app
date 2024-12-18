@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Ionicons } from '@expo/vector-icons';
+import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { Poppins_400Regular, Poppins_600SemiBold } from '@expo-google-fonts/poppins';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -25,6 +25,7 @@ import { PreferenceSettingsProvider } from './PreferenceContext';
 import { SessionProvider } from './SessionContext';
 
 cssInterop(Ionicons, { className: 'style' });
+cssInterop(FontAwesome5, { className: 'style' });
 cssInterop(SafeAreaView, { className: 'style' });
 
 const LIGHT_THEME: Theme = {

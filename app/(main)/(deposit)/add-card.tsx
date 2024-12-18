@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import creditCardType from 'credit-card-type';
 import { CreditCardType } from 'credit-card-type/dist/types';
 import { endOfMonth, isBefore } from 'date-fns';
+import { router } from 'expo-router';
 import { openBrowserAsync } from 'expo-web-browser';
 import { Controller, useForm } from 'react-hook-form';
 import { ActivityIndicator, SafeAreaView, ScrollView, Text, View } from 'react-native';
@@ -63,13 +64,11 @@ export default function AddCard() {
 
 	const cardNumber = watch('cardNumber');
 
-	// Handle card number input changes
 	useEffect(() => {
 		if (cardNumber) {
 			const sanitizedNumber = cardNumber.replace(/\s+/g, '');
 			const detectedCard = creditCardType(sanitizedNumber)[0];
 			setCardType(detectedCard || null);
-
 			// Format card number dynamically based on detected gaps
 			const gaps = detectedCard?.gaps || [4, 8, 12];
 			let formatted = '';
@@ -130,7 +129,7 @@ export default function AddCard() {
 						createTask: false,
 					});
 				} else {
-					//TODO: show success screen and redirect (button) to deposit?
+					router.navigate('/(main)/(deposit)/manage-cards');
 				}
 			},
 			onError: (error) => {

@@ -48,7 +48,7 @@ export type Database = {
 					},
 				];
 			};
-			deposit: {
+			deposits: {
 				Row: {
 					account_id: string;
 					amount: number;
@@ -302,6 +302,50 @@ export type Database = {
 						isOneToOne: false;
 						referencedRelation: 'account_details';
 						referencedColumns: ['account_id'];
+					},
+				];
+			};
+			user_contacts: {
+				Row: {
+					contact_id: string;
+					user_id: string;
+				};
+				Insert: {
+					contact_id: string;
+					user_id: string;
+				};
+				Update: {
+					contact_id?: string;
+					user_id?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'user_contacts_contact_id_fkey';
+						columns: ['contact_id'];
+						isOneToOne: false;
+						referencedRelation: 'account_details';
+						referencedColumns: ['person_id'];
+					},
+					{
+						foreignKeyName: 'user_contacts_contact_id_fkey';
+						columns: ['contact_id'];
+						isOneToOne: false;
+						referencedRelation: 'person';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'user_contacts_user_id_fkey';
+						columns: ['user_id'];
+						isOneToOne: false;
+						referencedRelation: 'account_details';
+						referencedColumns: ['person_id'];
+					},
+					{
+						foreignKeyName: 'user_contacts_user_id_fkey';
+						columns: ['user_id'];
+						isOneToOne: false;
+						referencedRelation: 'person';
+						referencedColumns: ['id'];
 					},
 				];
 			};

@@ -1,19 +1,31 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
 import { openBrowserAsync } from 'expo-web-browser';
+import { useAtomValue } from 'jotai/react';
 import { Controller, useForm } from 'react-hook-form';
-import { Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
+import {
+	ActivityIndicator,
+	Keyboard,
+	KeyboardAvoidingView,
+	Platform,
+	SafeAreaView,
+	ScrollView,
+	Text,
+	View,
+} from 'react-native';
 import { z } from 'zod';
 
 import { Card as CardType } from '~/api/deposit/card.types';
 import { Button } from '~/components/ui/button';
 import { Card, CardFooter, CardHeader } from '~/components/ui/card';
+import { HintBox } from '~/components/ui/hint-box';
 import { Input } from '~/components/ui/input';
 import { H3 } from '~/components/ui/typography';
 import { Env } from '~/config/env';
+import { defaultCardAtom } from '~/lib/atoms';
 import { getCardIcon } from '~/lib/CardIcons';
 import { useListCards } from '~/lib/pound/use-list-cards';
 import { useMakePayment } from '~/lib/pound/use-make-payment';
@@ -31,9 +43,13 @@ type AmountFormValues = z.infer<typeof AmountSchema>;
 const predefinedAmounts = [0.01, 10, 25, 50, 100];
 
 export default function Deposit() {
-	const { data: cards } = useListCards();
+	const { data: cards, isLoading } = useListCards();
 	const { mutate: makePayment } = useMakePayment();
+
 	const cardSelectModal = useRef<BottomSheetModal>(null);
+
+	const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
+	const defaultCard = useAtomValue(defaultCardAtom);
 
 	const renderBackDrop = useCallback(
 		(backdropProps: BottomSheetBackdropProps) => (
@@ -54,8 +70,6 @@ export default function Deposit() {
 		},
 	});
 
-	const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
-
 	const onSubmit = (data: AmountFormValues) => {
 		if (!selectedCard) {
 			alert('Please select a card.');
@@ -73,7 +87,7 @@ export default function Deposit() {
 							createTask: false,
 						});
 					} else {
-						//TODO: show deposit success screen and redirect (button) to home?
+						router.dismissAll();
 					}
 				},
 				onError: (error) => {
@@ -82,6 +96,17 @@ export default function Deposit() {
 			}
 		);
 	};
+
+	useEffect(() => {
+		if (defaultCard && cards && cards?.length > 0) {
+			const matchedCard = cards.find((card) => card.token === defaultCard.token);
+			if (matchedCard) {
+				setSelectedCard(matchedCard);
+			} else {
+				setSelectedCard(null);
+			}
+		}
+	}, [defaultCard, cards]);
 
 	return (
 		<SafeAreaView className="flex-1">
@@ -164,9 +189,14 @@ export default function Deposit() {
 						)}
 					</View>
 					<Button disabled={isSubmitting || !selectedCard} onPress={handleSubmit(onSubmit)} className="bg-primary">
-						<Text className="text-primary-foreground">{isSubmitting ? 'Submitting...' : 'Next'}</Text>
+						{isSubmitting ? (
+							<ActivityIndicator color={'white'} />
+						) : (
+							<Text className="text-primary-foreground">Next</Text>
+						)}
 					</Button>
 				</View>
+				{/* Card Select Modal */}
 				<BottomSheetModal
 					backdropComponent={renderBackDrop}
 					ref={cardSelectModal}
@@ -181,8 +211,9 @@ export default function Deposit() {
 					<BottomSheetView className={cn('flex-1 gap-5 rounded-t-2xl bg-card p-5 transition-all duration-700')}>
 						<H3 className="text-card-foreground">Select A Card</H3>
 						<View className="gap-2">
+							{isLoading && <ActivityIndicator color={'white'} />}
 							{cards?.map((card) => {
-								const isSelectedCard = selectedCard === card;
+								const isSelectedCard = selectedCard?.token === card.token;
 								return (
 									<Button
 										key={card.token}
@@ -211,6 +242,20 @@ export default function Deposit() {
 									</Button>
 								);
 							})}
+							{cards?.length !== 0 && (
+								<Button
+									variant="outline"
+									size={'lg'}
+									onPress={() => {
+										cardSelectModal.current?.close();
+										router.push('/(main)/(deposit)/manage-cards');
+									}}
+									className={'flex flex-row items-center justify-start gap-2 px-4 py-2'}
+								>
+									<Ionicons name={'settings-outline'} className="text-foreground" size={24} />
+									<Text className={'text-base font-semibold text-foreground'}>Manage Cards</Text>
+								</Button>
+							)}
 							<Button
 								variant="outline"
 								size={'lg'}
@@ -223,6 +268,11 @@ export default function Deposit() {
 								<Ionicons name={'add-circle-outline'} className="text-foreground" size={24} />
 								<Text className={'text-base font-semibold text-foreground'}>Add a new Card</Text>
 							</Button>
+							<HintBox
+								className="my-2"
+								text="Tip: You can enable a card to be auto selected by setting up a Primary Card in the manage cards."
+								when={!defaultCard && cards?.length !== 0}
+							/>
 						</View>
 					</BottomSheetView>
 				</BottomSheetModal>

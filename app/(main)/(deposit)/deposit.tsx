@@ -29,7 +29,7 @@ import { defaultCardAtom } from '~/lib/atoms';
 import { getCardIcon } from '~/lib/CardIcons';
 import { useListCards } from '~/lib/pound/use-list-cards';
 import { useMakePayment } from '~/lib/pound/use-make-payment';
-import { cn, uuid } from '~/lib/utils';
+import { cn } from '~/lib/utils';
 
 const AmountSchema = z.object({
 	amount: z.preprocess(
@@ -78,7 +78,7 @@ export default function Deposit() {
 		//maybe redirect should also go to the same success screen on successful 3ds?
 		const redirectUrl = `${Env.EXPO_PUBLIC_POUND_WEB_URL}/app/home?env=${Env.APP_ENV}`;
 		makePayment(
-			{ amount: data.amount, token: selectedCard.token, reference: uuid(), redirectUrl },
+			{ amount: data.amount, token: selectedCard.token, redirectUrl },
 			{
 				onSuccess: async (data) => {
 					if (data.nextStepUrl) {
@@ -87,6 +87,7 @@ export default function Deposit() {
 							createTask: false,
 						});
 					} else {
+						//TODO: you can check for status PAID and do something here
 						router.dismissAll();
 					}
 				},

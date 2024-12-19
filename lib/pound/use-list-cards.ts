@@ -1,19 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { listCards } from '~/api/deposit/card';
+import { queries } from './queries';
 
-const QUERY_KEY = 'card';
-
-export function getQueryKey(page?: number) {
-	if (page === undefined) {
-		return [QUERY_KEY];
-	}
-	return [QUERY_KEY, page];
+interface Props {
+	enabled?: boolean;
 }
 
-export function useListCards() {
-	return useQuery({
-		queryKey: getQueryKey(),
-		queryFn: ({ signal }) => listCards({ signal }),
-	});
-}
+const defaultProps = {
+	enabled: true,
+};
+
+export const useListCards = (props: Props = defaultProps) => {
+	return useQuery({ ...queries.cards.list, enabled: props.enabled });
+};

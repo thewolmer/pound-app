@@ -30,10 +30,14 @@ export default function ManageCards() {
 	const { data: cards } = useListCards();
 	const { mutate: deleteCard } = useDeleteCard();
 	const [confirmDelete, setConfirmDelete] = React.useState(false);
+
 	const handleDelete = (tokenId: string) => {
 		deleteCard(tokenId, {
 			onSuccess: () => {
 				menu.current?.close();
+				if (defaultCard && defaultCard?.token === tokenId) {
+					setDefaultCard(null);
+				}
 				console.log('Card deleted successfully');
 			},
 			onError: (error) => {

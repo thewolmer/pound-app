@@ -12,6 +12,7 @@ import Animated, { SlideInDown, SlideOutDown, SlideOutUp } from 'react-native-re
 
 import { NumberPad } from '../number-pad';
 import { Button } from '../ui/button';
+import { IconWrapper } from '../ui/IconWrapper';
 import { H3 } from '../ui/typography';
 import { NAV_THEME } from '~/constants/theme';
 import { useAccount } from '~/context/AccountContext';
@@ -69,9 +70,11 @@ export const RequestButton = () => {
 
 	return (
 		<>
-			<Button onPress={handleRequest} haptics="impact-light" variant={'outline'} size={'lg'}>
-				<Ionicons name="arrow-down-circle-outline" className="text-foreground" size={24} />
-				<Text className="text-xs text-foreground">Request</Text>
+			<Button onPress={handleRequest} haptics="impact-light" variant={'link'} size={'lg'}>
+				<IconWrapper>
+					<Ionicons name="arrow-down-circle-outline" className="text-foreground" size={24} />
+				</IconWrapper>
+				<Text className="text-xs font-semibold text-muted-foreground">Request</Text>
 			</Button>
 			<BottomSheetModal
 				backdropComponent={renderBackDrop}

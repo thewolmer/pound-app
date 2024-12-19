@@ -94,9 +94,6 @@ export const SendViaPoundTag = () => {
 				enableDismissOnClose
 				handleIndicatorStyle={{ backgroundColor: '#fff' }}
 				backgroundStyle={{ backgroundColor: 'transparent' }}
-				onDismiss={() => {
-					console.log('Modal closed');
-				}}
 			>
 				<KeyboardAvoidingView
 					keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}

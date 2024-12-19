@@ -9,29 +9,16 @@ export default function DepositLayout() {
 			<Stack.Screen
 				name="deposit"
 				options={{
-					title: 'Deposit',
-					// headerLargeTitle: true,
+					title: 'Add Funds',
+					headerLargeTitle: true,
 					headerShadowVisible: false,
-					headerLeft(props) {
-						return (
-							<Button
-								haptics="impact-light"
-								variant={'link'}
-								hitSlop={20}
-								onPressIn={() => router.back()}
-								className="flex-row items-center px-5"
-							>
-								<TabBarIcon name="arrow-back" className="text-foreground" />
-							</Button>
-						);
-					},
 				}}
 			/>
 			<Stack.Screen
 				name="add-card"
 				options={{
 					title: 'Add New Card',
-					// headerLargeTitle: true,
+					headerLargeTitle: true,
 					headerShadowVisible: false,
 				}}
 			/>
@@ -39,7 +26,7 @@ export default function DepositLayout() {
 				name="manage-cards"
 				options={{
 					title: 'Manage Cards',
-					// headerLargeTitle: true,
+					headerLargeTitle: true,
 					headerShadowVisible: false,
 					headerRight(props) {
 						return (

@@ -112,11 +112,11 @@ export default function Deposit() {
 	return (
 		<SafeAreaView className="flex-1">
 			<KeyboardAvoidingView
-				keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+				keyboardVerticalOffset={Platform.OS === 'ios' ? 50 : 0}
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 				className="flex-1"
 			>
-				<ScrollView contentContainerStyle={{ padding: 6 }}>
+				<ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ padding: 6 }}>
 					<Card>
 						<CardHeader>
 							<Controller
@@ -271,7 +271,7 @@ export default function Deposit() {
 							</Button>
 							<HintBox
 								className="my-2"
-								text="Tip: You can enable a card to be auto selected by setting up a Primary Card in the manage cards."
+								text="You can enable a card to be auto selected by setting up your Primary Card in the Manage Cards screen."
 								when={!defaultCard && cards?.length !== 0}
 							/>
 						</View>

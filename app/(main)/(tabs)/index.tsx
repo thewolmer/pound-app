@@ -2,14 +2,16 @@ import { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
-import { Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { RequestButton } from '~/components/action-buttons/RequestButton';
+import { PoundIcon } from '~/components/icons/PoundIcon';
 import { LatestTransactions } from '~/components/transactions/latest-transactions';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 import { Card, CardFooter, CardHeader } from '~/components/ui/card';
+import { IconWrapper } from '~/components/ui/IconWrapper';
 import { H1 } from '~/components/ui/typography';
 import { useAccount } from '~/context/AccountContext';
 import { useSession } from '~/context/SessionContext';
@@ -76,8 +78,10 @@ export default function StartScreen() {
 		<SafeAreaView className="flex-1">
 			<View className="flex flex-1 flex-col gap-5 px-4">
 				<View className="flex flex-row items-center justify-between px-2 text-foreground">
-					<Text className="text-foreground"> Welcome</Text>
-					<Pressable onPress={() => router.push('/(main)/(profile)/profile')} className="px-5">
+					<View className="w-28">
+						<PoundIcon />
+					</View>
+					<Pressable onPress={() => router.push('/(main)/(profile)/profile')}>
 						<Avatar alt="User avatar">
 							<AvatarImage source={{ uri: person?.avatar_url || undefined }} />
 							<AvatarFallback>
@@ -89,27 +93,31 @@ export default function StartScreen() {
 				<Card>
 					<CardHeader className="items-center">
 						<Text className="mb-2 text-accent-foreground">Available Balance</Text>
-						<H1 className={getBalanceColor()}>{formatCurrency(Number(balance))}</H1>
+						{isLoading ? <ActivityIndicator /> : <H1 className={getBalanceColor()}>{formatCurrency(balance)}</H1>}
 					</CardHeader>
 
 					<CardFooter className="flex justify-between">
 						<Button
 							onPress={() => router.push('/(main)/(deposit)/deposit')}
-							variant={'outline'}
+							variant={'link'}
 							haptics="impact-light"
 							size={'lg'}
 						>
-							<Ionicons name="business-outline" className="text-foreground" size={22} />
-							<Text className="text-xs text-foreground">Deposit</Text>
+							<IconWrapper>
+								<Ionicons name="add" className="text-foreground" size={22} />
+							</IconWrapper>
+							<Text className="text-xs font-semibold text-muted-foreground">Add</Text>
 						</Button>
 						<Button
 							onPress={() => router.push('/(main)/(send)/send')}
 							haptics="impact-light"
-							variant={'outline'}
+							variant={'link'}
 							size={'lg'}
 						>
-							<Ionicons name="arrow-up-circle-outline" className="text-foreground" size={24} />
-							<Text className="text-xs text-foreground">Send</Text>
+							<IconWrapper>
+								<Ionicons name="arrow-up-circle-outline" className="text-foreground" size={24} />
+							</IconWrapper>
+							<Text className="text-xs font-semibold text-muted-foreground">Send</Text>
 						</Button>
 						<RequestButton />
 					</CardFooter>

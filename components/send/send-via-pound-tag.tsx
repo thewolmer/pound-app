@@ -14,7 +14,7 @@ import { z } from 'zod';
 
 import { Input } from '../ui/input';
 import { Button } from '~/components/ui/button';
-import { ForwardCard } from '~/components/ui/ForwardCard';
+import { ForwardCard } from '~/components/ui/forward-card';
 import { H3 } from '~/components/ui/typography';
 import { useSession } from '~/context/SessionContext';
 import { supabase } from '~/lib/supabase';

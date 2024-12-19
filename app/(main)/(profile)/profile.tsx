@@ -3,7 +3,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ForwardCard } from '~/components/ui/ForwardCard';
+import { ForwardCard } from '~/components/ui/forward-card';
 import { useSession } from '~/context/SessionContext';
 import { supabase } from '~/lib/supabase';
 import type { Tables } from '~/types/database.types';

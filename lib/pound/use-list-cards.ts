@@ -2,6 +2,14 @@ import { useQuery } from '@tanstack/react-query';
 
 import { queries } from './queries';
 
-export function useListCards() {
-	return useQuery(queries.cards.list);
+interface Props {
+	enabled?: boolean;
 }
+
+const defaultProps = {
+	enabled: true,
+};
+
+export const useListCards = (props: Props = defaultProps) => {
+	return useQuery({ ...queries.cards.list, enabled: props.enabled });
+};

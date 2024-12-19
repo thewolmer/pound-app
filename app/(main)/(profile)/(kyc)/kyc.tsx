@@ -1,9 +1,9 @@
 import React from 'react';
 import { router } from 'expo-router';
-import { Image, Text, View } from 'react-native';
+import { Image, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ForwardCard } from '~/components/ui/ForwardCard';
+import { ForwardCard } from '~/components/ui/forward-card';
 
 export default function Kyc() {
 	return (

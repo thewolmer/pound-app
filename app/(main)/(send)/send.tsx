@@ -15,7 +15,7 @@ export default function SendScreen() {
 					<SendViaContact />
 					<ForwardCard
 						ionicons="qr-code"
-						title="Send by scanning QR"
+						title="Scan a QR"
 						description="Send money by scanning someone QR code"
 						onPress={() => router.push('/scan')}
 					/>

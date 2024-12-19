@@ -2,36 +2,30 @@ import React, { useCallback, useRef } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { useAtom } from 'jotai/react';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import Animated, {
-	FadeInDown,
-	FadeOutDown,
-	SlideInDown,
-	SlideInLeft,
-	SlideInRight,
-	SlideOutDown,
-	SlideOutLeft,
-	SlideOutRight,
-} from 'react-native-reanimated';
+import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Card as CardType } from '~/api/deposit/card.types';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { Card, CardFooter, CardHeader } from '~/components/ui/card';
+import { IconWrapper } from '~/components/ui/IconWrapper';
 import { Switch } from '~/components/ui/switch';
 import { H4 } from '~/components/ui/typography';
 import { defaultCardAtom } from '~/lib/atoms';
 import { getCardIcon } from '~/lib/CardIcons';
 import { useDeleteCard } from '~/lib/pound/use-delete.card';
 import { useListCards } from '~/lib/pound/use-list-cards';
+import { useHaptics } from '~/lib/useHaptics';
 import { cn } from '~/lib/utils';
 
 export default function ManageCards() {
 	const menu = useRef<BottomSheetModal>(null);
 	const [selectedCard, setSelectedCard] = React.useState<CardType | null>(null);
 	const [defaultCard, setDefaultCard] = useAtom(defaultCardAtom);
+	const { triggerHaptics } = useHaptics();
 
 	const { data: cards } = useListCards();
 	const { mutate: deleteCard } = useDeleteCard();
@@ -65,16 +59,17 @@ export default function ManageCards() {
 										{getCardIcon(card.card.type)}
 										<Text className="ml-2 font-semibold text-foreground">XXXX {card.card.last_4_digits}</Text>
 									</View>
-									<Button
-										variant="link"
-										size={'icon'}
+									<Pressable
 										onPress={() => {
+											triggerHaptics('impact-light');
 											setSelectedCard(card);
 											menu.current?.present();
 										}}
 									>
-										<Ionicons name="ellipsis-horizontal" size={24} className="text-foreground" />
-									</Button>
+										<IconWrapper>
+											<Ionicons name="ellipsis-horizontal" size={24} className="text-foreground" />
+										</IconWrapper>
+									</Pressable>
 								</View>
 							</CardHeader>
 							<CardFooter>

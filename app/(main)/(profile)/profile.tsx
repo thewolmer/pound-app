@@ -82,6 +82,12 @@ export default function Profile() {
 					onPress={() => router.push('/(profile)/poundTag')}
 				/>
 				<ForwardCard
+					title="Your Cards"
+					description={'Manage your cards.'}
+					ionicons="card-sharp"
+					onPress={() => router.push('/(main)/(deposit)/manage-cards')}
+				/>
+				<ForwardCard
 					title="Kyc"
 					description={'Verify your identity'}
 					ionicons="id-card"

@@ -74,7 +74,7 @@ export default function AmountScreen() {
 								</View>
 								<View className="flex flex-col">
 									<Text className="line-clamp-2 text-lg font-semibold text-foreground"> {user?.display_name}</Text>
-									<Text className="line-clamp-1 text-sm text-muted-foreground">
+									<Text className="line-clamp-1 text-sm font-semibold text-muted-foreground">
 										{user?.identity_tag ? `@${user.identity_tag}` : ''}
 									</Text>
 								</View>

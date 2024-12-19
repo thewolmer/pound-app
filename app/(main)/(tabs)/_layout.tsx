@@ -43,7 +43,7 @@ export default function TabsLayout() {
 					headerTitle: 'Scan QR Code',
 
 					tabBarIcon: ({ color, focused }) => (
-						<View className="elevation-md mb-5 h-[65px] w-[65px] items-center justify-center rounded-full bg-primary">
+						<View className="elevation-sm mb-2 h-[65px] w-[65px] items-center justify-center rounded-3xl bg-primary">
 							<TabBarIcon name={focused ? 'qr-code' : 'qr-code-outline'} className="text-white" />
 						</View>
 					),

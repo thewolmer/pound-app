@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FlatList } from 'react-native';
+import { FlatList, View } from 'react-native';
 
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { useAccount } from '~/context/AccountContext';
@@ -15,15 +15,18 @@ interface LatestTransactionsProps {
 export function LatestTransactions({ count }: LatestTransactionsProps) {
 	const { accountId } = useAccount();
 	const [transactions, setTransactions] = useState<Tables<'account_transactions'>[] | null>([]);
+	const [isLoading, setLoading] = useState(false);
 
 	useEffect(() => {
 		const getTransactions = async () => {
+			setLoading(true);
 			const { data, error } = await supabase
 				.from('account_transactions')
 				.select('*')
 				.or(`origin_account_id.eq.${accountId},destination_account_id.eq.${accountId}`)
 				.order('created_at', { ascending: false })
 				.limit(count);
+			setLoading(false);
 			if (error) console.error(error);
 			setTransactions(data);
 		};
@@ -47,11 +50,27 @@ export function LatestTransactions({ count }: LatestTransactionsProps) {
 				<CardTitle className="text-lg">Latest Transactions</CardTitle>
 			</CardHeader>
 			<CardContent>
-				<FlatList
-					data={transactions}
-					renderItem={renderTransaction}
-					keyExtractor={(item) => item.id || Math.random().toString()}
-				/>
+				{isLoading ? (
+					Array.from({ length: 5 }).map((_, index) => (
+						<View key={index} className="flex-row items-center justify-between border-b border-border p-2">
+							<View className="flex-row items-center gap-4">
+								<View className="relative h-12 w-12 animate-pulse rounded-2xl bg-muted p-2"></View>
+
+								<View className="flex gap-2">
+									<View className="animate-pulse rounded-full bg-muted px-14 py-2" />
+									<View className="animate-pulse rounded-full bg-muted px-4 py-1" />
+								</View>
+							</View>
+							<View className="animate-pulse rounded-2xl bg-muted px-8 py-4" />
+						</View>
+					))
+				) : (
+					<FlatList
+						data={transactions}
+						renderItem={renderTransaction}
+						keyExtractor={(item) => item.id || Math.random().toString()}
+					/>
+				)}
 			</CardContent>
 		</Card>
 	);

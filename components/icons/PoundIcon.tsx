@@ -5,7 +5,7 @@ import { useColorScheme } from '~/lib/useColorScheme';
 
 export const PoundIcon = () => {
 	const { isDarkColorScheme } = useColorScheme();
-	const fill = isDarkColorScheme ? '#fff' : '#000';
+	const fill = isDarkColorScheme ? '#cecac0' : '#010000';
 	const originalWidth = 698.02;
 	const originalHeight = 154.75;
 	const aspectRatio = originalWidth / originalHeight;

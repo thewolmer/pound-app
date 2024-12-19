@@ -1,4 +1,4 @@
-import { useCallback, useDeferredValue, useRef, useState } from 'react';
+import { useCallback, useDeferredValue, useEffect, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import {
 	BottomSheetBackdrop,
@@ -7,7 +7,7 @@ import {
 	BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import type { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import { Contact, Fields, getContactsAsync, requestPermissionsAsync } from 'expo-contacts';
+import { Fields, getContactsAsync, requestPermissionsAsync } from 'expo-contacts';
 import { router } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
 import { Image, Platform, Pressable, Text, View } from 'react-native';
@@ -15,20 +15,27 @@ import { FlatList } from 'react-native-gesture-handler';
 
 import { Input } from '../ui/input';
 import { Button } from '~/components/ui/button';
-import { ForwardCard } from '~/components/ui/ForwardCard';
+import { ForwardCard } from '~/components/ui/forward-card';
 import { H3 } from '~/components/ui/typography';
-import { supabase } from '~/lib/supabase';
-import { cn } from '~/lib/utils';
+import { useListAccountDetails } from '~/lib/pound/account-details/use-list-account-details';
+import { useCreateContacts } from '~/lib/pound/contacts/use-create-contacts';
+import { useListContacts } from '~/lib/pound/contacts/use-list-contacts';
 import type { Tables } from '~/types/database.types';
 
-interface ContactWithAccountDetails extends Contact {
-	isPoundUser: boolean;
-	account_details?: Tables<'account_details'>;
-}
-
 export const SendViaContact = () => {
+	const [emails, setEmails] = useState<string[]>([]);
+	const [isModalOpen, setIsModalOpen] = useState(false);
+
+	//TODO: @wol do something with loading states or remove them
+	const { data: contacts, isPending: isLoadingContacts } = useListContacts({ enabled: isModalOpen });
+	const { data: poundUsers, isPending: isLoadingPhoneContacts } = useListAccountDetails(
+		{ filterByEmails: emails },
+		{ enabled: emails.length > 0 }
+	);
+	const { mutate: createContacts, isPending: isCreatingContacts } = useCreateContacts();
+
 	const contactsModalRef = useRef<BottomSheetModal>(null);
-	const [contacts, setContacts] = useState<ContactWithAccountDetails[]>([]);
+
 	const { control, watch } = useForm({
 		defaultValues: {
 			search: '',
@@ -45,7 +52,19 @@ export const SendViaContact = () => {
 		[]
 	);
 
-	const fetchContacts = async () => {
+	useEffect(() => {
+		if (contacts && poundUsers) {
+			const existingContactsIds = new Set(contacts.map((contact) => contact.person_id as string));
+			const phoneContactsIds = new Set(poundUsers.map((contact) => contact.person_id as string));
+
+			const newContacts = [...phoneContactsIds].filter((id) => !existingContactsIds.has(id));
+			if (newContacts.length > 0) {
+				createContacts(newContacts);
+			}
+		}
+	}, [contacts, poundUsers, createContacts]);
+
+	const getDeviceContacts = async () => {
 		const { status } = await requestPermissionsAsync();
 		if (status === 'granted') {
 			const { data: contactData } = await getContactsAsync({
@@ -53,43 +72,21 @@ export const SendViaContact = () => {
 			});
 
 			const emails = contactData
-				.flatMap((contact) => contact.emails?.map((email) => email.email) || [])
+				.flatMap((contact) => contact.emails?.map((email) => email.email?.toLowerCase()) || [])
 				.filter((email): email is string => !!email);
 
-			const { data: accountDetails, error } = await supabase.from('account_details').select('*').in('email', emails);
-
-			if (error) {
-				console.error('Error fetching account details:', error.message);
-				return;
-			}
-
-			const accountDetailsMap = new Map();
-			for (const detail of accountDetails || []) {
-				if (detail.email) accountDetailsMap.set(detail.email, detail);
-			}
-
-			const updatedContacts = contactData.map((contact) => {
-				const contactEmail = contact.emails?.[0]?.email;
-				const accountInfo = contactEmail ? accountDetailsMap.get(contactEmail) : undefined;
-
-				return {
-					...contact,
-					isPoundUser: !!accountInfo,
-					account_details: accountInfo,
-				};
-			});
-
-			setContacts(updatedContacts);
+			setEmails(emails);
 		}
 	};
 
 	const openContactsModal = async () => {
 		contactsModalRef.current?.present();
-		await fetchContacts();
+		await getDeviceContacts();
+		setIsModalOpen(true);
 	};
 
-	const filteredContacts = contacts.filter((contact) =>
-		contact.name?.toLowerCase().includes(deferredSearch.toLowerCase())
+	const filteredContacts = contacts?.filter((contact) =>
+		contact.display_name?.toLowerCase().includes(deferredSearch.toLowerCase())
 	);
 
 	return (
@@ -141,7 +138,7 @@ export const SendViaContact = () => {
 
 					<FlatList
 						data={filteredContacts}
-						keyExtractor={(item) => item.id || ''}
+						keyExtractor={(item) => item.person_id || ''}
 						renderItem={(props) => renderContactItem({ ...props, ref: contactsModalRef })}
 						ListEmptyComponent={
 							<View className="flex-1 items-center justify-center">
@@ -159,44 +156,33 @@ const renderContactItem = ({
 	item,
 	ref,
 }: {
-	item: ContactWithAccountDetails;
+	item: Tables<'account_details'>;
 	ref: React.RefObject<BottomSheetModalMethods>;
 }) => (
 	<Pressable
-		disabled={!item.isPoundUser}
 		onPress={() => {
 			ref.current?.close();
 			router.push({
 				pathname: '/(main)/(send)/amount',
-				params: { account_details: JSON.stringify(item.account_details) },
+				params: { account_details: JSON.stringify(item) },
 			});
 		}}
-		className={cn(
-			'flex-row items-center justify-start border-b border-border p-2',
-			item.isPoundUser ? 'opacity-100' : 'opacity-60'
-		)}
+		className="flex-row items-center justify-start border-b border-border p-2"
 	>
-		{item.imageAvailable && item.image ? (
-			<Image source={{ uri: item.image.uri }} className="h-10 w-10 rounded-full" />
+		{item.avatar_url ? (
+			<Image source={{ uri: item.avatar_url }} className="h-10 w-10 rounded-full" />
 		) : (
 			<View className="flex h-10 w-10 items-center justify-center rounded-full bg-accent">
-				<Text className="text-center text-2xl text-foreground">{item.name?.[0]}</Text>
+				<Text className="text-center text-2xl text-foreground">{item.display_name?.[0]}</Text>
 			</View>
 		)}
 		<View className="ml-3">
-			<Text className="font-semibold text-foreground">{item.name}</Text>
-			{item.isPoundUser &&
-				(item.account_details?.identity_tag ? (
-					<Text className="text-xs text-muted-foreground">@{item.account_details?.identity_tag}</Text>
-				) : (
-					<Text className="text-xs text-muted-foreground">{item.account_details?.email}</Text>
-				))}
-			{!item.isPoundUser &&
-				(item.emails?.length ? (
-					<Text className="text-xs text-muted-foreground">{item.emails[0].email}</Text>
-				) : (
-					<Text className="text-xs text-muted-foreground">{item.phoneNumbers?.[0].number}</Text>
-				))}
+			<Text className="font-semibold text-foreground">{item.display_name}</Text>
+			{item.identity_tag ? (
+				<Text className="text-xs text-muted-foreground">@{item.identity_tag}</Text>
+			) : (
+				<Text className="text-xs text-muted-foreground">{item.email}</Text>
+			)}
 		</View>
 	</Pressable>
 );

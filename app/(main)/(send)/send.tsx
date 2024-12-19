@@ -2,9 +2,9 @@ import { router } from 'expo-router';
 import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { SendViaContact } from '~/components/send/SendViaContact';
-import { SendViaPoundTag } from '~/components/send/SendViaPoundTag';
-import { ForwardCard } from '~/components/ui/ForwardCard';
+import { SendViaContact } from '~/components/send/send-via-contact';
+import { SendViaPoundTag } from '~/components/send/send-via-pound-tag';
+import { ForwardCard } from '~/components/ui/forward-card';
 
 export default function SendScreen() {
 	return (

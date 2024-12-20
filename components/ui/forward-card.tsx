@@ -7,6 +7,7 @@ import { cn } from '~/lib/utils';
 
 import { Button } from './button';
 import { Card, CardFooter, CardHeader } from './card';
+import { IconWrapper } from './IconWrapper';
 import { H4 } from './typography';
 
 type IoniconsName = keyof (typeof Ionicons)['glyphMap'];
@@ -41,16 +42,20 @@ export const ForwardCard: React.FC<ForwardCardProps> = ({
 				onPress?.();
 			}}
 		>
-			<Card className="mb-3 flex w-full flex-row items-center justify-between px-4 shadow-sm">
+			<Card className="mb-3 flex w-full flex-row items-center justify-between px-3 shadow-sm">
 				<View className="flex w-[85%] flex-row items-center">
-					{ionicons && <Ionicons name={ionicons} size={38} className="text-foreground" />}
+					{ionicons && (
+						<IconWrapper>
+							<Ionicons name={ionicons} size={38} className="text-foreground" />
+						</IconWrapper>
+					)}
 					{IconLeft && !ionicons && <>{IconLeft}</>}
 					<View>
 						<CardHeader className="pb-0">
-							<H4 className={cn(titleClassName)}>{title}</H4>
+							<Text className={cn(titleClassName, 'text-lg font-bold text-card-foreground')}>{title}</Text>
 						</CardHeader>
 						<CardFooter>
-							<Text className={cn('w-[95%] truncate text-sm text-muted-foreground', descriptionClassName)}>
+							<Text className={cn('w-[95%] truncate text-balance text-sm text-muted-foreground', descriptionClassName)}>
 								{description}
 							</Text>
 						</CardFooter>

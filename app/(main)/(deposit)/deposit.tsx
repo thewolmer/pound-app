@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { openBrowserAsync } from 'expo-web-browser';
 import { useAtomValue } from 'jotai/react';
 import { Controller, useForm } from 'react-hook-form';
@@ -27,6 +27,7 @@ import { H3 } from '~/components/ui/typography';
 import { Env } from '~/config/env';
 import { defaultCardAtom } from '~/lib/atoms';
 import { getCardIcon } from '~/lib/CardIcons';
+import { parseCurrency } from '~/lib/formatCurrency';
 import { useListCards } from '~/lib/pound/use-list-cards';
 import { useMakePayment } from '~/lib/pound/use-make-payment';
 import { cn } from '~/lib/utils';
@@ -62,7 +63,7 @@ export default function Deposit() {
 		control,
 		handleSubmit,
 		setValue,
-		formState: { errors, isSubmitting },
+		formState: { errors, isSubmitting, isDirty },
 	} = useForm<AmountFormValues>({
 		resolver: zodResolver(AmountSchema),
 		defaultValues: {
@@ -98,7 +99,11 @@ export default function Deposit() {
 		);
 	};
 
-	useEffect(() => {
+	useFocusEffect(() => {
+		setSelectedCard(null); // clear if coming from back btn
+		if (!defaultCard && cards && cards.length > 0) {
+			setSelectedCard(cards[0]);
+		}
 		if (defaultCard && cards && cards?.length > 0) {
 			const matchedCard = cards.find((card) => card.token === defaultCard.token);
 			if (matchedCard) {
@@ -107,7 +112,7 @@ export default function Deposit() {
 				setSelectedCard(null);
 			}
 		}
-	}, [defaultCard, cards]);
+	});
 
 	return (
 		<SafeAreaView className="flex-1">
@@ -128,8 +133,8 @@ export default function Deposit() {
 										<Input
 											keyboardType="decimal-pad"
 											className="w-[90%] text-2xl placeholder:font-extrabold placeholder:text-muted-foreground"
-											value={value > 0 ? value?.toString() : ''}
-											onChangeText={(text) => onChange(Number(text))}
+											value={isDirty ? value.toString() : ''}
+											onChangeText={(text) => onChange(parseCurrency(text))}
 											autoFocus
 											placeholder="Enter amount"
 										/>
@@ -141,7 +146,12 @@ export default function Deposit() {
 						<CardFooter>
 							<View className="flex flex-row flex-wrap items-center gap-2">
 								{predefinedAmounts.map((amount) => (
-									<Button variant={'outline'} size={'sm'} key={amount} onPress={() => setValue('amount', amount)}>
+									<Button
+										variant={'outline'}
+										size={'sm'}
+										key={amount}
+										onPress={() => setValue('amount', amount, { shouldDirty: true, shouldTouch: true })}
+									>
 										<Text className="font-semibold text-foreground">£{amount}</Text>
 									</Button>
 								))}

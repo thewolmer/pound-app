@@ -8,12 +8,17 @@ import { z } from 'zod';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
+import { parseCurrency } from '~/lib/formatCurrency';
 import type { Tables } from '~/types/database.types';
 
 const AmountSchema = z.object({
 	amount: z.preprocess(
 		(val) => Number.parseFloat(val as string),
-		z.number().positive('Amount must be greater than 0').min(0.01, 'Amount must be at least 0.01')
+		z
+			.number()
+			.positive('Amount must be greater than 0')
+			.min(0.01, 'Amount must be at least 0.01')
+			.refine((val) => /^\d+(\.\d{1,2})?$/.test(val.toString()), 'Amount must have at most 2 decimal places')
 	),
 	message: z.string().max(30, 'Message is too long').nullable().optional(),
 });
@@ -92,8 +97,8 @@ export default function AmountScreen() {
 											<Input
 												keyboardType="numeric"
 												className="w-[90%] text-2xl placeholder:font-extrabold placeholder:text-muted-foreground"
-												value={value > 0 ? value?.toString() : ''}
-												onChangeText={onChange}
+												value={isDirty ? value.toString() : ''}
+												onChangeText={(text) => onChange(parseCurrency(text))}
 												autoFocus
 												placeholder="Enter amount"
 											/>

@@ -1,8 +1,9 @@
 import React, { useCallback, useRef } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import { Link } from 'expo-router';
 import { useAtom } from 'jotai/react';
-import { Pressable, Text, View } from 'react-native';
+import { FlatList, Pressable, Text, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -51,42 +52,60 @@ export default function ManageCards() {
 		),
 		[]
 	);
+
+	const renderTransaction = ({ item }: { item: CardType }) => {
+		return (
+			<Card key={item.token} className="border-border">
+				<CardHeader>
+					<View className="flex-row items-center justify-between">
+						<View className="flex-row items-center">
+							{getCardIcon(item.card.type)}
+							<Text className="ml-2 font-semibold text-foreground">XXXX {item.card.last_4_digits}</Text>
+						</View>
+						<Pressable
+							onPress={() => {
+								triggerHaptics('impact-light');
+								setSelectedCard(item);
+								menu.current?.present();
+							}}
+						>
+							<IconWrapper>
+								<Ionicons name="ellipsis-horizontal" size={24} className="text-foreground" />
+							</IconWrapper>
+						</Pressable>
+					</View>
+				</CardHeader>
+				<CardFooter>
+					<View className="flex-row items-center justify-between">
+						{defaultCard && defaultCard.token === item.token && (
+							<Badge variant={'outline'} className="bg-success">
+								<Text className="text-xs font-semibold capitalize text-success-foreground">Primary</Text>
+							</Badge>
+						)}
+					</View>
+				</CardFooter>
+			</Card>
+		);
+	};
+
 	return (
 		<SafeAreaView className="flex-1">
 			<ScrollView contentContainerStyle={{ padding: 16 }} contentInsetAdjustmentBehavior="automatic">
 				<View className="flex flex-col gap-4">
-					{cards?.map((card) => (
-						<Card key={card.token} className="border-border">
-							<CardHeader>
-								<View className="flex-row items-center justify-between">
-									<View className="flex-row items-center">
-										{getCardIcon(card.card.type)}
-										<Text className="ml-2 font-semibold text-foreground">XXXX {card.card.last_4_digits}</Text>
-									</View>
-									<Pressable
-										onPress={() => {
-											triggerHaptics('impact-light');
-											setSelectedCard(card);
-											menu.current?.present();
-										}}
-									>
-										<IconWrapper>
-											<Ionicons name="ellipsis-horizontal" size={24} className="text-foreground" />
-										</IconWrapper>
-									</Pressable>
-								</View>
-							</CardHeader>
-							<CardFooter>
-								<View className="flex-row items-center justify-between">
-									{defaultCard && defaultCard.token === card.token && (
-										<Badge variant={'outline'} className="bg-success">
-											<Text className="text-xs font-semibold capitalize text-success-foreground">Primary</Text>
-										</Badge>
-									)}
-								</View>
-							</CardFooter>
-						</Card>
-					))}
+					<FlatList
+						data={cards}
+						renderItem={renderTransaction}
+						ListEmptyComponent={
+							<View className="h-full w-full flex-1 items-center justify-center p-4">
+								<Text className="py-6 text-muted-foreground"> TODO: maybe an illustration here</Text>
+								<Link href={'/(main)/(deposit)/add-card'} asChild>
+									<Button className="text-muted-foreground">
+										<Text className="text-primary-foreground">Add your first Card.</Text>
+									</Button>
+								</Link>
+							</View>
+						}
+					/>
 				</View>
 			</ScrollView>
 			<BottomSheetModal

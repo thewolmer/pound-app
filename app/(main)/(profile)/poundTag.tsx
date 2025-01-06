@@ -11,14 +11,14 @@ import { supabase } from '~/lib/supabase';
 
 const tagSchema = z
 	.string()
-	.regex(/^[a-z0-9]+$/, 'Tag can only contain lowercase letters and numbers')
+	.regex(/^[a-z0-9@]+$/, 'Tag can only contain lowercase letters and numbers')
 	.min(3, 'Tag must be at least 3 characters long')
 	.max(15, 'Tag can be up to 15 characters');
 
 export default function UpdateTag() {
 	const { person, updatePerson } = useSession();
 
-	const [tag, setTag] = useState(person?.identity_tag || '');
+	const [tag, setTag] = useState('');
 	const [isAvailable, setIsAvailable] = useState(true);
 	const [error, setError] = useState('');
 	const [loading, setLoading] = useState(false);
@@ -38,10 +38,11 @@ export default function UpdateTag() {
 	useEffect(() => {
 		const checkTagAvailability = async () => {
 			if (debouncedTag) {
+				const cleanTag = debouncedTag.startsWith('@') ? debouncedTag.slice(1) : debouncedTag;
 				const { data } = await supabase
 					.from('account_details')
 					.select('identity_tag')
-					.eq('identity_tag', debouncedTag)
+					.eq('identity_tag', cleanTag)
 					.single();
 				setIsAvailable(data === null);
 			}
@@ -80,7 +81,7 @@ export default function UpdateTag() {
 						value={tag}
 						onChangeText={handleTagChange}
 						returnKeyType="done"
-						placeholder="Enter your pound tag"
+						placeholder={initialTag || 'Enter your tag'}
 						autoCapitalize="none"
 						secureTextEntry={Platform.OS !== 'ios'}
 						keyboardType={Platform.OS === 'ios' ? undefined : 'visible-password'}
@@ -92,7 +93,9 @@ export default function UpdateTag() {
 						!isAvailable && !error ? (
 							<Text className="mt-2 text-destructive-foreground">Tag is already taken</Text>
 						) : (
-							<Text className="mt-2 text-success-foreground">Tag is available</Text>
+							<Text className="mt-2 text-success-foreground">
+								{debouncedTag.startsWith('@') ? debouncedTag : '@' + debouncedTag} is available
+							</Text>
 						)
 					) : null}
 					{error && <Text className="mt-2 text-destructive-foreground">{error}</Text>}

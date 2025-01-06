@@ -1,9 +1,10 @@
 import type React from 'react';
-import { ScrollView, Switch, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemeToggle } from '~/components/ThemeToggle';
 import { Button } from '~/components/ui/button';
+import { Switch } from '~/components/ui/switch';
 import { Text } from '~/components/ui/text';
 import { P } from '~/components/ui/typography';
 import { type PreferenceSettings, usePreferenceSettings } from '~/context/PreferenceContext';
@@ -15,7 +16,7 @@ export default function Settings() {
 	return (
 		<ScrollView contentInsetAdjustmentBehavior="automatic">
 			<SafeAreaView className="flex-1 p-6">
-				<SettingsCard title="Theme" description="Toggle light and dark themes">
+				<SettingsCard title="Dark Theme" description="Toggle Dark theme">
 					<ThemeToggle />
 				</SettingsCard>
 				<SettingsCard
@@ -62,9 +63,8 @@ const SettingsCard = ({ title, description, children, settingsKey }: SettingsCar
 				children
 			) : isBooleanSetting ? (
 				<Switch
-					value={preferenceSettings[settingsKey] as boolean}
-					trackColor={{ true: '#794cff' }}
-					onValueChange={(value) => updatePreferenceSetting(settingsKey, value)}
+					checked={preferenceSettings[settingsKey] as boolean}
+					onCheckedChange={(value) => updatePreferenceSetting(settingsKey, value)}
 				/>
 			) : null}
 		</View>

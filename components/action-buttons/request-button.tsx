@@ -15,7 +15,7 @@ import { z } from 'zod';
 
 import { Button } from '../ui/button';
 import { Card, CardFooter, CardHeader } from '../ui/card';
-import { IconWrapper } from '../ui/IconWrapper';
+import { IconWrapper } from '../ui/icon-wrapper';
 import { Input } from '../ui/input';
 import { H3 } from '../ui/typography';
 import { NAV_THEME } from '~/constants/theme';

@@ -34,12 +34,12 @@ export default function AddCard() {
 			.refine((value) => cardType?.lengths.includes(value.replace(/\s+/g, '').length), 'Invalid card number.'),
 		expiryDate: z
 			.string()
-			.regex(/^(0[1-9]|1[0-2])\/\d{4}$/, 'Invalid Expiry Date.')
+			.regex(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Invalid Expiry Date.')
 			.refine((value) => {
 				const [month, year] = value.split('/');
-				const expiry = endOfMonth(new Date(Number(year), Number(month) - 1));
+				const expiry = endOfMonth(new Date(Number(20 + year), Number(month) - 1));
 				return !isBefore(expiry, new Date());
-			}, 'Your Card has expired.'),
+			}, 'Card has expired.'),
 		cvv: z
 			.string()
 			.refine((value) => cardType?.code?.size === value.length, `CVV must be ${cardType?.code?.size || 3} digits.`),
@@ -111,7 +111,7 @@ export default function AddCard() {
 			card: {
 				cvv: data.cvv,
 				expiry_month: data.expiryDate.split('/')[0],
-				expiry_year: data.expiryDate.split('/')[1],
+				expiry_year: '20' + data.expiryDate.split('/')[1],
 				last_4_digits: data.cardNumber.slice(-4),
 				name: data.cardHolderName,
 				number: data.cardNumber,
@@ -192,11 +192,11 @@ export default function AddCard() {
 						render={({ field: { onChange, value } }) => (
 							<Input
 								textContentType="creditCardExpiration"
-								placeholder="MM/YYYY"
+								placeholder="MM/YY"
 								value={value}
 								keyboardType="numeric"
 								onChangeText={onChange}
-								maxLength={7}
+								maxLength={5}
 							/>
 						)}
 					/>

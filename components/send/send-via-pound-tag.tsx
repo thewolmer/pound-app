@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import {
 	BottomSheetBackdrop,
 	type BottomSheetBackdropProps,
@@ -9,7 +9,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
-import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Text, View } from 'react-native';
 import { z } from 'zod';
 
 import { Input } from '../ui/input';
@@ -21,7 +21,7 @@ import { supabase } from '~/lib/supabase';
 
 // Zod Schema
 const PoundTagSchema = z.object({
-	poundTag: z.string().nonempty('Pound tag is required').min(3, 'Pound tag must be at least 3 characters long'),
+	poundTag: z.string().min(3, 'Pound tag must be at least 3 characters long'),
 });
 
 type PoundTagFormValues = z.infer<typeof PoundTagSchema>;
@@ -29,6 +29,7 @@ type PoundTagFormValues = z.infer<typeof PoundTagSchema>;
 export const SendViaPoundTag = () => {
 	const poundTagModalRef = useRef<BottomSheetModal>(null);
 	const { session } = useSession();
+	const [isLoading, setLoading] = useState(false);
 
 	const {
 		control,
@@ -47,29 +48,30 @@ export const SendViaPoundTag = () => {
 	);
 
 	const handleVerifyTag = async (data: PoundTagFormValues) => {
+		setLoading(true);
 		const { poundTag } = data;
+		const tag = poundTag.startsWith('@') ? poundTag.slice(1) : poundTag;
 
-		const { data: userData, error } = await supabase
-			.from('account_details')
-			.select()
-			.eq('identity_tag', poundTag)
-			.single();
+		const { data: userData, error } = await supabase.from('account_details').select().eq('identity_tag', tag).single();
 
 		if (!userData) {
 			alert(`${poundTag} is not a valid PoundTag`);
+			setLoading(false);
 			return;
 		}
 
 		if (error) {
 			alert('Something went wrong');
+			setLoading(false);
 			return;
 		}
 
 		if (userData.person_id === session?.user.id) {
 			alert('You cannot send money to yourself');
+			setLoading(false);
 			return;
 		}
-
+		setLoading(false);
 		poundTagModalRef.current?.close();
 		router.push({ pathname: '/(main)/(send)/amount', params: { account_details: JSON.stringify(userData) } });
 	};
@@ -135,7 +137,11 @@ export const SendViaPoundTag = () => {
 
 						{/* Submit Button */}
 						<Button onPress={handleSubmit(handleVerifyTag)} className="mt-5">
-							<Text className="text-white">Next</Text>
+							{isLoading ? (
+								<ActivityIndicator color={'white'} />
+							) : (
+								<Text className="text-primary-foreground">Next</Text>
+							)}
 						</Button>
 
 						{/* Info Section */}

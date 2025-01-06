@@ -7,8 +7,7 @@ import { cn } from '~/lib/utils';
 
 import { Button } from './button';
 import { Card, CardFooter, CardHeader } from './card';
-import { IconWrapper } from './IconWrapper';
-import { H4 } from './typography';
+import { IconWrapper } from './icon-wrapper';
 
 type IoniconsName = keyof (typeof Ionicons)['glyphMap'];
 

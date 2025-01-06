@@ -2,7 +2,7 @@ import React from 'react';
 import { router, Tabs } from 'expo-router';
 import { View } from 'react-native';
 
-import { TabBarIcon } from '~/components/icons/TabBarIcon';
+import { TabBarIcon } from '~/components/icons/tab-bar-icon';
 import { Button } from '~/components/ui/button';
 
 export default function TabsLayout() {

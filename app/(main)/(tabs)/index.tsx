@@ -5,13 +5,13 @@ import { router } from 'expo-router';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { RequestButton } from '~/components/action-buttons/RequestButton';
-import { PoundIcon } from '~/components/icons/PoundIcon';
+import { RequestButton } from '~/components/action-buttons/request-button';
+import { PoundIcon } from '~/components/icons/pound-icon';
 import { LatestTransactions } from '~/components/transactions/latest-transactions';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 import { Card, CardFooter, CardHeader } from '~/components/ui/card';
-import { IconWrapper } from '~/components/ui/IconWrapper';
+import { IconWrapper } from '~/components/ui/icon-wrapper';
 import { H1 } from '~/components/ui/typography';
 import { useAccount } from '~/context/AccountContext';
 import { useSession } from '~/context/SessionContext';

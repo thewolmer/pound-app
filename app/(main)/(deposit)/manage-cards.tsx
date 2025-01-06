@@ -12,7 +12,7 @@ import { Card as CardType } from '~/api/deposit/card.types';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { Card, CardFooter, CardHeader } from '~/components/ui/card';
-import { IconWrapper } from '~/components/ui/IconWrapper';
+import { IconWrapper } from '~/components/ui/icon-wrapper';
 import { Switch } from '~/components/ui/switch';
 import { H4 } from '~/components/ui/typography';
 import { defaultCardAtom } from '~/lib/atoms';

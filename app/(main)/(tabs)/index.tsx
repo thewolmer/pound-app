@@ -3,9 +3,11 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import PagerView from 'react-native-pager-view';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { RequestButton } from '~/components/action-buttons/request-button';
+import { HomePageAdsSlider } from '~/components/ads/homepage-ads-slider';
 import { PoundIcon } from '~/components/icons/pound-icon';
 import { LatestTransactions } from '~/components/transactions/latest-transactions';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
@@ -76,7 +78,7 @@ export default function StartScreen() {
 
 	return (
 		<SafeAreaView className="flex-1">
-			<View className="flex flex-1 flex-col gap-5 px-4">
+			<View className="flex flex-col gap-2 px-4">
 				<View className="flex flex-row items-center justify-between px-2 text-foreground">
 					<View className="w-28">
 						<PoundIcon />
@@ -122,6 +124,7 @@ export default function StartScreen() {
 						<RequestButton />
 					</CardFooter>
 				</Card>
+				<HomePageAdsSlider />
 				<LatestTransactions count={5} />
 			</View>
 		</SafeAreaView>

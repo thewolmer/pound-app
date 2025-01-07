@@ -45,7 +45,7 @@ export function LatestTransactions({ count }: LatestTransactionsProps) {
 	};
 
 	return (
-		<Card>
+		<Card className="">
 			<CardHeader>
 				<CardTitle className="text-lg">Latest Transactions</CardTitle>
 			</CardHeader>

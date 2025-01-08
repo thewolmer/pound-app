@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { RequestButton } from '~/components/action-buttons/request-button';
@@ -22,10 +22,22 @@ import { registerForPushNotificationsAsync } from '~/lib/usePushNotifications';
 
 export default function StartScreen() {
 	const { session, person } = useSession();
-
+	const [refreshing, setRefreshing] = useState(false);
 	const { balance, isLoading } = useAccount();
 	const [previousBalance, setPreviousBalance] = useState<number | null>(null);
 	const [isChanged, setIsChanged] = useState(false);
+
+	const onRefresh = async () => {
+		setRefreshing(true);
+		try {
+			// Refresh the current route
+			console.log('Refreshing the route...'); // TODO: Logic to refresh data
+		} catch (error) {
+			console.error('Failed to refresh the route:', error);
+		} finally {
+			setRefreshing(false);
+		}
+	};
 
 	useEffect(() => {
 		const registerForPushNotifications = async () => {
@@ -76,8 +88,8 @@ export default function StartScreen() {
 	};
 
 	return (
-		<SafeAreaView style={{ flex: 1 }}>
-			<ScrollView>
+		<SafeAreaView>
+			<ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
 				<View className="flex flex-col gap-2 px-4">
 					<View className="flex flex-row items-center justify-between px-2 text-foreground">
 						<View className="w-28">

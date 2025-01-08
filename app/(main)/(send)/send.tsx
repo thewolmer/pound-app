@@ -16,7 +16,7 @@ export default function SendScreen() {
 					<ForwardCard
 						ionicons="qr-code"
 						title="Scan a QR"
-						description="Send money by scanning someone QR code"
+						description="Send money by scanning someone's QR code"
 						onPress={() => router.push('/scan')}
 					/>
 				</SafeAreaView>

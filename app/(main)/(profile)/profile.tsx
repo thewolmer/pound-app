@@ -76,10 +76,10 @@ export default function Profile() {
 				/>
 				<ForwardCard
 					title="Pound Tag"
-					description={user.identity_tag !== null ? (user.identity_tag as string) : 'Setup your Pound Tag >'}
+					description={user.identity_tag !== null ? (('@' + user.identity_tag) as string) : 'Setup your Pound Tag >'}
 					descriptionClassName={user.identity_tag !== null ? 'text-muted-foreground' : 'text-success-foreground'}
 					ionicons="id-card"
-					onPress={() => router.push('/(profile)/poundTag')}
+					onPress={() => router.push('/(profile)/pound-tag')}
 				/>
 				<ForwardCard
 					title="Your Cards"
@@ -88,7 +88,7 @@ export default function Profile() {
 					onPress={() => router.push('/(main)/(deposit)/manage-cards')}
 				/>
 				<ForwardCard
-					title="Kyc"
+					title="KYC"
 					description={'Verify your identity'}
 					ionicons="id-card"
 					onPress={() => router.push('/(profile)/kyc')}

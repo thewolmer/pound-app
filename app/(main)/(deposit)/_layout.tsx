@@ -1,6 +1,6 @@
 import { router, Stack } from 'expo-router';
 
-import { TabBarIcon } from '~/components/icons/TabBarIcon';
+import { TabBarIcon } from '~/components/icons/tab-bar-icon';
 import { Button } from '~/components/ui/button';
 
 export default function DepositLayout() {

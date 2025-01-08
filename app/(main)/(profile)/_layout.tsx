@@ -1,7 +1,7 @@
 import { router, Stack } from 'expo-router';
 import { Pressable } from 'react-native';
 
-import { TabBarIcon } from '~/components/icons/TabBarIcon';
+import { TabBarIcon } from '~/components/icons/tab-bar-icon';
 
 export default function ProfileLayout() {
 	return (
@@ -38,7 +38,7 @@ export default function ProfileLayout() {
 				}}
 			/>
 			<Stack.Screen
-				name="poundTag"
+				name="pound-tag"
 				options={{
 					title: 'Pound Tag',
 					headerLargeTitle: true,

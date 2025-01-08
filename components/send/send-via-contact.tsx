@@ -142,7 +142,7 @@ export const SendViaContact = () => {
 						renderItem={(props) => renderContactItem({ ...props, ref: contactsModalRef })}
 						ListEmptyComponent={
 							<View className="flex-1 items-center justify-center">
-								<Text className="text-muted-foreground">No contacts found</Text>
+								<Text className="text-muted-foreground">No contact found.</Text>
 							</View>
 						}
 					/>
@@ -170,9 +170,9 @@ const renderContactItem = ({
 		className="flex-row items-center justify-start border-b border-border p-2"
 	>
 		{item.avatar_url ? (
-			<Image source={{ uri: item.avatar_url }} className="h-10 w-10 rounded-full" />
+			<Image source={{ uri: item.avatar_url }} className="h-10 w-10 rounded-2xl" />
 		) : (
-			<View className="flex h-10 w-10 items-center justify-center rounded-full bg-accent">
+			<View className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent">
 				<Text className="text-center text-2xl text-foreground">{item.display_name?.[0]}</Text>
 			</View>
 		)}

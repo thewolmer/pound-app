@@ -38,7 +38,7 @@ export default function ProfileLayout() {
 				}}
 			/>
 			<Stack.Screen
-				name="poundTag"
+				name="pound-tag"
 				options={{
 					title: 'Pound Tag',
 					headerLargeTitle: true,

@@ -45,13 +45,13 @@ export function LatestTransactions({ count }: LatestTransactionsProps) {
 	};
 
 	return (
-		<Card>
+		<Card className="">
 			<CardHeader>
 				<CardTitle className="text-lg">Latest Transactions</CardTitle>
 			</CardHeader>
 			<CardContent>
 				{isLoading ? (
-					Array.from({ length: 5 }).map((_, index) => (
+					Array.from({ length: count }).map((_, index) => (
 						<View key={index} className="flex-row items-center justify-between border-b border-border p-2">
 							<View className="flex-row items-center gap-4">
 								<View className="relative h-12 w-12 animate-pulse rounded-2xl bg-muted p-2"></View>
@@ -68,6 +68,8 @@ export function LatestTransactions({ count }: LatestTransactionsProps) {
 					<FlatList
 						data={transactions}
 						renderItem={renderTransaction}
+						scrollEnabled={false}
+						nestedScrollEnabled
 						keyExtractor={(item) => item.id || Math.random().toString()}
 					/>
 				)}

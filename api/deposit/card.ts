@@ -14,7 +14,7 @@ export const createCard = async (cardData: CreateCardProps, options?: { signal?:
 		const { data } = await poundApi.post<{ nextStepUrl?: string }>(ENDPOINT, cardData, options);
 		return data;
 	} catch (error) {
-		console.log(error);
+		console.error(error);
 		throw error;
 	}
 };

@@ -1,13 +1,14 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { router, useFocusEffect } from 'expo-router';
+import { router, useFocusEffect, useGlobalSearchParams } from 'expo-router';
 import { openBrowserAsync } from 'expo-web-browser';
 import { useAtomValue } from 'jotai/react';
 import { Controller, useForm } from 'react-hook-form';
 import {
 	ActivityIndicator,
+	Alert,
 	Keyboard,
 	KeyboardAvoidingView,
 	Platform,
@@ -30,6 +31,7 @@ import { getCardIcon } from '~/lib/CardIcons';
 import { parseCurrency } from '~/lib/formatCurrency';
 import { useListCards } from '~/lib/pound/use-list-cards';
 import { useMakePayment } from '~/lib/pound/use-make-payment';
+import { useRefetchOnFocus } from '~/lib/use-refetch-on-focus';
 import { cn } from '~/lib/utils';
 
 const AmountSchema = z.object({
@@ -44,7 +46,9 @@ type AmountFormValues = z.infer<typeof AmountSchema>;
 const predefinedAmounts = [0.01, 10, 25, 50, 100];
 
 export default function Deposit() {
-	const { data: cards, isLoading } = useListCards();
+	const { action } = useGlobalSearchParams<{ action?: string }>();
+	const { data: cards, isLoading, refetch } = useListCards();
+	useRefetchOnFocus(refetch, 0);
 	const { mutate: makePayment, isPending } = useMakePayment();
 
 	const cardSelectModal = useRef<BottomSheetModal>(null);
@@ -89,15 +93,27 @@ export default function Deposit() {
 						});
 					} else {
 						//TODO: you can check for status PAID and do something here
-						router.dismissAll();
+						router.push('/(main)/(tabs)');
 					}
 				},
 				onError: (error) => {
-					console.log(error);
+					console.error(error);
 				},
 			}
 		);
 	};
+
+	useFocusEffect(
+		useCallback(() => {
+			if (action === 'card-added') {
+				router.setParams({ action: undefined });
+				Alert.alert('Card added!\nI want to look sexy!');
+			}
+
+			// Return function is invoked whenever the route gets out of focus.
+			return () => {};
+		}, [action])
+	);
 
 	useFocusEffect(() => {
 		setSelectedCard(null); // clear if coming from back btn

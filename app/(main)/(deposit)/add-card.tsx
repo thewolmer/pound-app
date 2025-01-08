@@ -106,7 +106,7 @@ export default function AddCard() {
 
 	const onSubmit = (data: AddCardFormValues) => {
 		//maybe redirect should also go to the same success screen on successful card adding after 3ds?
-		const redirectUrl = `${Env.EXPO_PUBLIC_POUND_WEB_URL}/app/deposit?env=${Env.APP_ENV}`;
+		const redirectUrl = `${Env.EXPO_PUBLIC_POUND_WEB_URL}/app/deposit?action=card-added&env=${Env.APP_ENV}`;
 		const variables = {
 			card: {
 				cvv: data.cvv,

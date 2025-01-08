@@ -114,11 +114,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		[
 			'expo-splash-screen',
 			{
-				image: './assets/images/pound-white.png',
+				image: './assets/images/splash-new.png',
 				backgroundColor: '#0d103f',
-				imageWidth: 200,
+				imageWidth: 300,
 				dark: {
-					image: './assets/images/pound-white.png',
+					image: './assets/images/splash-new.png',
 					backgroundColor: '#0d103f',
 				},
 			},

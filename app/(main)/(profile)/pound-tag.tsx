@@ -69,7 +69,7 @@ export default function UpdateTag() {
 	};
 
 	return (
-		<SafeAreaView className="w-full flex-1">
+		<SafeAreaView className="w-full flex-1 p-6">
 			<ScrollView contentInsetAdjustmentBehavior="automatic" className="flex w-full flex-1 p-6">
 				<View className="mb-10 flex flex-1">
 					<Text className="mb-4 text-lg text-foreground">
@@ -86,7 +86,6 @@ export default function UpdateTag() {
 						secureTextEntry={Platform.OS !== 'ios'}
 						keyboardType={Platform.OS === 'ios' ? undefined : 'visible-password'}
 						autoFocus
-						onSubmitEditing={handleSubmit}
 					/>
 					{/* TODO: Add a loading indicator */}
 					{debouncedTag && !error && debouncedTag !== initialTag ? (

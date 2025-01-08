@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
-import PagerView from 'react-native-pager-view';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { RequestButton } from '~/components/action-buttons/request-button';
@@ -77,56 +76,58 @@ export default function StartScreen() {
 	};
 
 	return (
-		<SafeAreaView className="flex-1">
-			<View className="flex flex-col gap-2 px-4">
-				<View className="flex flex-row items-center justify-between px-2 text-foreground">
-					<View className="w-28">
-						<PoundIcon />
+		<SafeAreaView style={{ flex: 1 }}>
+			<ScrollView>
+				<View className="flex flex-col gap-2 px-4">
+					<View className="flex flex-row items-center justify-between px-2 text-foreground">
+						<View className="w-28">
+							<PoundIcon />
+						</View>
+						<Pressable onPress={() => router.push('/(main)/(profile)/profile')}>
+							<Avatar alt="User avatar">
+								<AvatarImage source={{ uri: person?.avatar_url || undefined }} />
+								<AvatarFallback>
+									<Ionicons name="person" size={24} className="text-foreground" />
+								</AvatarFallback>
+							</Avatar>
+						</Pressable>
 					</View>
-					<Pressable onPress={() => router.push('/(main)/(profile)/profile')}>
-						<Avatar alt="User avatar">
-							<AvatarImage source={{ uri: person?.avatar_url || undefined }} />
-							<AvatarFallback>
-								<Ionicons name="person" size={24} className="text-foreground" />
-							</AvatarFallback>
-						</Avatar>
-					</Pressable>
-				</View>
-				<Card>
-					<CardHeader className="items-center">
-						<Text className="mb-2 text-accent-foreground">Available Balance</Text>
-						{isLoading ? <ActivityIndicator /> : <H1 className={getBalanceColor()}>{formatCurrency(balance)}</H1>}
-					</CardHeader>
+					<Card>
+						<CardHeader className="items-center">
+							<Text className="mb-2 text-accent-foreground">Available Balance</Text>
+							{isLoading ? <ActivityIndicator /> : <H1 className={getBalanceColor()}>{formatCurrency(balance)}</H1>}
+						</CardHeader>
 
-					<CardFooter className="flex justify-between">
-						<Button
-							onPress={() => router.push('/(main)/(deposit)/deposit')}
-							variant={'link'}
-							haptics="impact-light"
-							size={'lg'}
-						>
-							<IconWrapper>
-								<Ionicons name="add" className="text-foreground" size={22} />
-							</IconWrapper>
-							<Text className="text-xs font-semibold text-muted-foreground">Add</Text>
-						</Button>
-						<Button
-							onPress={() => router.push('/(main)/(send)/send')}
-							haptics="impact-light"
-							variant={'link'}
-							size={'lg'}
-						>
-							<IconWrapper>
-								<Ionicons name="arrow-up-circle-outline" className="text-foreground" size={24} />
-							</IconWrapper>
-							<Text className="text-xs font-semibold text-muted-foreground">Send</Text>
-						</Button>
-						<RequestButton />
-					</CardFooter>
-				</Card>
-				<HomePageAdsSlider />
-				<LatestTransactions count={5} />
-			</View>
+						<CardFooter className="flex justify-between">
+							<Button
+								onPress={() => router.push('/(main)/(deposit)/deposit')}
+								variant={'link'}
+								haptics="impact-light"
+								size={'lg'}
+							>
+								<IconWrapper>
+									<Ionicons name="add" className="text-foreground" size={22} />
+								</IconWrapper>
+								<Text className="text-xs font-semibold text-muted-foreground">Add</Text>
+							</Button>
+							<Button
+								onPress={() => router.push('/(main)/(send)/send')}
+								haptics="impact-light"
+								variant={'link'}
+								size={'lg'}
+							>
+								<IconWrapper>
+									<Ionicons name="arrow-up-circle-outline" className="text-foreground" size={24} />
+								</IconWrapper>
+								<Text className="text-xs font-semibold text-muted-foreground">Send</Text>
+							</Button>
+							<RequestButton />
+						</CardFooter>
+					</Card>
+					<HomePageAdsSlider />
+					<LatestTransactions count={4} />
+				</View>
+			</ScrollView>
 		</SafeAreaView>
 	);
 }

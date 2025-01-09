@@ -8,7 +8,7 @@ import { Button } from '~/components/ui/button';
 import { useAccount } from '~/context/AccountContext';
 import { formatCurrency } from '~/lib/formatCurrency';
 import { supabase } from '~/lib/supabase';
-import { useHaptics } from '~/lib/useHaptics';
+import { useHaptics } from '~/lib/use-haptics';
 import { uuid } from '~/lib/utils';
 import type { Tables } from '~/types/database.types';
 

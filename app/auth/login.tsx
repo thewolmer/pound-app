@@ -12,7 +12,7 @@ import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
 import { useSession } from '~/context/SessionContext';
-import { useHaptics } from '~/lib/useHaptics';
+import { useHaptics } from '~/lib/use-haptics';
 import { cn } from '~/lib/utils';
 
 const loginSchema = z.object({

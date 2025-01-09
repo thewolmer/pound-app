@@ -1,11 +1,12 @@
+import { use$ } from '@legendapp/state/react';
 import { View } from 'react-native';
 import { Defs, G, LinearGradient, Path, Stop, Svg } from 'react-native-svg';
 
-import { useColorScheme } from '~/lib/useColorScheme';
+import { preferenceSettings$ } from '~/context/preferences';
 
 export const PoundIcon = () => {
-	const { isDarkColorScheme } = useColorScheme();
-	const fill = isDarkColorScheme ? '#cecac0' : '#010000';
+	const isDarkTheme = use$(preferenceSettings$.isDarkTheme);
+	const fill = isDarkTheme ? '#cecac0' : '#010000';
 	const originalWidth = 698.02;
 	const originalHeight = 154.75;
 	const aspectRatio = originalWidth / originalHeight;

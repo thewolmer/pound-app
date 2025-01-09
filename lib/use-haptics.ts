@@ -1,6 +1,7 @@
+import { use$ } from '@legendapp/state/react';
 import * as Haptics from 'expo-haptics';
 
-import { usePreferenceSettings } from '~/context/PreferenceContext';
+import { preferenceSettings$ } from '~/context/preferences';
 
 type HapticType =
 	| 'impact-light'
@@ -11,10 +12,10 @@ type HapticType =
 	| 'notification-error';
 
 export const useHaptics = () => {
-	const { preferenceSettings } = usePreferenceSettings();
+	const hapticsEnabled = use$(preferenceSettings$.hapticsEnabled);
 
 	const triggerHaptics = async (type: HapticType) => {
-		if (!preferenceSettings.hapticsEnabled) return;
+		if (!hapticsEnabled) return;
 
 		const hapticsMap = {
 			'impact-light': Haptics.ImpactFeedbackStyle.Light,

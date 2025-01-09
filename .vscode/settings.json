@@ -28,6 +28,7 @@
 		"gorhom",
 		"haptics",
 		"Ionicons",
+		"legendapp",
 		"lucide",
 		"lukemorales",
 		"nativewind",
@@ -38,7 +39,6 @@
 		"Recents",
 		"SUPABASE",
 		"tailwindcss",
-		"upsert",
-		"zustand"
+		"upsert"
 	]
 }

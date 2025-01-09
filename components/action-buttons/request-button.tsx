@@ -22,7 +22,7 @@ import { NAV_THEME } from '~/constants/theme';
 import { useAccount } from '~/context/AccountContext';
 import { parseCurrency } from '~/lib/formatCurrency';
 import { supabase } from '~/lib/supabase';
-import { useHaptics } from '~/lib/useHaptics';
+import { useHaptics } from '~/lib/use-haptics';
 import { cn, uuid } from '~/lib/utils';
 
 const AmountSchema = z.object({

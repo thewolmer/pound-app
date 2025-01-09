@@ -13,7 +13,7 @@ import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
 import { P } from '~/components/ui/typography';
 import { useSession } from '~/context/SessionContext';
-import { useHaptics } from '~/lib/useHaptics';
+import { useHaptics } from '~/lib/use-haptics';
 import { cn } from '~/lib/utils';
 
 const emailSchema = z.object({

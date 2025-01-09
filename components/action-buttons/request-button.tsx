@@ -7,10 +7,12 @@ import {
 	BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { shareAsync } from 'expo-sharing';
 import { Controller, useForm } from 'react-hook-form';
 import { Keyboard, Text, View } from 'react-native';
 import QRCodeStyled from 'react-native-qrcode-styled';
 import Animated, { SlideInDown, SlideOutDown, SlideOutUp } from 'react-native-reanimated';
+import { captureRef } from 'react-native-view-shot';
 import { z } from 'zod';
 
 import { Button } from '../ui/button';
@@ -37,6 +39,7 @@ export const RequestButton = () => {
 	const { accountId } = useAccount();
 	const requestModal = useRef<BottomSheetModal>(null);
 	const { triggerHaptics } = useHaptics();
+	const qrCodeRef = useRef(null);
 
 	const renderBackDrop = useCallback(
 		(backdropProps: BottomSheetBackdropProps) => (
@@ -90,6 +93,17 @@ export const RequestButton = () => {
 		.subscribe();
 
 	const logoFromFile = require('~/assets/images/icon-for-qr-code.png');
+	const handleShareQR = async () => {
+		try {
+			const uri = await captureRef(qrCodeRef, {
+				format: 'jpg',
+				quality: 1,
+			});
+			shareAsync(uri);
+		} catch (error) {
+			console.error('Failed to capture or share QR code:', error);
+		}
+	};
 
 	return (
 		<>
@@ -159,6 +173,15 @@ export const RequestButton = () => {
 
 					{reference && isValid && (
 						<Animated.View entering={SlideInDown} exiting={SlideOutUp}>
+							<Button
+								variant={'ghost'}
+								size={'icon'}
+								onPress={handleShareQR}
+								className="absolute inset-0 left-2 top-0 z-50"
+							>
+								<Ionicons name="share-outline" className="text-foreground" size={24} />
+							</Button>
+
 							<H3 className={cn('text-center', reference ? 'text-neutral-800' : '')}>Payment Request</H3>
 							<View className="items-center rounded-xl p-6">
 								<Text
@@ -166,8 +189,9 @@ export const RequestButton = () => {
 								>
 									£{amount}
 								</Text>
-								<View className="">
+								<View>
 									<QRCodeStyled
+										ref={qrCodeRef}
 										data={JSON.stringify({
 											type: 'payment_request',
 											accountId,

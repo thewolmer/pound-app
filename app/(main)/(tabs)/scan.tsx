@@ -4,7 +4,7 @@ import { ActivityIndicator, Modal, View } from 'react-native';
 
 import { QRScanner } from '~/components/qr-scanner';
 import { supabase } from '~/lib/supabase';
-import { useHaptics } from '~/lib/useHaptics';
+import { useHaptics } from '~/lib/use-haptics';
 
 export default function Scan() {
 	const { triggerHaptics } = useHaptics();

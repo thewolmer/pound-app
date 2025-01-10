@@ -1,7 +1,7 @@
 import { use$ } from '@legendapp/state/react';
 import * as Haptics from 'expo-haptics';
 
-import { preferenceSettings$ } from '~/context/preferences';
+import { preferenceSettings$ } from '~/stores/preferences.store';
 
 type HapticType =
 	| 'impact-light'

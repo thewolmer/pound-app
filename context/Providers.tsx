@@ -20,10 +20,10 @@ import { NAV_THEME } from '~/constants/theme';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
 import { useEffectOnce } from '~/lib/use-effect-once';
 import { usePushNotifications } from '~/lib/usePushNotifications';
+import { preferenceSettings$ } from '~/stores/preferences.store';
 
 import { AccountProvider } from './AccountContext';
 import { NetworkProvider } from './NetworkContext';
-import { preferenceSettings$ } from './preferences';
 import { SessionProvider } from './SessionContext';
 
 cssInterop(Ionicons, { className: 'style' });

@@ -1,7 +1,7 @@
 import { use$ } from '@legendapp/state/react';
 import { useColorScheme } from 'nativewind';
 
-import { preferenceSettings$ } from '~/context/preferences';
+import { preferenceSettings$ } from '~/stores/preferences.store';
 
 import { Switch } from './ui/switch';
 

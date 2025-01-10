@@ -4,8 +4,8 @@ import { Root, RootProps, RootRef, Thumb } from '@rn-primitives/switch';
 import { Platform } from 'react-native';
 import Animated, { interpolateColor, useAnimatedStyle, useDerivedValue, withTiming } from 'react-native-reanimated';
 
-import { preferenceSettings$ } from '~/context/preferences';
 import { cn } from '~/lib/utils';
+import { preferenceSettings$ } from '~/stores/preferences.store';
 
 const SwitchWeb = React.forwardRef<RootRef, RootProps>(({ className, ...props }, ref) => (
 	<Root

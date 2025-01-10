@@ -2,7 +2,7 @@ import { use$ } from '@legendapp/state/react';
 import { View } from 'react-native';
 import { Defs, G, LinearGradient, Path, Stop, Svg } from 'react-native-svg';
 
-import { preferenceSettings$ } from '~/context/preferences';
+import { preferenceSettings$ } from '~/stores/preferences.store';
 
 export const PoundIcon = () => {
 	const isDarkTheme = use$(preferenceSettings$.isDarkTheme);

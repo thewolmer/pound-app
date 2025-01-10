@@ -8,8 +8,8 @@ import { Button } from '~/components/ui/button';
 import { Switch } from '~/components/ui/switch';
 import { Text } from '~/components/ui/text';
 import { P } from '~/components/ui/typography';
-import { preferenceSettings$ } from '~/context/preferences';
 import { useSession } from '~/context/SessionContext';
+import { preferenceSettings$ } from '~/stores/preferences.store';
 
 export default function Settings() {
 	const { session, signOut } = useSession();

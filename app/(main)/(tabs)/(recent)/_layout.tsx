@@ -31,6 +31,21 @@ export default function RecentLayout() {
 				options={{
 					title: 'Transaction',
 					headerShadowVisible: false,
+					headerLeft(props) {
+						return (
+							<Button
+								haptics="impact-light"
+								variant={'link'}
+								hitSlop={20}
+								onPressIn={() =>
+									router.canDismiss() ? router.back() : router.replace('/(main)/(tabs)/(recent)/transactions')
+								}
+								className="flex-row items-center px-5"
+							>
+								<TabBarIcon name="arrow-back" className="text-foreground" />
+							</Button>
+						);
+					},
 				}}
 			/>
 		</Stack>

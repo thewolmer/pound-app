@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, Image, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '~/components/ui/card';
 import { useAccount } from '~/context/AccountContext';
 import { formatCurrency } from '~/lib/formatCurrency';
+import { useCreateContacts } from '~/lib/pound/contacts/use-create-contacts';
+import { useListContacts } from '~/lib/pound/contacts/use-list-contacts';
 import { supabase } from '~/lib/supabase';
 import type { Tables } from '~/types/database.types';
 
@@ -53,6 +56,20 @@ function Transaction() {
 
 	const isDeposit = transaction?.destination_account_id === accountId;
 
+	const { data: contacts = [], isPending: isLoadingContacts } = useListContacts();
+	const { mutate: createContacts, isPending: isCreatingContacts } = useCreateContacts();
+	const otherPerson = isDeposit
+		? transaction?.origin_account_details?.person_id
+		: transaction?.destination_account_details?.person_id;
+
+	const isInContacts = !!contacts.find((contact) => contact.person_id === otherPerson);
+
+	const addToContact = () => {
+		if (!isInContacts && typeof otherPerson === 'string' && !isLoadingContacts && !isCreatingContacts) {
+			createContacts([otherPerson]);
+		}
+	};
+
 	if (!id || !transaction || !accountId) {
 		return (
 			<View className="flex-1 items-center justify-center">
@@ -63,7 +80,7 @@ function Transaction() {
 
 	return (
 		<SafeAreaView className="flex-1">
-			<View className="p-6">
+			<View className="gap-4 p-6">
 				<Card>
 					<CardHeader>
 						<Text className="text-lg font-bold text-foreground">{isDeposit ? 'Received from ' : 'Sent to'}</Text>
@@ -170,6 +187,65 @@ function Transaction() {
 							</Text>
 						</View>
 					</View>
+				</Card>
+				<Card>
+					<CardHeader className="flex w-full flex-row items-center justify-between">
+						<View className="flex w-[1/4] items-center justify-center gap-1">
+							<Button size={'icon'} variant={'secondary'} disabled={isInContacts} onPress={addToContact}>
+								<Ionicons
+									name={isInContacts ? 'person-add' : 'person-add-outline'}
+									size={18}
+									className="text-secondary-foreground"
+								/>
+							</Button>
+							<Text className="w-14 text-balance text-center text-[9px] text-muted-foreground">
+								{isInContacts ? 'Contact Saved' : 'Add Contact'}
+							</Text>
+						</View>
+						<View className="flex w-[1/4] items-center justify-center gap-1">
+							<Button
+								size={'icon'}
+								variant={'secondary'}
+								onPress={() => {
+									router.push({
+										pathname: '/(main)/(send)/amount',
+										params: {
+											account_details: JSON.stringify(
+												isDeposit ? transaction.origin_account_details : transaction.destination_account_details
+											),
+										},
+									});
+								}}
+							>
+								<Ionicons name={'arrow-up'} size={18} className="text-secondary-foreground" />
+							</Button>
+							<Text className="w-14 text-balance text-center text-[9px] text-muted-foreground">Send Money</Text>
+						</View>
+						<View className="flex w-[1/4] items-center justify-center gap-1">
+							<Button
+								size={'icon'}
+								variant={'secondary'}
+								onPress={() => {
+									console.log('report clicked');
+								}}
+							>
+								<Ionicons name={'flag'} size={18} className="text-secondary-foreground" />
+							</Button>
+							<Text className="w-16 text-center text-[9px] text-muted-foreground">Report Transaction</Text>
+						</View>
+						<View className="flex w-[1/4] items-center justify-center gap-1">
+							<Button
+								size={'icon'}
+								variant={'secondary'}
+								onPress={() => {
+									console.log('Help clicked');
+								}}
+							>
+								<Ionicons name={'help-outline'} size={18} className="text-secondary-foreground" />
+							</Button>
+							<Text className="w-14 text-balance text-center text-[9px] text-muted-foreground">Do something</Text>
+						</View>
+					</CardHeader>
 				</Card>
 			</View>
 		</SafeAreaView>

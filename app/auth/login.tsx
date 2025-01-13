@@ -74,12 +74,12 @@ export default function Login() {
 	const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 	return (
-		<SafeAreaView className="flex-1 items-center bg-background p-10">
-			<View className="w-full max-w-sm gap-8">
-				<View className="w-52 gap-2">
-					<PoundIcon />
-					<Text className="text-lg">Welcome Back!</Text>
-				</View>
+		<SafeAreaView className="flex-1 bg-background p-10">
+			<View className="mb-5 w-52 gap-2">
+				<PoundIcon />
+				<Text className="text-lg">Welcome Back!</Text>
+			</View>
+			<View className="w-full max-w-sm gap-6">
 				<View className="gap-4">
 					<Input
 						placeholder="Email"

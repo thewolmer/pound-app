@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { Pressable } from 'react-native';
 
 import { TextClassContext } from '~/components/ui/text';
-import { useHaptics } from '~/lib/useHaptics';
+import { useHaptics } from '~/lib/use-haptics';
 import { cn } from '~/lib/utils';
 
 const buttonVariants = cva(

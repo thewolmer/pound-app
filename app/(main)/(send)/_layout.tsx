@@ -1,16 +1,8 @@
-import { Redirect, router, Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 
 import { TabBarIcon } from '~/components/icons/tab-bar-icon';
 import { Button } from '~/components/ui/button';
-import { useSession } from '~/context/SessionContext';
-
 export default function SendLayout() {
-	const { session } = useSession();
-
-	if (!session) {
-		return <Redirect href="/auth/welcome" />;
-	}
-
 	return (
 		<Stack initialRouteName="send">
 			<Stack.Screen

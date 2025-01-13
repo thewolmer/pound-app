@@ -1,8 +1,8 @@
 import { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
+import { use$ } from '@legendapp/state/react';
 
 import { supabase } from '~/lib/supabase';
-
-import { useSession } from './SessionContext';
+import { auth$ } from '~/stores/auth.store';
 
 interface AccountContextType {
 	accountId: string | null;
@@ -13,8 +13,9 @@ interface AccountContextType {
 
 const AccountContext = createContext<AccountContextType | undefined>(undefined);
 
+//TODO: move me to legend state
 export function AccountProvider({ children }: { children: ReactNode }) {
-	const { session } = useSession();
+	const userId$ = use$(auth$.session.user.id);
 	const [accountId, setAccountId] = useState<string | null>(null);
 	const [balance, setBalance] = useState(0);
 	const [isLoading, setIsLoading] = useState(false);
@@ -33,16 +34,12 @@ export function AccountProvider({ children }: { children: ReactNode }) {
 	}, [accountId]);
 
 	useEffect(() => {
-		if (!session?.user.id) return;
+		if (!userId$) return;
 
 		//TODO: make it multiple accounts
 		const getAccount = async () => {
 			setIsLoading(true);
-			const { data, error } = await supabase
-				.from('account')
-				.select('id, balance')
-				.eq('person_id', session.user.id)
-				.single();
+			const { data, error } = await supabase.from('account').select('id, balance').eq('person_id', userId$).single();
 			if (error) {
 				console.error(error);
 				setError(error.message);
@@ -54,7 +51,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
 		};
 
 		getAccount();
-	}, [session?.user.id]);
+	}, [userId$]);
 
 	// biome-ignore lint/suspicious/noExplicitAny: FIXME later
 	const handleAccountUpdate = (payload: any) => {

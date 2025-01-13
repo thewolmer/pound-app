@@ -19,7 +19,7 @@ import { defaultCardAtom } from '~/lib/atoms';
 import { getCardIcon } from '~/lib/CardIcons';
 import { useDeleteCard } from '~/lib/pound/use-delete.card';
 import { useListCards } from '~/lib/pound/use-list-cards';
-import { useHaptics } from '~/lib/useHaptics';
+import { useHaptics } from '~/lib/use-haptics';
 import { cn } from '~/lib/utils';
 
 export default function ManageCards() {

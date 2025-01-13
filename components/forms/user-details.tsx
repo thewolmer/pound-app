@@ -1,5 +1,6 @@
 import React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { use$ } from '@legendapp/state/react';
 import { Controller, useForm } from 'react-hook-form';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,8 +9,8 @@ import { z } from 'zod';
 import { Button } from '../ui/button';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
-import { useSession } from '~/context/SessionContext';
 import { cn } from '~/lib/utils';
+import { updateUser, user$ } from '~/stores/user.store';
 
 const UserSchema = z.object({
 	first_name: z.string().min(1, 'First name is required').max(15, 'First name must be at most 10 characters'),
@@ -19,7 +20,8 @@ const UserSchema = z.object({
 type UserFormValues = z.infer<typeof UserSchema>;
 
 export const UserDetailsForm = () => {
-	const { person, updatePerson } = useSession();
+	const first_name$ = use$(user$.user.first_name);
+	const last_name$ = use$(user$.user.last_name);
 
 	const {
 		control,
@@ -28,14 +30,14 @@ export const UserDetailsForm = () => {
 	} = useForm<UserFormValues>({
 		resolver: zodResolver(UserSchema),
 		defaultValues: {
-			first_name: person?.first_name || '',
-			last_name: person?.last_name || '',
+			first_name: first_name$ || '',
+			last_name: last_name$ || '',
 		},
 	});
 
 	const onSubmit = async (data: UserFormValues) => {
 		try {
-			await updatePerson(data);
+			await updateUser(data);
 			alert('Profile updated successfully');
 		} catch (error) {
 			alert('Failed to update profile');

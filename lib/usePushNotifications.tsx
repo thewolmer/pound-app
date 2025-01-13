@@ -30,7 +30,6 @@ export const registerForPushNotificationsAsync = async () => {
 		token = await Notifications.getExpoPushTokenAsync({
 			projectId: Constants?.expoConfig?.extra?.eas.projectId,
 		});
-		// await AsyncStorage.setItem('pushToken', token.data);
 	} else {
 		console.error('Must use physical device for Push Notifications');
 	}

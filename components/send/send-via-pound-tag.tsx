@@ -7,6 +7,7 @@ import {
 	BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { use$ } from '@legendapp/state/react';
 import { router } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Text, View } from 'react-native';
@@ -16,8 +17,8 @@ import { Input } from '../ui/input';
 import { Button } from '~/components/ui/button';
 import { ForwardCard } from '~/components/ui/forward-card';
 import { H3 } from '~/components/ui/typography';
-import { useSession } from '~/context/SessionContext';
 import { supabase } from '~/lib/supabase';
+import { auth$ } from '~/stores/auth.store';
 
 // Zod Schema
 const PoundTagSchema = z.object({
@@ -28,7 +29,7 @@ type PoundTagFormValues = z.infer<typeof PoundTagSchema>;
 
 export const SendViaPoundTag = () => {
 	const poundTagModalRef = useRef<BottomSheetModal>(null);
-	const { session } = useSession();
+	const userId$ = use$(auth$.session.user.id);
 	const [isLoading, setLoading] = useState(false);
 
 	const {
@@ -66,7 +67,7 @@ export const SendViaPoundTag = () => {
 			return;
 		}
 
-		if (userData.person_id === session?.user.id) {
+		if (userData.person_id === userId$) {
 			alert('You cannot send money to yourself');
 			setLoading(false);
 			return;

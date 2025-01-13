@@ -12,8 +12,8 @@ import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
 import { P } from '~/components/ui/typography';
-import { useSession } from '~/context/SessionContext';
-import { useHaptics } from '~/lib/useHaptics';
+import { signUp } from '~/lib/auth';
+import { useHaptics } from '~/lib/use-haptics';
 import { cn } from '~/lib/utils';
 
 const emailSchema = z.object({
@@ -72,7 +72,6 @@ const PasswordRequirements = ({ password }: { password: string }) => {
 };
 
 export default function Register() {
-	const { signUp } = useSession();
 	const router = useRouter();
 	const [showPassword, setShowPassword] = useState(false);
 	const { triggerHaptics } = useHaptics();

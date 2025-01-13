@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import type React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import { useHaptics } from '~/lib/useHaptics';
+import { useHaptics } from '~/lib/use-haptics';
 import { cn } from '~/lib/utils';
 
 import { Button } from './button';

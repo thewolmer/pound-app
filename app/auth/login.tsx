@@ -11,7 +11,7 @@ import { PoundIcon } from '~/components/icons/pound-icon';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
-import { useSession } from '~/context/SessionContext';
+import { signIn } from '~/lib/auth';
 import { useHaptics } from '~/lib/use-haptics';
 import { cn } from '~/lib/utils';
 
@@ -23,7 +23,6 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
-	const { signIn } = useSession();
 	const router = useRouter();
 	const [form, setForm] = useState<LoginForm>({ email: '', password: '' });
 	const [errors, setErrors] = useState<Partial<LoginForm>>({});

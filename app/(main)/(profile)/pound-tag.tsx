@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
+import { use$ } from '@legendapp/state/react';
 import { router } from 'expo-router';
 import { Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { z } from 'zod';
 
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
-import { useSession } from '~/context/SessionContext';
 import { useDebounce } from '~/hooks/useDebounce';
 import { supabase } from '~/lib/supabase';
+import { updateUser, user$ } from '~/stores/user.store';
 
 const tagSchema = z
 	.string()
@@ -16,7 +17,7 @@ const tagSchema = z
 	.max(15, 'Tag can be up to 15 characters');
 
 export default function UpdateTag() {
-	const { person, updatePerson } = useSession();
+	const _user$ = use$(user$.user);
 
 	const [tag, setTag] = useState('');
 	const [isAvailable, setIsAvailable] = useState(true);
@@ -24,7 +25,7 @@ export default function UpdateTag() {
 	const [loading, setLoading] = useState(false);
 	const debouncedTag = useDebounce(tag, 300);
 
-	const initialTag = person?.identity_tag || '';
+	const initialTag = _user$?.identity_tag || '';
 
 	const validateTag = (input: string) => {
 		const result = tagSchema.safeParse(input);
@@ -59,7 +60,7 @@ export default function UpdateTag() {
 		if (error || !isAvailable) return;
 		setLoading(true);
 		try {
-			await updatePerson({ identity_tag: tag });
+			await updateUser({ identity_tag: tag });
 			router.back();
 		} catch (error) {
 			console.error(error);

@@ -1,11 +1,12 @@
+import { use$ } from '@legendapp/state/react';
 import { Redirect, Stack } from 'expo-router';
 
-import { useSession } from '~/context/SessionContext';
+import { auth$ } from '~/stores/auth.store';
 
 export default function AuthLayout() {
-	const { session } = useSession();
+	const session$ = use$(auth$.session);
 
-	if (session) {
+	if (session$) {
 		return <Redirect href="/" />;
 	}
 

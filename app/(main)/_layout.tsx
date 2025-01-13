@@ -1,48 +1,44 @@
-import { Redirect, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 
-import { useSession } from '~/context/SessionContext';
+import { AuthGuard } from '~/components/auth-guard';
 
 export default function MainLayout() {
-	const { session } = useSession();
-
-	if (!session) {
-		return <Redirect href="/auth/welcome" />;
-	}
-
 	return (
-		<Stack initialRouteName="(tabs)">
-			<Stack.Screen
-				name="(tabs)"
-				options={{
-					headerShown: false,
-				}}
-			/>
-			<Stack.Screen
-				name="(profile)"
-				options={{
-					headerShown: false,
-				}}
-			/>
-			<Stack.Screen
-				name="(send)"
-				options={{
-					headerShown: false,
-				}}
-			/>
-			<Stack.Screen
-				name="(deposit)"
-				options={{
-					headerShown: false,
-				}}
-			/>
-			<Stack.Screen
-				name="search"
-				options={{
-					animation: 'fade_from_bottom',
-					animationTypeForReplace: 'push',
-					headerShown: false,
-				}}
-			/>
-		</Stack>
+		<AuthGuard>
+			<Stack initialRouteName="(tabs)">
+				<Stack.Screen
+					name="(tabs)"
+					options={{
+						headerShown: false,
+					}}
+				/>
+				<Stack.Screen
+					name="(profile)"
+					options={{
+						headerShown: false,
+					}}
+				/>
+				<Stack.Screen
+					name="(send)"
+					options={{
+						headerShown: false,
+					}}
+				/>
+				<Stack.Screen
+					name="(deposit)"
+					options={{
+						headerShown: false,
+					}}
+				/>
+				<Stack.Screen
+					name="search"
+					options={{
+						animation: 'fade_from_bottom',
+						animationTypeForReplace: 'push',
+						headerShown: false,
+					}}
+				/>
+			</Stack>
+		</AuthGuard>
 	);
 }

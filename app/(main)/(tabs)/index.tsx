@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { use$ } from '@legendapp/state/react';
 import { router } from 'expo-router';
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,13 +15,15 @@ import { Card, CardFooter, CardHeader } from '~/components/ui/card';
 import { IconWrapper } from '~/components/ui/icon-wrapper';
 import { H1 } from '~/components/ui/typography';
 import { useAccount } from '~/context/AccountContext';
-import { useSession } from '~/context/SessionContext';
 import { formatCurrency } from '~/lib/formatCurrency';
-import { supabase } from '~/lib/supabase';
 import { registerForPushNotificationsAsync } from '~/lib/usePushNotifications';
+import { auth$ } from '~/stores/auth.store';
+import { setPushNotificationToken } from '~/stores/push-notification.store';
+import { user$ } from '~/stores/user.store';
 
 export default function StartScreen() {
-	const { session, person } = useSession();
+	const userId$ = use$(auth$.session.user.id);
+	const avatarUrl$ = use$(user$.user.avatar_url);
 	const [refreshing, setRefreshing] = useState(false);
 	const { balance, isLoading } = useAccount();
 	const [previousBalance, setPreviousBalance] = useState<number | null>(null);
@@ -43,24 +45,12 @@ export default function StartScreen() {
 		const registerForPushNotifications = async () => {
 			const token = await registerForPushNotificationsAsync();
 			if (token) {
-				const tokenFromLocalStorage = await AsyncStorage.getItem('pushToken');
-				if (tokenFromLocalStorage !== token) {
-					const { data } = await supabase
-						.from('expo_push_token')
-						.insert({
-							expo_push_token: token,
-							person_id: session?.user.id,
-						})
-						.select();
-					if (data) {
-						await AsyncStorage.setItem('pushToken', token);
-					}
-				}
+				setPushNotificationToken(token);
 			}
 		};
 
 		registerForPushNotifications();
-	}, [session?.user.id]);
+	}, [userId$]);
 
 	useEffect(() => {
 		if (isLoading) return;
@@ -106,7 +96,7 @@ export default function StartScreen() {
 							</Pressable>
 							<Pressable onPress={() => router.push('/(main)/(profile)/profile')}>
 								<Avatar alt="User avatar">
-									<AvatarImage source={{ uri: person?.avatar_url || undefined }} />
+									<AvatarImage source={{ uri: avatarUrl$ || undefined }} />
 									<AvatarFallback>
 										<Ionicons name="person" size={24} className="text-foreground" />
 									</AvatarFallback>

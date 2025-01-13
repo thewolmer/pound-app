@@ -3,14 +3,14 @@ import { syncObservable } from '@legendapp/state/sync';
 
 import { persistOptions } from '~/config/legend-state';
 
-interface PreferenceSettings {
+interface PreferenceSettingsState {
 	hapticsEnabled: boolean;
 	reduceMotion: boolean;
 	isDarkTheme: boolean;
 	theme: Promise<'light' | 'dark'>;
 }
 
-export const preferenceSettings$ = observable<PreferenceSettings>({
+export const preferenceSettings$ = observable<PreferenceSettingsState>({
 	hapticsEnabled: true,
 	reduceMotion: false,
 	isDarkTheme: true,
@@ -21,7 +21,7 @@ syncObservable(
 	preferenceSettings$,
 	persistOptions({
 		persist: {
-			name: 'userPreferenceSettings',
+			name: 'preference-settings',
 		},
 	})
 );

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { use$ } from '@legendapp/state/react';
 import { decode } from 'base64-arraybuffer';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { launchImageLibraryAsync } from 'expo-image-picker';
@@ -7,11 +8,13 @@ import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from 'rea
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { UserDetailsForm } from '~/components/forms/user-details';
-import { useSession } from '~/context/SessionContext';
 import { supabase } from '~/lib/supabase';
+import { updateUser, user$ } from '~/stores/user.store';
 
 const User = () => {
-	const { person, updatePerson } = useSession();
+	const user_id$ = use$(user$.user.id);
+	const first_name$ = use$(user$.user.first_name);
+	const avatar_url$ = use$(user$.user.avatar_url);
 
 	const [isUploading, setIsUploading] = useState(false);
 
@@ -36,7 +39,7 @@ const User = () => {
 				const resizedImage = await resizedImageRef.saveAsync({ format: SaveFormat.JPEG, base64: true, compress: 1 });
 
 				// Upload to Supabase Storage using file URI
-				const newAvatarFileName = `${person?.id}-${Date.now()}.jpg`;
+				const newAvatarFileName = `${user_id$}-${Date.now()}.jpg`;
 				const { error: uploadError } = await supabase.storage
 					.from('avatar')
 					.upload(newAvatarFileName, decode(resizedImage.base64 as string), {
@@ -57,13 +60,13 @@ const User = () => {
 					throw new Error('Failed to retrieve avatar URL');
 				}
 
-				const oldAvatarFileName = person?.avatar_url?.split('/').pop();
+				const oldAvatarFileName = avatar_url$?.split('/').pop();
 
 				if (oldAvatarFileName) {
 					await supabase.storage.from('avatar').remove([oldAvatarFileName]);
 				}
 
-				await updatePerson({ avatar_url: avatarUrl });
+				await updateUser({ avatar_url: avatarUrl });
 
 				alert('Avatar uploaded successfully');
 			}
@@ -84,15 +87,10 @@ const User = () => {
 						className="relative flex w-40 items-center justify-center"
 						disabled={isUploading}
 					>
-						{!person && (
+						{avatar_url$ && <Image source={{ uri: avatar_url$ }} className="h-40 w-40 rounded-full" />}
+						{first_name$ && !avatar_url$ && (
 							<View className="flex h-40 w-40 items-center justify-center rounded-full bg-accent text-center">
-								<ActivityIndicator size={'large'} className="absolute" color="white" />
-							</View>
-						)}
-						{person?.avatar_url && <Image source={{ uri: person.avatar_url }} className="h-40 w-40 rounded-full" />}
-						{person?.first_name && !person?.avatar_url && (
-							<View className="flex h-40 w-40 items-center justify-center rounded-full bg-accent text-center">
-								<Text className="text-6xl text-accent-foreground">{person?.first_name[0]}</Text>
+								<Text className="text-6xl text-accent-foreground">{first_name$[0]}</Text>
 							</View>
 						)}
 

@@ -8,11 +8,14 @@ import { Button } from '~/components/ui/button';
 import { Switch } from '~/components/ui/switch';
 import { Text } from '~/components/ui/text';
 import { P } from '~/components/ui/typography';
-import { useSession } from '~/context/SessionContext';
+import { signOut } from '~/lib/auth';
+import { auth$ } from '~/stores/auth.store';
 import { preferenceSettings$ } from '~/stores/preferences.store';
 
 export default function Settings() {
-	const { session, signOut } = useSession();
+	const email$ = use$(auth$.session.user.email);
+	if (!email$) return null;
+
 	const hapticsEnabled = use$(preferenceSettings$.hapticsEnabled);
 	const reduceMotion = use$(preferenceSettings$.reduceMotion);
 
@@ -28,7 +31,7 @@ export default function Settings() {
 				<SettingsCard title="Reduced Motion" description="Disable animations">
 					<Switch checked={reduceMotion} onCheckedChange={preferenceSettings$.reduceMotion.toggle} />
 				</SettingsCard>
-				<SettingsCard title={session?.user.email as string} description="Remove your account from this device">
+				<SettingsCard title={email$} description="Remove your account from this device">
 					<Button variant="destructive" onPress={signOut} className="flex-row items-center gap-1">
 						<Text>Sign Out</Text>
 					</Button>

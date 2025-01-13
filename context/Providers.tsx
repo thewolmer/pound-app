@@ -24,7 +24,6 @@ import { preferenceSettings$ } from '~/stores/preferences.store';
 
 import { AccountProvider } from './AccountContext';
 import { NetworkProvider } from './NetworkContext';
-import { SessionProvider } from './SessionContext';
 
 cssInterop(Ionicons, { className: 'style' });
 cssInterop(FontAwesome5, { className: 'style' });
@@ -96,9 +95,7 @@ export const ProvidersWrapper = ({ children }: { children: React.ReactNode }) =>
 						<StatusBar style={isDarkTheme ? 'light' : 'dark'} />
 						<SafeAreaProvider onLayout={onLayoutRootView}>
 							<NetworkProvider>
-								<SessionProvider>
-									<AccountProvider>{children}</AccountProvider>
-								</SessionProvider>
+								<AccountProvider>{children}</AccountProvider>
 							</NetworkProvider>
 						</SafeAreaProvider>
 						<PortalHost />

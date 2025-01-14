@@ -3,47 +3,53 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
 	public: {
 		Tables: {
-			account: {
+			accounts: {
 				Row: {
 					balance: number;
 					closed_at: string | null;
 					created_at: string;
+					deleted: boolean | null;
 					id: string;
-					person_id: string | null;
 					status: string;
 					type: Database['public']['Enums']['account_type'];
+					updated_at: string | null;
+					user_id: string | null;
 				};
 				Insert: {
 					balance?: number;
 					closed_at?: string | null;
 					created_at?: string;
+					deleted?: boolean | null;
 					id?: string;
-					person_id?: string | null;
 					status?: string;
 					type: Database['public']['Enums']['account_type'];
+					updated_at?: string | null;
+					user_id?: string | null;
 				};
 				Update: {
 					balance?: number;
 					closed_at?: string | null;
 					created_at?: string;
+					deleted?: boolean | null;
 					id?: string;
-					person_id?: string | null;
 					status?: string;
 					type?: Database['public']['Enums']['account_type'];
+					updated_at?: string | null;
+					user_id?: string | null;
 				};
 				Relationships: [
 					{
 						foreignKeyName: 'account_person_id_fkey';
-						columns: ['person_id'];
+						columns: ['user_id'];
 						isOneToOne: false;
 						referencedRelation: 'account_details';
-						referencedColumns: ['person_id'];
+						referencedColumns: ['user_id'];
 					},
 					{
 						foreignKeyName: 'account_person_id_fkey';
-						columns: ['person_id'];
+						columns: ['user_id'];
 						isOneToOne: false;
-						referencedRelation: 'person';
+						referencedRelation: 'users';
 						referencedColumns: ['id'];
 					},
 				];
@@ -84,145 +90,100 @@ export type Database = {
 						foreignKeyName: 'deposit_account_id_fkey';
 						columns: ['account_id'];
 						isOneToOne: false;
-						referencedRelation: 'account';
-						referencedColumns: ['id'];
+						referencedRelation: 'account_details';
+						referencedColumns: ['account_id'];
 					},
 					{
 						foreignKeyName: 'deposit_account_id_fkey';
 						columns: ['account_id'];
 						isOneToOne: false;
-						referencedRelation: 'account_details';
-						referencedColumns: ['account_id'];
+						referencedRelation: 'accounts';
+						referencedColumns: ['id'];
 					},
 				];
 			};
-			expo_push_token: {
+			expo_push_tokens: {
 				Row: {
 					created_at: string;
 					expo_push_token: string;
 					id: string;
-					person_id: string | null;
+					user_id: string | null;
 				};
 				Insert: {
 					created_at?: string;
 					expo_push_token: string;
 					id?: string;
-					person_id?: string | null;
+					user_id?: string | null;
 				};
 				Update: {
 					created_at?: string;
 					expo_push_token?: string;
 					id?: string;
-					person_id?: string | null;
+					user_id?: string | null;
 				};
 				Relationships: [
 					{
 						foreignKeyName: 'expo_token_person_id_fkey';
-						columns: ['person_id'];
+						columns: ['user_id'];
 						isOneToOne: false;
 						referencedRelation: 'account_details';
-						referencedColumns: ['person_id'];
+						referencedColumns: ['user_id'];
 					},
 					{
 						foreignKeyName: 'expo_token_person_id_fkey';
-						columns: ['person_id'];
+						columns: ['user_id'];
 						isOneToOne: false;
-						referencedRelation: 'person';
+						referencedRelation: 'users';
 						referencedColumns: ['id'];
 					},
 				];
 			};
-			notification: {
+			notifications: {
 				Row: {
 					body: string | null;
 					created_at: string;
 					data: Json | null;
 					id: string;
-					person_id: string | null;
 					title: string | null;
 					type: string | null;
+					user_id: string | null;
 				};
 				Insert: {
 					body?: string | null;
 					created_at?: string;
 					data?: Json | null;
 					id?: string;
-					person_id?: string | null;
 					title?: string | null;
 					type?: string | null;
+					user_id?: string | null;
 				};
 				Update: {
 					body?: string | null;
 					created_at?: string;
 					data?: Json | null;
 					id?: string;
-					person_id?: string | null;
 					title?: string | null;
 					type?: string | null;
+					user_id?: string | null;
 				};
 				Relationships: [
 					{
 						foreignKeyName: 'notification_person_id_fkey';
-						columns: ['person_id'];
+						columns: ['user_id'];
 						isOneToOne: false;
 						referencedRelation: 'account_details';
-						referencedColumns: ['person_id'];
+						referencedColumns: ['user_id'];
 					},
 					{
 						foreignKeyName: 'notification_person_id_fkey';
-						columns: ['person_id'];
+						columns: ['user_id'];
 						isOneToOne: false;
-						referencedRelation: 'person';
+						referencedRelation: 'users';
 						referencedColumns: ['id'];
 					},
 				];
 			};
-			person: {
-				Row: {
-					avatar_url: string | null;
-					created_at: string;
-					date_of_birth: string | null;
-					email: string;
-					first_name: string | null;
-					id: string;
-					identity_tag: string | null;
-					last_name: string | null;
-					middle_name: string | null;
-					phone: string | null;
-					status: string | null;
-					updated_at: string | null;
-				};
-				Insert: {
-					avatar_url?: string | null;
-					created_at?: string;
-					date_of_birth?: string | null;
-					email: string;
-					first_name?: string | null;
-					id?: string;
-					identity_tag?: string | null;
-					last_name?: string | null;
-					middle_name?: string | null;
-					phone?: string | null;
-					status?: string | null;
-					updated_at?: string | null;
-				};
-				Update: {
-					avatar_url?: string | null;
-					created_at?: string;
-					date_of_birth?: string | null;
-					email?: string;
-					first_name?: string | null;
-					id?: string;
-					identity_tag?: string | null;
-					last_name?: string | null;
-					middle_name?: string | null;
-					phone?: string | null;
-					status?: string | null;
-					updated_at?: string | null;
-				};
-				Relationships: [];
-			};
-			transaction: {
+			transactions: {
 				Row: {
 					amount: number;
 					created_at: string;
@@ -279,21 +240,14 @@ export type Database = {
 						foreignKeyName: 'transaction_destination_account_id_fkey';
 						columns: ['destination_account_id'];
 						isOneToOne: false;
-						referencedRelation: 'account';
-						referencedColumns: ['id'];
+						referencedRelation: 'account_details';
+						referencedColumns: ['account_id'];
 					},
 					{
 						foreignKeyName: 'transaction_destination_account_id_fkey';
 						columns: ['destination_account_id'];
 						isOneToOne: false;
-						referencedRelation: 'account_details';
-						referencedColumns: ['account_id'];
-					},
-					{
-						foreignKeyName: 'transaction_origin_account_id_fkey';
-						columns: ['origin_account_id'];
-						isOneToOne: false;
-						referencedRelation: 'account';
+						referencedRelation: 'accounts';
 						referencedColumns: ['id'];
 					},
 					{
@@ -302,6 +256,13 @@ export type Database = {
 						isOneToOne: false;
 						referencedRelation: 'account_details';
 						referencedColumns: ['account_id'];
+					},
+					{
+						foreignKeyName: 'transaction_origin_account_id_fkey';
+						columns: ['origin_account_id'];
+						isOneToOne: false;
+						referencedRelation: 'accounts';
+						referencedColumns: ['id'];
 					},
 				];
 			};
@@ -324,13 +285,13 @@ export type Database = {
 						columns: ['contact_id'];
 						isOneToOne: false;
 						referencedRelation: 'account_details';
-						referencedColumns: ['person_id'];
+						referencedColumns: ['user_id'];
 					},
 					{
 						foreignKeyName: 'user_contacts_contact_id_fkey';
 						columns: ['contact_id'];
 						isOneToOne: false;
-						referencedRelation: 'person';
+						referencedRelation: 'users';
 						referencedColumns: ['id'];
 					},
 					{
@@ -338,16 +299,61 @@ export type Database = {
 						columns: ['user_id'];
 						isOneToOne: false;
 						referencedRelation: 'account_details';
-						referencedColumns: ['person_id'];
+						referencedColumns: ['user_id'];
 					},
 					{
 						foreignKeyName: 'user_contacts_user_id_fkey';
 						columns: ['user_id'];
 						isOneToOne: false;
-						referencedRelation: 'person';
+						referencedRelation: 'users';
 						referencedColumns: ['id'];
 					},
 				];
+			};
+			users: {
+				Row: {
+					avatar_url: string | null;
+					created_at: string;
+					date_of_birth: string | null;
+					email: string;
+					first_name: string | null;
+					id: string;
+					identity_tag: string | null;
+					last_name: string | null;
+					middle_name: string | null;
+					phone: string | null;
+					status: string | null;
+					updated_at: string | null;
+				};
+				Insert: {
+					avatar_url?: string | null;
+					created_at?: string;
+					date_of_birth?: string | null;
+					email: string;
+					first_name?: string | null;
+					id?: string;
+					identity_tag?: string | null;
+					last_name?: string | null;
+					middle_name?: string | null;
+					phone?: string | null;
+					status?: string | null;
+					updated_at?: string | null;
+				};
+				Update: {
+					avatar_url?: string | null;
+					created_at?: string;
+					date_of_birth?: string | null;
+					email?: string;
+					first_name?: string | null;
+					id?: string;
+					identity_tag?: string | null;
+					last_name?: string | null;
+					middle_name?: string | null;
+					phone?: string | null;
+					status?: string | null;
+					updated_at?: string | null;
+				};
+				Relationships: [];
 			};
 		};
 		Views: {
@@ -358,8 +364,8 @@ export type Database = {
 					display_name: string | null;
 					email: string | null;
 					identity_tag: string | null;
-					person_id: string | null;
 					phone: string | null;
+					user_id: string | null;
 				};
 				Relationships: [];
 			};
@@ -371,7 +377,6 @@ export type Database = {
 					destination_avatar_url: string | null;
 					destination_display_name: string | null;
 					id: string | null;
-					message: string | null;
 					origin_account_id: string | null;
 					origin_avatar_url: string | null;
 					origin_display_name: string | null;
@@ -382,21 +387,14 @@ export type Database = {
 						foreignKeyName: 'transaction_destination_account_id_fkey';
 						columns: ['destination_account_id'];
 						isOneToOne: false;
-						referencedRelation: 'account';
-						referencedColumns: ['id'];
+						referencedRelation: 'account_details';
+						referencedColumns: ['account_id'];
 					},
 					{
 						foreignKeyName: 'transaction_destination_account_id_fkey';
 						columns: ['destination_account_id'];
 						isOneToOne: false;
-						referencedRelation: 'account_details';
-						referencedColumns: ['account_id'];
-					},
-					{
-						foreignKeyName: 'transaction_origin_account_id_fkey';
-						columns: ['origin_account_id'];
-						isOneToOne: false;
-						referencedRelation: 'account';
+						referencedRelation: 'accounts';
 						referencedColumns: ['id'];
 					},
 					{
@@ -405,6 +403,13 @@ export type Database = {
 						isOneToOne: false;
 						referencedRelation: 'account_details';
 						referencedColumns: ['account_id'];
+					},
+					{
+						foreignKeyName: 'transaction_origin_account_id_fkey';
+						columns: ['origin_account_id'];
+						isOneToOne: false;
+						referencedRelation: 'accounts';
+						referencedColumns: ['id'];
 					},
 				];
 			};

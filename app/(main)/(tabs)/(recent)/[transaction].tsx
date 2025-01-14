@@ -14,7 +14,7 @@ import { useListContacts } from '~/lib/pound/contacts/use-list-contacts';
 import { supabase } from '~/lib/supabase';
 import type { Tables } from '~/types/database.types';
 
-interface TransactionWithAccounts extends Tables<'transaction'> {
+interface TransactionWithAccounts extends Tables<'transactions'> {
 	destination_account_details: Tables<'account_details'> | null;
 	origin_account_details: Tables<'account_details'> | null;
 }
@@ -28,7 +28,7 @@ function Transaction() {
 	useEffect(() => {
 		const fetchData = async () => {
 			const { data, error } = await supabase
-				.from('transaction')
+				.from('transactions')
 				.select(
 					`
           *,
@@ -58,15 +58,15 @@ function Transaction() {
 
 	const { data: contacts = [], isPending: isLoadingContacts } = useListContacts();
 	const { mutate: createContacts, isPending: isCreatingContacts } = useCreateContacts();
-	const otherPerson = isDeposit
-		? transaction?.origin_account_details?.person_id
-		: transaction?.destination_account_details?.person_id;
+	const otherUser = isDeposit
+		? transaction?.origin_account_details?.user_id
+		: transaction?.destination_account_details?.user_id;
 
-	const isInContacts = !!contacts.find((contact) => contact.person_id === otherPerson);
+	const isInContacts = !!contacts.find((contact) => contact.user_id === otherUser);
 
 	const addToContact = () => {
-		if (!isInContacts && typeof otherPerson === 'string' && !isLoadingContacts && !isCreatingContacts) {
-			createContacts([otherPerson]);
+		if (!isInContacts && typeof otherUser === 'string' && !isLoadingContacts && !isCreatingContacts) {
+			createContacts([otherUser]);
 		}
 	};
 

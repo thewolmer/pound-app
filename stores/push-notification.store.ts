@@ -32,10 +32,10 @@ export const setPushNotificationToken = async (token: string) => {
 		const session = auth$.session.get();
 		if (!session) return;
 		const { data } = await supabase
-			.from('expo_push_token')
+			.from('expo_push_tokens')
 			.insert({
 				expo_push_token: token,
-				person_id: session.user.id,
+				user_id: session.user.id,
 			})
 			.select();
 		if (data) {
@@ -47,6 +47,6 @@ export const setPushNotificationToken = async (token: string) => {
 export const deletePushNotificationToken = async () => {
 	const token$ = pushNotification$.token.get();
 	if (!token$) return;
-	await supabase.from('expo_push_token').delete().eq('expo_push_token', token$);
+	await supabase.from('expo_push_tokens').delete().eq('expo_push_token', token$);
 	pushNotification$.token.set(null);
 };

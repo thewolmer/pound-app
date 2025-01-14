@@ -25,7 +25,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
 		const accountChannel = supabase.channel('account');
 		if (accountId) {
 			accountChannel
-				.on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'account' }, handleAccountUpdate)
+				.on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'accounts' }, handleAccountUpdate)
 				.subscribe();
 		}
 		return () => {
@@ -39,7 +39,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
 		//TODO: make it multiple accounts
 		const getAccount = async () => {
 			setIsLoading(true);
-			const { data, error } = await supabase.from('account').select('id, balance').eq('person_id', userId$).single();
+			const { data, error } = await supabase.from('accounts').select('id, balance').eq('user_id', userId$).single();
 			if (error) {
 				console.error(error);
 				setError(error.message);

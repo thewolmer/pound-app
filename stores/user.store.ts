@@ -8,7 +8,7 @@ import { Tables } from '~/types/database.types';
 import { auth$ } from './auth.store';
 
 interface UserState {
-	user: Tables<'person'> | null;
+	user: Tables<'users'> | null;
 }
 
 export const user$ = observable<UserState>({
@@ -28,7 +28,7 @@ export const getUser = async () => {
 	const userId = auth$.session.get()?.user.id;
 	if (!userId) return;
 
-	const { data, error } = await supabase.from('person').select('*').eq('id', userId).single();
+	const { data, error } = await supabase.from('users').select('*').eq('id', userId).single();
 	if (error) {
 		console.error(error);
 	}
@@ -45,7 +45,7 @@ export const updateUser = async (props: UpdateUserProps) => {
 	const userId$ = user$.user.get()?.id;
 	if (!userId$) return;
 
-	const { data, error } = await supabase.from('person').update(props).eq('id', userId$).select('*').single();
+	const { data, error } = await supabase.from('users').update(props).eq('id', userId$).select('*').single();
 	if (error) {
 		console.error(error);
 		throw error;

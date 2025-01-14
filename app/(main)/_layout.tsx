@@ -33,8 +33,6 @@ export default function MainLayout() {
 				<Stack.Screen
 					name="search"
 					options={{
-						animation: 'fade_from_bottom',
-						animationTypeForReplace: 'push',
 						headerShown: false,
 					}}
 				/>

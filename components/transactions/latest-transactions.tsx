@@ -35,7 +35,7 @@ export function LatestTransactions({ count }: LatestTransactionsProps) {
 
 			supabase
 				.channel('transaction')
-				.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transaction' }, getTransactions)
+				.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transactions' }, getTransactions)
 				.subscribe();
 		}
 	}, [accountId, count]);

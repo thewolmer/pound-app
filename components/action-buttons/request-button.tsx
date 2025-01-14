@@ -89,7 +89,7 @@ export const RequestButton = () => {
 
 	supabase
 		.channel('account-transaction')
-		.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transaction' }, handleTransactionInsert)
+		.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transactions' }, handleTransactionInsert)
 		.subscribe();
 
 	const logoFromFile = require('~/assets/images/icon-for-qr-code.png');

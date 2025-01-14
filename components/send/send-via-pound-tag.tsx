@@ -67,7 +67,7 @@ export const SendViaPoundTag = () => {
 			return;
 		}
 
-		if (userData.person_id === userId$) {
+		if (userData.user_id === userId$) {
 			alert('You cannot send money to yourself');
 			setLoading(false);
 			return;

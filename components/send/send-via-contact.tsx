@@ -54,8 +54,8 @@ export const SendViaContact = () => {
 
 	useEffect(() => {
 		if (contacts && poundUsers) {
-			const existingContactsIds = new Set(contacts.map((contact) => contact.person_id as string));
-			const phoneContactsIds = new Set(poundUsers.map((contact) => contact.person_id as string));
+			const existingContactsIds = new Set(contacts.map((contact) => contact.user_id as string));
+			const phoneContactsIds = new Set(poundUsers.map((contact) => contact.user_id as string));
 
 			const newContacts = [...phoneContactsIds].filter((id) => !existingContactsIds.has(id));
 			if (newContacts.length > 0) {
@@ -138,7 +138,7 @@ export const SendViaContact = () => {
 
 					<FlatList
 						data={filteredContacts}
-						keyExtractor={(item) => item.person_id || ''}
+						keyExtractor={(item) => item.user_id || ''}
 						renderItem={(props) => renderContactItem({ ...props, ref: contactsModalRef })}
 						ListEmptyComponent={
 							<View className="flex-1 items-center justify-center">

@@ -100,9 +100,9 @@ export default function StartScreen() {
 						<View className="flex flex-row gap-3">
 							<Pressable
 								onPress={() => router.push('/(main)/search')}
-								className="flex items-center justify-center rounded-full bg-muted p-1.5"
+								className="flex items-center justify-center rounded-2xl bg-muted p-2"
 							>
-								<Ionicons name="search" size={22} className="text-foreground" />
+								<Ionicons name="search" size={20} className="text-foreground" />
 							</Pressable>
 							<Pressable onPress={() => router.push('/(main)/(profile)/profile')}>
 								<Avatar alt="User avatar">

@@ -1,8 +1,11 @@
+import React from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import { use$ } from '@legendapp/state/react';
 import { router } from 'expo-router';
-import { Image, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { ForwardCard } from '~/components/ui/forward-card';
 import { user$ } from '~/stores/user.store';
 
@@ -19,19 +22,12 @@ export default function Profile() {
 					onPress={() => router.push('/(profile)/user')}
 					className="flex w-full items-center justify-center gap-1 py-6"
 				>
-					{avatar_url$ ? (
-						<Image
-							source={{ uri: avatar_url$.toString() }}
-							style={{ width: 100, height: 100, borderRadius: 50 }}
-							resizeMode="cover"
-						/>
-					) : (
-						<View className="flex h-[100px] w-[100px] items-center justify-center rounded-full bg-accent text-center">
-							<View className="text-xl font-extrabold text-foreground">
-								<Text>{first_name$?.[0]}</Text>
-							</View>
-						</View>
-					)}
+					<Avatar alt="User avatar" className="h-24 w-24">
+						<AvatarImage source={{ uri: avatar_url$ ? avatar_url$.toString() : undefined }} />
+						<AvatarFallback>
+							<Ionicons name="person" size={24} className="text-foreground" />
+						</AvatarFallback>
+					</Avatar>
 					{first_name$ && last_name$ && (
 						<Text className={'text-lg font-bold text-foreground'}>
 							{first_name$} {last_name$}

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { use$ } from '@legendapp/state/react';
 import { useRouter } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
-import { ActivityIndicator, Image, Pressable, Text, View } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -10,15 +11,15 @@ import { TransactionItem } from '~/components/transactions/transaction-item';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
-import { useAccount } from '~/context/AccountContext';
 import { useDebounce } from '~/hooks/useDebounce';
 import { useListContacts } from '~/lib/pound/contacts/use-list-contacts';
 import { supabase } from '~/lib/supabase';
+import { account$ } from '~/stores/account.store';
 import { Tables } from '~/types/database.types';
 
 const Search = () => {
 	const router = useRouter();
-	const { accountId } = useAccount();
+	const accountId$ = use$(account$.accountId);
 	const [poundTagUser, setPoundTagUser] = useState<Tables<'account_details'> | null>(null);
 	const [contactUsers, setContactUsers] = useState<Tables<'account_details'>[] | null>(null);
 	const [transactions, setTransactions] = useState<Tables<'account_transactions'>[] | null>(null);
@@ -65,12 +66,12 @@ const Search = () => {
 			}
 			// transaction search
 			const fetchTransactions = async () => {
-				if (!accountId) return;
+				if (!accountId$) return;
 
 				const { data, error } = await supabase
 					.from('account_transactions')
 					.select('*')
-					.or(`origin_account_id.eq.${accountId},destination_account_id.eq.${accountId}`)
+					.or(`origin_account_id.eq.${accountId$},destination_account_id.eq.${accountId$}`)
 					.order('created_at', { ascending: false });
 
 				if (error) {

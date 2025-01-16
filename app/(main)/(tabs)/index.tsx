@@ -89,14 +89,6 @@ export default function StartScreen() {
 								</Avatar>
 							</Pressable>
 						</View>
-						<Pressable onPress={() => router.push('/(main)/(profile)/profile')}>
-							<Avatar alt="User avatar">
-								<AvatarImage source={{ uri: avatarUrl$ || undefined }} />
-								<AvatarFallback>
-									<Ionicons name="person" size={24} className="text-foreground" />
-								</AvatarFallback>
-							</Avatar>
-						</Pressable>
 					</View>
 					<Card>
 						<CardHeader className="items-center">

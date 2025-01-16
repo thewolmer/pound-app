@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { use$ } from '@legendapp/state/react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Image, SafeAreaView, Text, View } from 'react-native';
 import Animated, { BounceIn, FadeIn, FadeInUp, FadeOut, SlideInDown } from 'react-native-reanimated';
 
 import { Button } from '~/components/ui/button';
-import { useAccount } from '~/context/AccountContext';
 import { formatCurrency } from '~/lib/formatCurrency';
 import { supabase } from '~/lib/supabase';
 import { useHaptics } from '~/lib/use-haptics';
 import { uuid } from '~/lib/utils';
+import { account$ } from '~/stores/account.store';
 import type { Tables } from '~/types/database.types';
 
 export default function TransferScreen() {
@@ -24,18 +25,18 @@ export default function TransferScreen() {
 
 	const logoFromFile = require('~/assets/images/pound-icon.png');
 
-	const { accountId } = useAccount();
+	const accountId$ = use$(account$.accountId);
 	const { triggerHaptics } = useHaptics();
 	const [success, setSuccess] = useState<boolean | null>(null);
 
 	if (!account_details || !amount) return null;
 
 	const handleSendSubmit = async () => {
-		if (!accountId || !user?.account_id || !amount) return;
+		if (!accountId$ || !user?.account_id || !amount) return;
 
 		const { error } = await supabase.rpc('make_transfer', {
 			amount: amountToSend,
-			origin_account_id: accountId,
+			origin_account_id: accountId$,
 			destination_account_id: user.account_id,
 			reference: uuid(),
 			message: message || '',

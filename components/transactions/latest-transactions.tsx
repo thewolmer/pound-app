@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
+import { use$ } from '@legendapp/state/react';
 import { FlatList, View } from 'react-native';
 
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
-import { useAccount } from '~/context/AccountContext';
 import { supabase } from '~/lib/supabase';
+import { account$ } from '~/stores/account.store';
 import type { Tables } from '~/types/database.types';
 
 import { TransactionItem } from './transaction-item';
@@ -13,7 +14,7 @@ interface LatestTransactionsProps {
 }
 
 export function LatestTransactions({ count }: LatestTransactionsProps) {
-	const { accountId } = useAccount();
+	const accountId$ = use$(account$.accountId);
 	const [transactions, setTransactions] = useState<Tables<'account_transactions'>[] | null>([]);
 	const [isLoading, setLoading] = useState(false);
 
@@ -23,14 +24,14 @@ export function LatestTransactions({ count }: LatestTransactionsProps) {
 			const { data, error } = await supabase
 				.from('account_transactions')
 				.select('*')
-				.or(`origin_account_id.eq.${accountId},destination_account_id.eq.${accountId}`)
+				.or(`origin_account_id.eq.${accountId$},destination_account_id.eq.${accountId$}`)
 				.order('created_at', { ascending: false })
 				.limit(count);
 			setLoading(false);
 			if (error) console.error(error);
 			setTransactions(data);
 		};
-		if (accountId) {
+		if (accountId$) {
 			getTransactions();
 
 			supabase
@@ -38,7 +39,7 @@ export function LatestTransactions({ count }: LatestTransactionsProps) {
 				.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transactions' }, getTransactions)
 				.subscribe();
 		}
-	}, [accountId, count]);
+	}, [accountId$, count]);
 
 	const renderTransaction = ({ item }: { item: Tables<'account_transactions'> }) => {
 		return <TransactionItem item={item} />;

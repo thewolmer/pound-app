@@ -22,7 +22,6 @@ import { useEffectOnce } from '~/lib/use-effect-once';
 import { usePushNotifications } from '~/lib/usePushNotifications';
 import { preferenceSettings$ } from '~/stores/preferences.store';
 
-import { AccountProvider } from './AccountContext';
 import { NetworkProvider } from './NetworkContext';
 
 cssInterop(Ionicons, { className: 'style' });
@@ -94,9 +93,7 @@ export const ProvidersWrapper = ({ children }: { children: React.ReactNode }) =>
 					<BottomSheetModalProvider>
 						<StatusBar style={isDarkTheme ? 'light' : 'dark'} />
 						<SafeAreaProvider onLayout={onLayoutRootView}>
-							<NetworkProvider>
-								<AccountProvider>{children}</AccountProvider>
-							</NetworkProvider>
+							<NetworkProvider>{children}</NetworkProvider>
 						</SafeAreaProvider>
 						<PortalHost />
 					</BottomSheetModalProvider>

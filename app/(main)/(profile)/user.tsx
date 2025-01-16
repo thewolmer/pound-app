@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { use$ } from '@legendapp/state/react';
 import { decode } from 'base64-arraybuffer';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { launchImageLibraryAsync } from 'expo-image-picker';
-import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { UserDetailsForm } from '~/components/forms/user-details';
+import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { supabase } from '~/lib/supabase';
 import { updateUser, user$ } from '~/stores/user.store';
 
 const User = () => {
 	const user_id$ = use$(user$.user.id);
-	const first_name$ = use$(user$.user.first_name);
 	const avatar_url$ = use$(user$.user.avatar_url);
 
 	const [isUploading, setIsUploading] = useState(false);
@@ -87,17 +87,18 @@ const User = () => {
 						className="relative flex w-40 items-center justify-center"
 						disabled={isUploading}
 					>
-						{avatar_url$ && <Image source={{ uri: avatar_url$ }} className="h-40 w-40 rounded-full" />}
-						{first_name$ && !avatar_url$ && (
-							<View className="flex h-40 w-40 items-center justify-center rounded-full bg-accent text-center">
-								<Text className="text-6xl text-accent-foreground">{first_name$[0]}</Text>
+						<Avatar alt="User avatar" className="h-24 w-24">
+							<AvatarImage source={{ uri: avatar_url$ ? avatar_url$ : undefined }} />
+							<AvatarFallback>
+								<Ionicons name="person" size={24} className="text-foreground" />
+							</AvatarFallback>
+						</Avatar>
+						{isUploading && <ActivityIndicator size={'large'} className="absolute" />}
+						{!isUploading && (
+							<View className="absolute bottom-0 right-4 rounded-full bg-secondary p-2 shadow">
+								<Ionicons name="create-outline" size={18} className="text-secondary-foreground" />
 							</View>
 						)}
-
-						{isUploading && <ActivityIndicator size={'large'} className="absolute" color="white" />}
-						<View className="absolute bottom-0 right-0 rounded-full bg-secondary p-2 shadow">
-							<Ionicons name="create-outline" size={24} className="text-secondary-foreground" />
-						</View>
 					</Pressable>
 				</View>
 

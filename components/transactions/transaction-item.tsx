@@ -1,13 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
+import { use$ } from '@legendapp/state/react';
 import { format } from 'date-fns';
 import { router } from 'expo-router';
 import type { ComponentProps } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
-import { useAccount } from '~/context/AccountContext';
 import { formatCurrency } from '~/lib/formatCurrency';
 import { cn, formatTransactionDate } from '~/lib/utils';
+import { account$ } from '~/stores/account.store';
 import type { Tables } from '~/types/database.types';
 
 function getInitials(name: string | null) {
@@ -27,7 +28,7 @@ export function TransactionItem({
 	item: Tables<'account_transactions'>;
 	onlyShowTime?: boolean;
 }) {
-	const { accountId } = useAccount();
+	const accountId$ = use$(account$.accountId);
 
 	let accountDetails: {
 		icon: ComponentProps<typeof Ionicons>['name'];
@@ -48,7 +49,7 @@ export function TransactionItem({
 	}
 
 	if (item.type === 'transfer') {
-		if (item.destination_account_id === accountId) {
+		if (item.destination_account_id === accountId$) {
 			accountDetails = {
 				icon: 'arrow-back-sharp',
 				displayName: item.origin_display_name,
@@ -92,11 +93,11 @@ export function TransactionItem({
 			</View>
 			<Text
 				className={cn(
-					item.destination_account_id === accountId ? 'text-success-foreground' : 'text-destructive-foreground',
+					item.destination_account_id === accountId$ ? 'text-success-foreground' : 'text-destructive-foreground',
 					'font-semibold'
 				)}
 			>
-				{item.destination_account_id === accountId ? '+' : '-'}
+				{item.destination_account_id === accountId$ ? '+' : '-'}
 				{formatCurrency(item.amount || 0)}
 			</Text>
 		</Pressable>

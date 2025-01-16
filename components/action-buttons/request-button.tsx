@@ -7,6 +7,7 @@ import {
 	BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { use$ } from '@legendapp/state/react';
 import { shareAsync } from 'expo-sharing';
 import { Controller, useForm } from 'react-hook-form';
 import { Keyboard, Text, View } from 'react-native';
@@ -21,11 +22,11 @@ import { IconWrapper } from '../ui/icon-wrapper';
 import { Input } from '../ui/input';
 import { H3 } from '../ui/typography';
 import { NAV_THEME } from '~/constants/theme';
-import { useAccount } from '~/context/AccountContext';
 import { parseCurrency } from '~/lib/formatCurrency';
 import { supabase } from '~/lib/supabase';
 import { useHaptics } from '~/lib/use-haptics';
 import { cn, uuid } from '~/lib/utils';
+import { account$ } from '~/stores/account.store';
 
 const AmountSchema = z.object({
 	amount: z.preprocess(
@@ -36,7 +37,7 @@ const AmountSchema = z.object({
 type AmountFormValues = z.infer<typeof AmountSchema>;
 
 export const RequestButton = () => {
-	const { accountId } = useAccount();
+	const accountId$ = use$(account$.accountId);
 	const requestModal = useRef<BottomSheetModal>(null);
 	const { triggerHaptics } = useHaptics();
 	const qrCodeRef = useRef(null);
@@ -75,7 +76,7 @@ export const RequestButton = () => {
 	}
 
 	const onSubmit = (data: AmountFormValues) => {
-		if (!accountId) return;
+		if (!accountId$) return;
 		setReference(uuid());
 	};
 
@@ -194,7 +195,7 @@ export const RequestButton = () => {
 										ref={qrCodeRef}
 										data={JSON.stringify({
 											type: 'payment_request',
-											accountId,
+											accountId: accountId$,
 											amount,
 											reference,
 										})}

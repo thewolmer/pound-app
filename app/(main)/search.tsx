@@ -12,18 +12,18 @@ import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
 import { useDebounce } from '~/hooks/useDebounce';
-import { useListContacts } from '~/lib/pound/contacts/use-list-contacts';
 import { supabase } from '~/lib/supabase';
 import { account$ } from '~/stores/account.store';
+import { userContacts$ } from '~/stores/user-contacts.store';
 import { Tables } from '~/types/database.types';
 
 const Search = () => {
 	const router = useRouter();
 	const accountId$ = use$(account$.accountId);
+	const contacts$ = use$(userContacts$.contacts);
 	const [poundTagUser, setPoundTagUser] = useState<Tables<'account_details'> | null>(null);
 	const [contactUsers, setContactUsers] = useState<Tables<'account_details'>[] | null>(null);
 	const [transactions, setTransactions] = useState<Tables<'account_transactions'>[] | null>(null);
-	const { data: contacts = [] } = useListContacts();
 
 	const { control, watch } = useForm({
 		defaultValues: {
@@ -52,7 +52,7 @@ const Search = () => {
 				}
 			};
 			// contact search
-			const inContact = contacts.filter(
+			const inContact = Object.values(contacts$).filter(
 				(contact) =>
 					contact.identity_tag === cleanQuery ||
 					contact.display_name?.toLowerCase().includes(cleanQuery.toLowerCase()) ||

@@ -79,7 +79,7 @@ const User = () => {
 	};
 
 	return (
-		<BodyView>
+		<BodyView className="p-5">
 			<View className="flex items-center justify-center">
 				<Pressable
 					onPress={handleUploadAvatar}

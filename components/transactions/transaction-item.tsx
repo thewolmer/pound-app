@@ -83,7 +83,7 @@ export function TransactionItem({
 				</View>
 
 				<View>
-					<Text className="text-md font-bold text-foreground">{accountDetails.displayName}</Text>
+					<Text className="text-md font-heading text-foreground">{accountDetails.displayName}</Text>
 					{onlyShowTime ? (
 						<Text className="text-sm text-muted-foreground">{format(new Date(item.created_at || ''), 'h:mm a')}</Text>
 					) : (

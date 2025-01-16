@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router, useFocusEffect, useGlobalSearchParams } from 'expo-router';
 import { openBrowserAsync } from 'expo-web-browser';
@@ -24,7 +24,7 @@ import { Button } from '~/components/ui/button';
 import { Card, CardFooter, CardHeader } from '~/components/ui/card';
 import { HintBox } from '~/components/ui/hint-box';
 import { Input } from '~/components/ui/input';
-import { H3 } from '~/components/ui/typography';
+import { Modal } from '~/components/ui/modal';
 import { Env } from '~/config/env';
 import { defaultCardAtom } from '~/lib/atoms';
 import { getCardIcon } from '~/lib/CardIcons';
@@ -55,13 +55,6 @@ export default function Deposit() {
 
 	const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
 	const defaultCard = useAtomValue(defaultCardAtom);
-
-	const renderBackDrop = useCallback(
-		(backdropProps: BottomSheetBackdropProps) => (
-			<BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...backdropProps} />
-		),
-		[]
-	);
 
 	const {
 		control,
@@ -224,85 +217,72 @@ export default function Deposit() {
 					</Button>
 				</View>
 				{/* Card Select Modal */}
-				<BottomSheetModal
-					backdropComponent={renderBackDrop}
-					ref={cardSelectModal}
-					snapPoints={['80']}
-					enableDismissOnClose
-					handleIndicatorStyle={{ backgroundColor: '#fff' }}
-					backgroundStyle={{ backgroundColor: 'transparent' }}
-					onDismiss={() => {
-						cardSelectModal.current?.close();
-					}}
-				>
-					<BottomSheetView className={cn('flex-1 gap-5 rounded-t-2xl bg-card p-5 transition-all duration-700')}>
-						<H3 className="text-card-foreground">Select A Card</H3>
-						<View className="gap-2">
-							{isLoading && <ActivityIndicator color={'white'} />}
-							{cards?.map((card) => {
-								const isSelectedCard = selectedCard?.token === card.token;
-								return (
-									<Button
-										key={card.token}
-										size={'lg'}
-										disabled={!card.active}
-										onPress={() => {
-											setSelectedCard(card);
-											cardSelectModal.current?.close();
-										}}
-										variant={'outline'}
-										className={cn(
-											'flex flex-row items-center justify-start gap-2 px-4 py-2',
-											'text-primary-foreground',
-											isSelectedCard && 'border-primary'
-										)}
-									>
-										<Ionicons
-											name={isSelectedCard ? 'radio-button-on' : 'radio-button-off'}
-											size={24}
-											className={cn(isSelectedCard ? 'text-primary' : 'text-foreground')}
-										/>
-										{getCardIcon(card.card.type)}
-										<Text className={cn('text-base font-semibold text-foreground')}>
-											Ending in {card.card.last_4_digits}
-										</Text>
-									</Button>
-								);
-							})}
-							{cards?.length !== 0 && (
+				<Modal ref={cardSelectModal} title={'Select a Card'}>
+					<View className="gap-2">
+						{isLoading && <ActivityIndicator color={'white'} />}
+						{cards?.map((card) => {
+							const isSelectedCard = selectedCard?.token === card.token;
+							return (
 								<Button
-									variant="outline"
+									key={card.token}
 									size={'lg'}
+									disabled={!card.active}
 									onPress={() => {
+										setSelectedCard(card);
 										cardSelectModal.current?.close();
-										router.push('/(main)/(deposit)/manage-cards');
 									}}
-									className={'flex flex-row items-center justify-start gap-2 px-4 py-2'}
+									variant={'outline'}
+									className={cn(
+										'flex flex-row items-center justify-start gap-2 px-4 py-2',
+										'text-primary-foreground',
+										isSelectedCard && 'border-primary'
+									)}
 								>
-									<Ionicons name={'card-outline'} className="text-foreground" size={24} />
-									<Text className={'text-base font-semibold text-foreground'}>Manage Cards</Text>
+									<Ionicons
+										name={isSelectedCard ? 'radio-button-on' : 'radio-button-off'}
+										size={24}
+										className={cn(isSelectedCard ? 'text-primary' : 'text-foreground')}
+									/>
+									{getCardIcon(card.card.type)}
+									<Text className={cn('text-base font-semibold text-foreground')}>
+										Ending in {card.card.last_4_digits}
+									</Text>
 								</Button>
-							)}
+							);
+						})}
+						{cards?.length !== 0 && (
 							<Button
 								variant="outline"
 								size={'lg'}
 								onPress={() => {
 									cardSelectModal.current?.close();
-									router.push('/(main)/(deposit)/add-card');
+									router.push('/(main)/(deposit)/manage-cards');
 								}}
 								className={'flex flex-row items-center justify-start gap-2 px-4 py-2'}
 							>
-								<Ionicons name={'add-circle-outline'} className="text-foreground" size={24} />
-								<Text className={'text-base font-semibold text-foreground'}>Add a new Card</Text>
+								<Ionicons name={'card-outline'} className="text-foreground" size={24} />
+								<Text className={'text-base font-semibold text-foreground'}>Manage Cards</Text>
 							</Button>
-							<HintBox
-								className="my-2"
-								text="You can enable a card to be auto selected by setting up your Primary Card in the Manage Cards screen."
-								when={!defaultCard && cards?.length !== 0}
-							/>
-						</View>
-					</BottomSheetView>
-				</BottomSheetModal>
+						)}
+						<Button
+							variant="outline"
+							size={'lg'}
+							onPress={() => {
+								cardSelectModal.current?.close();
+								router.push('/(main)/(deposit)/add-card');
+							}}
+							className={'flex flex-row items-center justify-start gap-2 px-4 py-2'}
+						>
+							<Ionicons name={'add-circle-outline'} className="text-foreground" size={24} />
+							<Text className={'text-base font-semibold text-foreground'}>Add a new Card</Text>
+						</Button>
+						<HintBox
+							className="my-2"
+							text="You can enable a card to be auto selected by setting up your Primary Card in the Manage Cards screen."
+							when={!defaultCard && cards?.length !== 0}
+						/>
+					</View>
+				</Modal>
 			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);

@@ -1,12 +1,13 @@
 import { type SetStateAction, useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { use$ } from '@legendapp/state/react';
 import { useNavigation } from '@react-navigation/native';
 import { format, isToday, isYesterday, parseISO } from 'date-fns';
 import { ActivityIndicator, RefreshControl, SectionList, Text, View } from 'react-native';
 
 import { TransactionItem } from '~/components/transactions/transaction-item';
-import { useAccount } from '~/context/AccountContext';
 import { formatCurrency } from '~/lib/formatCurrency';
 import { supabase } from '~/lib/supabase';
+import { account$ } from '~/stores/account.store';
 import type { Tables } from '~/types/database.types';
 
 interface TransactionSection {
@@ -15,20 +16,20 @@ interface TransactionSection {
 }
 
 export default function Recent() {
-	const { accountId } = useAccount();
 	const navigation = useNavigation();
 	const [allTransactions, setAllTransactions] = useState<Tables<'account_transactions'>[]>([]);
 	const [filteredTransactions, setFilteredTransactions] = useState<TransactionSection[]>([]);
 	const [refreshing, setRefreshing] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
+	const accountId$ = use$(account$.accountId);
 
 	const fetchTransactions = async () => {
-		if (!accountId) return;
+		if (!accountId$) return;
 
 		const { data, error } = await supabase
 			.from('account_transactions')
 			.select('*')
-			.or(`origin_account_id.eq.${accountId},destination_account_id.eq.${accountId}`)
+			.or(`origin_account_id.eq.${accountId$},destination_account_id.eq.${accountId$}`)
 			.order('created_at', { ascending: false });
 
 		if (error) {
@@ -97,7 +98,7 @@ export default function Recent() {
 	// Initial Fetch
 	useEffect(() => {
 		fetchTransactions();
-	}, [accountId]);
+	}, [accountId$]);
 
 	const renderTransaction = ({ item }: { item: Tables<'account_transactions'> }) => (
 		<View className="px-5">
@@ -107,10 +108,10 @@ export default function Recent() {
 
 	const renderSectionHeader = ({ section }: { section: TransactionSection }) => {
 		const totalAmount = section.data.reduce((sum, transaction) => {
-			if (transaction.destination_account_id === accountId) {
+			if (transaction.destination_account_id === accountId$) {
 				return sum + (transaction.amount || 0);
 			}
-			if (transaction.origin_account_id === accountId) {
+			if (transaction.origin_account_id === accountId$) {
 				return sum - (transaction.amount || 0);
 			}
 			return sum;

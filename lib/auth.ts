@@ -1,6 +1,7 @@
 import NetInfo from '@react-native-community/netinfo';
 
 import { supabase } from '~/lib/supabase';
+import { clearAccount } from '~/stores/account.store';
 import { auth$, clearSession, setOffline, setSession } from '~/stores/auth.store';
 import { deletePushNotificationToken } from '~/stores/push-notification.store';
 import { clearUser, getUser, user$ } from '~/stores/user.store';
@@ -96,4 +97,5 @@ const cleanUp = async () => {
 	await deletePushNotificationToken();
 	clearUser();
 	clearSession();
+	clearAccount();
 };

@@ -14,20 +14,19 @@ import { Button } from '~/components/ui/button';
 import { Card, CardFooter, CardHeader } from '~/components/ui/card';
 import { IconWrapper } from '~/components/ui/icon-wrapper';
 import { H1 } from '~/components/ui/typography';
-import { useAccount } from '~/context/AccountContext';
 import { formatCurrency } from '~/lib/formatCurrency';
 import { registerForPushNotificationsAsync } from '~/lib/usePushNotifications';
+import { account$, refreshAccount } from '~/stores/account.store';
 import { auth$ } from '~/stores/auth.store';
 import { setPushNotificationToken } from '~/stores/push-notification.store';
 import { user$ } from '~/stores/user.store';
 
 export default function StartScreen() {
+	const balance$ = use$(account$.balance);
+	// const isAccountRefreshing$ = use$(account$.isRefreshing);
 	const userId$ = use$(auth$.session.user.id);
 	const avatarUrl$ = use$(user$.user.avatar_url);
 	const [refreshing, setRefreshing] = useState(false);
-	const { balance, isLoading } = useAccount();
-	const [previousBalance, setPreviousBalance] = useState<number | null>(null);
-	const [isChanged, setIsChanged] = useState(false);
 
 	const onRefresh = async () => {
 		setRefreshing(true);
@@ -49,33 +48,20 @@ export default function StartScreen() {
 			}
 		};
 
-		registerForPushNotifications();
+		const initializeAccount = async () => {
+			await refreshAccount();
+		};
+
+		if (userId$) {
+			registerForPushNotifications();
+			initializeAccount();
+		}
 	}, [userId$]);
 
-	useEffect(() => {
-		if (isLoading) return;
-		if (previousBalance === null) {
-			setPreviousBalance(balance);
-			return;
-		}
-
-		if (balance !== previousBalance) {
-			setIsChanged(true);
-
-			const timer = setTimeout(() => {
-				setPreviousBalance(balance);
-				setIsChanged(false);
-			}, 1000);
-
-			return () => clearTimeout(timer);
-		}
-	}, [balance, previousBalance, isLoading]);
-
-	const getBalanceColor = () => {
-		if (!isChanged || balance === previousBalance) return '';
-
-		return balance > (previousBalance || 0) ? 'text-success-foreground' : 'text-destructive-foreground';
-	};
+	//TODO: color the balance for a second
+	// account$.balance.onChange(({ value: newBalance, getPrevious }) => {
+	// 	const oldBalance = getPrevious();
+	// });
 
 	return (
 		<SafeAreaView>
@@ -97,7 +83,8 @@ export default function StartScreen() {
 					<Card>
 						<CardHeader className="items-center">
 							<Text className="mb-2 text-accent-foreground">Available Balance</Text>
-							{isLoading ? <ActivityIndicator /> : <H1 className={getBalanceColor()}>{formatCurrency(balance)}</H1>}
+							{/* TODO: use isAccountRefreshing$ to indicate that balance is refreshing, but keep the old balance */}
+							{balance$ ? <H1>{formatCurrency(balance$)}</H1> : <ActivityIndicator />}
 						</CardHeader>
 
 						<CardFooter className="flex justify-between">

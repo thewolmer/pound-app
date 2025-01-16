@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { use$ } from '@legendapp/state/react';
 import { format } from 'date-fns';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, Image, Text, View } from 'react-native';
@@ -7,11 +8,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '~/components/ui/card';
-import { useAccount } from '~/context/AccountContext';
 import { formatCurrency } from '~/lib/formatCurrency';
 import { useCreateContacts } from '~/lib/pound/contacts/use-create-contacts';
 import { useListContacts } from '~/lib/pound/contacts/use-list-contacts';
 import { supabase } from '~/lib/supabase';
+import { account$ } from '~/stores/account.store';
 import type { Tables } from '~/types/database.types';
 
 interface TransactionWithAccounts extends Tables<'transactions'> {
@@ -21,7 +22,7 @@ interface TransactionWithAccounts extends Tables<'transactions'> {
 
 function Transaction() {
 	const { transaction: id } = useLocalSearchParams();
-	const { accountId } = useAccount();
+	const accountId$ = use$(account$.accountId);
 
 	const [transaction, setTransaction] = useState<TransactionWithAccounts | null>(null);
 
@@ -54,7 +55,7 @@ function Transaction() {
 		fetchData();
 	}, [id]);
 
-	const isDeposit = transaction?.destination_account_id === accountId;
+	const isDeposit = transaction?.destination_account_id === accountId$;
 
 	const { data: contacts = [], isPending: isLoadingContacts } = useListContacts();
 	const { mutate: createContacts, isPending: isCreatingContacts } = useCreateContacts();
@@ -70,7 +71,7 @@ function Transaction() {
 		}
 	};
 
-	if (!id || !transaction || !accountId) {
+	if (!id || !transaction || !accountId$) {
 		return (
 			<View className="flex-1 items-center justify-center">
 				<ActivityIndicator size={'large'} />

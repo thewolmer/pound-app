@@ -21,3 +21,11 @@ export const listAccountDetails = async (props: AccountDetailsFilters, options?:
 
 	return data;
 };
+
+export const getAccountDetails = async (user_id: string) => {
+	const { data, error } = await supabase.from('account_details').select().eq('user_id', user_id).single();
+	if (error) {
+		throw error;
+	}
+	return data;
+};

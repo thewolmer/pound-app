@@ -9,10 +9,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '~/components/ui/card';
 import { formatCurrency } from '~/lib/formatCurrency';
-import { useCreateContacts } from '~/lib/pound/contacts/use-create-contacts';
-import { useListContacts } from '~/lib/pound/contacts/use-list-contacts';
 import { supabase } from '~/lib/supabase';
 import { account$ } from '~/stores/account.store';
+import { addContact, userContacts$ } from '~/stores/user-contacts.store';
 import type { Tables } from '~/types/database.types';
 
 interface TransactionWithAccounts extends Tables<'transactions'> {
@@ -23,6 +22,7 @@ interface TransactionWithAccounts extends Tables<'transactions'> {
 function Transaction() {
 	const { transaction: id } = useLocalSearchParams();
 	const accountId$ = use$(account$.accountId);
+	const contacts$ = use$(userContacts$.contacts);
 
 	const [transaction, setTransaction] = useState<TransactionWithAccounts | null>(null);
 
@@ -37,7 +37,7 @@ function Transaction() {
           origin_account:account_details!transaction_origin_account_id_fkey (*)
         `
 				)
-				.eq('id', id)
+				.eq('id', id as string)
 				.single();
 
 			if (data) {
@@ -55,19 +55,18 @@ function Transaction() {
 		fetchData();
 	}, [id]);
 
+	// FIXME: bad naming convention
 	const isDeposit = transaction?.destination_account_id === accountId$;
 
-	const { data: contacts = [], isPending: isLoadingContacts } = useListContacts();
-	const { mutate: createContacts, isPending: isCreatingContacts } = useCreateContacts();
-	const otherUser = isDeposit
+	const otherUserId = isDeposit
 		? transaction?.origin_account_details?.user_id
 		: transaction?.destination_account_details?.user_id;
 
-	const isInContacts = !!contacts.find((contact) => contact.user_id === otherUser);
+	const isInContacts = otherUserId ? !!contacts$[otherUserId] : false;
 
 	const addToContact = () => {
-		if (!isInContacts && typeof otherUser === 'string' && !isLoadingContacts && !isCreatingContacts) {
-			createContacts([otherUser]);
+		if (!isInContacts && typeof otherUserId === 'string') {
+			addContact(otherUserId);
 		}
 	};
 

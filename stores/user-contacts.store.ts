@@ -107,6 +107,15 @@ export const addContact = async (contactId: string) => {
 
 export const deleteContact = async (contactId: string) => {
 	userContacts$.isLoading.set(true);
+	const contact$ = userContacts$.contacts[contactId].get();
+	if (!contact$) {
+		return;
+	}
+	const deviceContacts = await getDeviceContacts();
+	const deviceContactEmails = deviceContacts.flatMap((contact) => contact.emails);
+	if (deviceContactEmails.includes(contact$.email as string)) {
+		throw new Error('Cannot delete contact that is in device contacts');
+	}
 	try {
 		await deleteContactApi(contactId);
 		userContacts$.contacts[contactId].delete();

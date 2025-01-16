@@ -1,23 +1,48 @@
 import * as React from 'react';
-import { TextInput } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { TextInput, View } from 'react-native';
 
 import { cn } from '~/lib/utils';
 
-const Input = React.forwardRef<React.ElementRef<typeof TextInput>, React.ComponentPropsWithoutRef<typeof TextInput>>(
-	// eslint-disable-next-line react/prop-types
-	({ className, placeholderClassName, ...props }, ref) => {
+interface InputProps extends React.ComponentPropsWithoutRef<typeof TextInput> {
+	leftIcon?: React.ComponentProps<typeof Ionicons>['name']; // Optional leftIcon prop
+}
+
+const Input = React.forwardRef<React.ElementRef<typeof TextInput>, InputProps>(
+	({ className, placeholderClassName, leftIcon, ...props }, ref) => {
+		if (!leftIcon) {
+			return (
+				<TextInput
+					ref={ref}
+					className={cn(
+						'native:h-12 native:text-lg native:leading-[1.25] h-10 h-12 w-full rounded-xl border border-input bg-card px-3 text-base text-foreground placeholder:text-muted-foreground/50 focus:outline-none lg:text-sm',
+						className
+					)}
+					placeholderClassName={cn('text-muted-foreground', placeholderClassName)}
+					{...props}
+				/>
+			);
+		}
 		return (
-			<TextInput
-				ref={ref}
-				className={cn(
-					'native:h-12 native:text-lg native:leading-[1.25] h-10 rounded-xl border border-input bg-background px-3 text-base text-foreground file:border-0 file:bg-transparent file:font-medium placeholder:text-muted-foreground web:flex web:w-full web:py-2 web:ring-offset-background web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2 lg:text-sm',
-					// eslint-disable-next-line react/prop-types
-					props.editable === false && 'opacity-50 web:cursor-not-allowed',
-					className
+			<View className="relative h-12 flex-1 rounded-xl border border-input bg-card px-3">
+				{leftIcon && (
+					<View className="absolute left-3 top-1/2 -translate-y-1/2">
+						<Ionicons name={leftIcon} size={20} className="text-muted-foreground" />
+					</View>
 				)}
-				placeholderClassName={cn('text-muted-foreground', placeholderClassName)}
-				{...props}
-			/>
+				<TextInput
+					ref={ref}
+					style={{
+						paddingLeft: leftIcon ? 30 : undefined,
+					}}
+					className={cn(
+						'native:h-12 native:text-lg native:leading-[1.25] h-10 w-full text-base text-foreground placeholder:text-muted-foreground/50 focus:outline-none lg:text-sm',
+						className
+					)}
+					placeholderClassName={cn('text-muted-foreground', placeholderClassName)}
+					{...props}
+				/>
+			</View>
 		);
 	}
 );

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { use$ } from '@legendapp/state/react';
 import { router } from 'expo-router';
@@ -23,7 +22,7 @@ export default function Profile() {
 					className="flex w-full items-center justify-center gap-1 py-6"
 				>
 					<Avatar alt="User avatar" className="h-24 w-24">
-						<AvatarImage source={{ uri: avatar_url$ ? avatar_url$.toString() : undefined }} />
+						<AvatarImage source={{ uri: avatar_url$ ? avatar_url$ : undefined }} />
 						<AvatarFallback>
 							<Ionicons name="person" size={24} className="text-foreground" />
 						</AvatarFallback>

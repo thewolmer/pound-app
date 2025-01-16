@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { use$ } from '@legendapp/state/react';
 import { decode } from 'base64-arraybuffer';
@@ -88,7 +88,7 @@ const User = () => {
 						disabled={isUploading}
 					>
 						<Avatar alt="User avatar" className="h-24 w-24">
-							<AvatarImage source={{ uri: avatar_url$ ? avatar_url$.toString() : undefined }} />
+							<AvatarImage source={{ uri: avatar_url$ ? avatar_url$ : undefined }} />
 							<AvatarFallback>
 								<Ionicons name="person" size={24} className="text-foreground" />
 							</AvatarFallback>

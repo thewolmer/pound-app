@@ -135,7 +135,7 @@ export default function Register() {
 	const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 	return (
-		<SafeAreaView className="flex-1 items-center bg-background p-10">
+		<SafeAreaView className="items-center bg-background p-10">
 			<View className="w-full max-w-sm gap-8">
 				<View className="gap-2">
 					<View className="w-52">

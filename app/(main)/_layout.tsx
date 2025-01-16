@@ -30,6 +30,12 @@ export default function MainLayout() {
 						headerShown: false,
 					}}
 				/>
+				<Stack.Screen
+					name="search"
+					options={{
+						headerShown: false,
+					}}
+				/>
 			</Stack>
 		</AuthGuard>
 	);

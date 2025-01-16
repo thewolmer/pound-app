@@ -26,6 +26,7 @@ export default function TabsLayout() {
 					title: 'Scan',
 					headerShown: true,
 					tabBarLabel: '',
+					animation: 'fade',
 					tabBarStyle: { display: 'none' },
 					headerLeft(props) {
 						return (
@@ -54,6 +55,7 @@ export default function TabsLayout() {
 				name="(recent)"
 				options={{
 					title: 'Recent',
+					animation: 'shift',
 					tabBarStyle: { display: 'none' },
 					headerShown: false,
 					tabBarIcon: ({ color, focused }) => (

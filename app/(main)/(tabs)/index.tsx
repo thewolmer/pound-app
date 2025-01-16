@@ -67,9 +67,27 @@ export default function StartScreen() {
 		<SafeAreaView>
 			<ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
 				<View className="flex flex-col gap-2 px-4">
-					<View className="flex flex-row items-center justify-between px-2 text-foreground">
+					<View className="mt-4 flex flex-row items-center justify-between px-2 text-foreground">
 						<View className="w-28">
-							<PoundIcon />
+							<Pressable onPress={() => router.push('/(main)/search')}>
+								<PoundIcon />
+							</Pressable>
+						</View>
+						<View className="flex flex-row gap-3">
+							<Pressable
+								onPress={() => router.push('/(main)/search')}
+								className="flex items-center justify-center rounded-2xl bg-muted p-2"
+							>
+								<Ionicons name="search" size={20} className="text-foreground" />
+							</Pressable>
+							<Pressable onPress={() => router.push('/(main)/(profile)/profile')}>
+								<Avatar alt="User avatar">
+									<AvatarImage source={{ uri: avatarUrl$ || undefined }} />
+									<AvatarFallback>
+										<Ionicons name="person" size={24} className="text-foreground" />
+									</AvatarFallback>
+								</Avatar>
+							</Pressable>
 						</View>
 						<Pressable onPress={() => router.push('/(main)/(profile)/profile')}>
 							<Avatar alt="User avatar">

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { Link } from 'expo-router';
 import { Dimensions, FlatList, Image, StyleSheet, View } from 'react-native';
 
@@ -19,6 +19,7 @@ const { width, height } = Dimensions.get('screen');
 
 export default function Welcome() {
 	const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+	const { dismiss } = useBottomSheetModal();
 	const carouselRef = useRef<FlatList>(null);
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -82,27 +83,28 @@ export default function Welcome() {
 				<Text>Get Started</Text>
 			</Button>
 
-			<Modal snapPoints={['50%']} index={-1} ref={bottomSheetModalRef}>
-				<Button variant="outline" size={'lg'} className="flex w-full flex-row gap-4">
-					<Ionicons name="logo-google" size={24} className="text-foreground" />
-					<Text className="font-bold">Continue with Google</Text>
-				</Button>
-
-				<Button variant="outline" size={'lg'} className="flex w-full flex-row gap-4">
-					<Ionicons name="logo-apple" size={28} className="text-foreground" />
-					<Text className="font-bold">Continue with Apple</Text>
-				</Button>
-				<View className="my-2 w-full border border-border/50" />
-				<Link href="/auth/login" asChild>
-					<Button variant="secondary" size={'lg'} className="w-full">
-						<Text className="font-bold">Login with email</Text>
+			<Modal snapPoints={['50%']} ref={bottomSheetModalRef}>
+				<View className="gap-5 py-4">
+					<Button variant="outline" size={'lg'} className="flex w-full flex-row gap-4" onPress={() => dismiss()}>
+						<Ionicons name="logo-google" size={24} className="text-foreground" />
+						<Text className="font-bold">Continue with Google</Text>
 					</Button>
-				</Link>
-				<Link href="/auth/register" asChild>
-					<Button variant="default" size={'lg'} className="w-full">
-						<Text className="font-bold">Sign Up with email</Text>
+					<Button variant="outline" size={'lg'} className="flex w-full flex-row gap-4" onPress={() => dismiss()}>
+						<Ionicons name="logo-apple" size={28} className="text-foreground" />
+						<Text className="font-bold">Continue with Apple</Text>
 					</Button>
-				</Link>
+					<View className="my-2 w-full border border-border/50" />
+					<Link href="/auth/login" asChild onPress={() => dismiss()}>
+						<Button variant="secondary" size={'lg'} className="w-full">
+							<Text className="font-bold">Login with email</Text>
+						</Button>
+					</Link>
+					<Link href="/auth/register" asChild onPress={() => dismiss()}>
+						<Button variant="default" size={'lg'} className="w-full">
+							<Text className="font-bold">Sign Up with email</Text>
+						</Button>
+					</Link>
+				</View>
 			</Modal>
 		</View>
 	);

@@ -4,8 +4,8 @@ import { use$ } from '@legendapp/state/react';
 import { format } from 'date-fns';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, Image, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { BodyView } from '~/components/ui/body-view';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '~/components/ui/card';
 import { formatCurrency } from '~/lib/formatCurrency';
@@ -37,7 +37,7 @@ function Transaction() {
           origin_account:account_details!transaction_origin_account_id_fkey (*)
         `
 				)
-				.eq('id', id)
+				.eq('id', Array.isArray(id) ? id[0] : id)
 				.single();
 
 			if (data) {
@@ -80,7 +80,7 @@ function Transaction() {
 	}
 
 	return (
-		<SafeAreaView className="flex-1">
+		<BodyView>
 			<View className="gap-4 p-6">
 				<Card>
 					<CardHeader>
@@ -249,7 +249,7 @@ function Transaction() {
 					</CardHeader>
 				</Card>
 			</View>
-		</SafeAreaView>
+		</BodyView>
 	);
 }
 

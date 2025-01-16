@@ -4,12 +4,11 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Link } from 'expo-router';
 import { useAtom } from 'jotai/react';
 import { FlatList, Pressable, Text, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Card as CardType } from '~/api/deposit/card.types';
 import { Badge } from '~/components/ui/badge';
+import { BodyView } from '~/components/ui/body-view';
 import { Button } from '~/components/ui/button';
 import { Card, CardFooter, CardHeader } from '~/components/ui/card';
 import { IconWrapper } from '~/components/ui/icon-wrapper';
@@ -83,8 +82,8 @@ export default function ManageCards() {
 	};
 
 	return (
-		<SafeAreaView className="flex-1">
-			<ScrollView contentContainerStyle={{ padding: 16 }} contentInsetAdjustmentBehavior="automatic">
+		<>
+			<BodyView>
 				<View className="flex flex-col gap-4">
 					<FlatList
 						data={cards}
@@ -101,7 +100,7 @@ export default function ManageCards() {
 						}
 					/>
 				</View>
-			</ScrollView>
+			</BodyView>
 			<Modal
 				ref={menu}
 				onDismiss={() => {
@@ -175,6 +174,6 @@ export default function ManageCards() {
 					</>
 				)}
 			</Modal>
-		</SafeAreaView>
+		</>
 	);
 }

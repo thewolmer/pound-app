@@ -42,3 +42,11 @@ export const createContacts = async (
 		throw error;
 	}
 };
+
+export const deleteContact = async (contact_id: string) => {
+	const query = supabase.from('user_contacts').delete().eq('contact_id', contact_id);
+	const { error } = await query;
+	if (error) {
+		throw error;
+	}
+};

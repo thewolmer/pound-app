@@ -1,7 +1,7 @@
-import { useDeferredValue, useEffect, useRef, useState } from 'react';
+import { useDeferredValue, useRef } from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import type { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import { Fields, getContactsAsync, requestPermissionsAsync } from 'expo-contacts';
+import { use$ } from '@legendapp/state/react';
 import { router } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
 import { Image, Platform, Pressable, Text, View } from 'react-native';
@@ -10,22 +10,11 @@ import { FlatList } from 'react-native-gesture-handler';
 import { Input } from '../ui/input';
 import { Modal } from '../ui/modal';
 import { ForwardCard } from '~/components/ui/forward-card';
-import { useListAccountDetails } from '~/lib/pound/account-details/use-list-account-details';
-import { useCreateContacts } from '~/lib/pound/contacts/use-create-contacts';
-import { useListContacts } from '~/lib/pound/contacts/use-list-contacts';
+import { refreshContacts, syncDeviceContacts, userContacts$ } from '~/stores/user-contacts.store';
 import type { Tables } from '~/types/database.types';
 
 export const SendViaContact = () => {
-	const [emails, setEmails] = useState<string[]>([]);
-	const [isModalOpen, setIsModalOpen] = useState(false);
-
-	//TODO: @wol do something with loading states or remove them
-	const { data: contacts, isPending: isLoadingContacts } = useListContacts({ enabled: isModalOpen });
-	const { data: poundUsers, isPending: isLoadingPhoneContacts } = useListAccountDetails(
-		{ filterByEmails: emails },
-		{ enabled: emails.length > 0 }
-	);
-	const { mutate: createContacts, isPending: isCreatingContacts } = useCreateContacts();
+	const contacts$ = use$(userContacts$.contacts);
 
 	const contactsModalRef = useRef<BottomSheetModal>(null);
 
@@ -38,40 +27,14 @@ export const SendViaContact = () => {
 	const search = watch('search');
 	const deferredSearch = useDeferredValue(search);
 
-	useEffect(() => {
-		if (contacts && poundUsers) {
-			const existingContactsIds = new Set(contacts.map((contact) => contact.user_id as string));
-			const phoneContactsIds = new Set(poundUsers.map((contact) => contact.user_id as string));
-
-			const newContacts = [...phoneContactsIds].filter((id) => !existingContactsIds.has(id));
-			if (newContacts.length > 0) {
-				createContacts(newContacts);
-			}
-		}
-	}, [contacts, poundUsers, createContacts]);
-
-	const getDeviceContacts = async () => {
-		const { status } = await requestPermissionsAsync();
-		if (status === 'granted') {
-			const { data: contactData } = await getContactsAsync({
-				fields: [Fields.Name, Fields.Image, Fields.PhoneNumbers, Fields.Emails],
-			});
-
-			const emails = contactData
-				.flatMap((contact) => contact.emails?.map((email) => email.email?.toLowerCase()) || [])
-				.filter((email): email is string => !!email);
-
-			setEmails(emails);
-		}
-	};
-
 	const openContactsModal = async () => {
 		contactsModalRef.current?.present();
-		await getDeviceContacts();
-		setIsModalOpen(true);
+		await refreshContacts();
+		// TODO: maybe we should sync contacts on some kind of interval (1 day or something)
+		await syncDeviceContacts();
 	};
 
-	const filteredContacts = contacts?.filter((contact) =>
+	const filteredContacts = Object.values(contacts$).filter((contact) =>
 		contact.display_name?.toLowerCase().includes(deferredSearch.toLowerCase())
 	);
 

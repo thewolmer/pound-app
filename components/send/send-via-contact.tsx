@@ -120,7 +120,7 @@ export const SendViaContact = () => {
 	);
 };
 
-const renderContactItem = ({
+export const renderContactItem = ({
 	item,
 	ref,
 }: {

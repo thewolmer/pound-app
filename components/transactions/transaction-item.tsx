@@ -83,18 +83,18 @@ export function TransactionItem({
 				</View>
 
 				<View>
-					<Text className="text-md font-bold text-foreground">{accountDetails.displayName}</Text>
+					<Text className="font-heading text-sm text-foreground">{accountDetails.displayName}</Text>
 					{onlyShowTime ? (
-						<Text className="text-sm text-muted-foreground">{format(new Date(item.created_at || ''), 'h:mm a')}</Text>
+						<Text className="text-xs text-muted-foreground">{format(new Date(item.created_at || ''), 'h:mm a')}</Text>
 					) : (
-						<Text className="text-sm text-muted-foreground">{formatTransactionDate(item.created_at || '')}</Text>
+						<Text className="text-xs text-muted-foreground">{formatTransactionDate(item.created_at || '')}</Text>
 					)}
 				</View>
 			</View>
 			<Text
 				className={cn(
 					item.destination_account_id === accountId$ ? 'text-success-foreground' : 'text-destructive-foreground',
-					'font-semibold'
+					'text-base font-semibold'
 				)}
 			>
 				{item.destination_account_id === accountId$ ? '+' : '-'}

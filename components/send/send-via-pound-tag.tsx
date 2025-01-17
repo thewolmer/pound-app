@@ -1,22 +1,16 @@
-import React, { useCallback, useRef, useState } from 'react';
-import {
-	BottomSheetBackdrop,
-	type BottomSheetBackdropProps,
-	BottomSheetModal,
-	BottomSheetTextInput,
-	BottomSheetView,
-} from '@gorhom/bottom-sheet';
+import React, { useRef, useState } from 'react';
+import { BottomSheetModal, BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { use$ } from '@legendapp/state/react';
 import { router } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Text, View } from 'react-native';
+import { ActivityIndicator, Platform, Text, View } from 'react-native';
 import { z } from 'zod';
 
-import { Input } from '../ui/input';
 import { Button } from '~/components/ui/button';
 import { ForwardCard } from '~/components/ui/forward-card';
-import { H3 } from '~/components/ui/typography';
+import { Input } from '~/components/ui/input';
+import { Modal } from '~/components/ui/modal';
 import { supabase } from '~/lib/supabase';
 import { auth$ } from '~/stores/auth.store';
 
@@ -40,13 +34,6 @@ export const SendViaPoundTag = () => {
 		resolver: zodResolver(PoundTagSchema),
 		defaultValues: { poundTag: '' },
 	});
-
-	const renderBackDrop = useCallback(
-		(backdropProps: BottomSheetBackdropProps) => (
-			<BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...backdropProps} />
-		),
-		[]
-	);
 
 	const handleVerifyTag = async (data: PoundTagFormValues) => {
 		setLoading(true);
@@ -89,71 +76,49 @@ export const SendViaPoundTag = () => {
 				description="Send money to someone using their pound tag."
 				onPress={openPoundTagModal}
 			/>
-			<BottomSheetModal
-				backdropComponent={renderBackDrop}
-				ref={poundTagModalRef}
-				snapPoints={['80%']}
-				enableDynamicSizing
-				enableDismissOnClose
-				handleIndicatorStyle={{ backgroundColor: '#fff' }}
-				backgroundStyle={{ backgroundColor: 'transparent' }}
-			>
-				<KeyboardAvoidingView
-					keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-					className="flex-1"
-				>
-					<BottomSheetView className="flex-1 gap-5 rounded-t-2xl bg-card p-5 py-10">
-						<H3>Send Via Pound Tag</H3>
+			<Modal ref={poundTagModalRef} title={'Send via Pound tag'}>
+				{/* Form Input */}
+				<Controller
+					name="poundTag"
+					control={control}
+					render={({ field: { onChange, value } }) =>
+						Platform.OS === 'ios' ? (
+							<BottomSheetTextInput
+								placeholder="poundtag"
+								value={value}
+								onChangeText={onChange}
+								autoCapitalize="none"
+								returnKeyType="next"
+								className={`rounded-xl border border-border bg-muted p-2 text-foreground ${
+									errors.poundTag ? 'border-destructive-foreground' : ''
+								}`}
+							/>
+						) : (
+							<Input
+								placeholder="poundtag"
+								value={value}
+								onChangeText={onChange}
+								autoCapitalize="none"
+								returnKeyType="next"
+								className={errors.poundTag ? 'border-destructive-foreground' : ''}
+							/>
+						)
+					}
+				/>
+				{errors.poundTag && <Text className="text-destructive-foreground">{errors.poundTag.message}</Text>}
 
-						{/* Form Input */}
-						<Controller
-							name="poundTag"
-							control={control}
-							render={({ field: { onChange, value } }) =>
-								Platform.OS === 'ios' ? (
-									<BottomSheetTextInput
-										placeholder="poundtag"
-										value={value}
-										onChangeText={onChange}
-										autoCapitalize="none"
-										returnKeyType="next"
-										className={`rounded-xl border border-border bg-muted p-2 text-foreground ${
-											errors.poundTag ? 'border-destructive-foreground' : ''
-										}`}
-									/>
-								) : (
-									<Input
-										placeholder="poundtag"
-										value={value}
-										onChangeText={onChange}
-										autoCapitalize="none"
-										returnKeyType="next"
-										className={errors.poundTag ? 'border-destructive-foreground' : ''}
-									/>
-								)
-							}
-						/>
-						{errors.poundTag && <Text className="text-destructive-foreground">{errors.poundTag.message}</Text>}
+				{/* Submit Button */}
+				<Button onPress={handleSubmit(handleVerifyTag)} className="mt-5">
+					{isLoading ? <ActivityIndicator color={'white'} /> : <Text className="text-primary-foreground">Next</Text>}
+				</Button>
 
-						{/* Submit Button */}
-						<Button onPress={handleSubmit(handleVerifyTag)} className="mt-5">
-							{isLoading ? (
-								<ActivityIndicator color={'white'} />
-							) : (
-								<Text className="text-primary-foreground">Next</Text>
-							)}
-						</Button>
-
-						{/* Info Section */}
-						<View>
-							<Text className="text-center text-sm text-muted-foreground">
-								TODO: a section here to explain what a pound tag is
-							</Text>
-						</View>
-					</BottomSheetView>
-				</KeyboardAvoidingView>
-			</BottomSheetModal>
+				{/* Info Section */}
+				<View>
+					<Text className="text-center text-sm text-muted-foreground">
+						TODO: a section here to explain what a pound tag is
+					</Text>
+				</View>
+			</Modal>
 		</>
 	);
 };

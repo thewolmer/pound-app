@@ -4,11 +4,11 @@ import { use$ } from '@legendapp/state/react';
 import { decode } from 'base64-arraybuffer';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { launchImageLibraryAsync } from 'expo-image-picker';
-import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 
 import { UserDetailsForm } from '~/components/forms/user-details';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
+import { BodyView } from '~/components/ui/body-view';
 import { supabase } from '~/lib/supabase';
 import { updateUser, user$ } from '~/stores/user.store';
 
@@ -79,32 +79,30 @@ const User = () => {
 	};
 
 	return (
-		<SafeAreaView className="w-full flex-1">
-			<ScrollView contentInsetAdjustmentBehavior="automatic" className="flex w-full flex-1 p-6 text-foreground">
-				<View className="flex items-center justify-center">
-					<Pressable
-						onPress={handleUploadAvatar}
-						className="relative flex w-40 items-center justify-center"
-						disabled={isUploading}
-					>
-						<Avatar alt="User avatar" className="h-24 w-24">
-							<AvatarImage source={{ uri: avatar_url$ ? avatar_url$ : undefined }} />
-							<AvatarFallback>
-								<Ionicons name="person" size={24} className="text-foreground" />
-							</AvatarFallback>
-						</Avatar>
-						{isUploading && <ActivityIndicator size={'large'} className="absolute" />}
-						{!isUploading && (
-							<View className="absolute bottom-0 right-4 rounded-full bg-secondary p-2 shadow">
-								<Ionicons name="create-outline" size={18} className="text-secondary-foreground" />
-							</View>
-						)}
-					</Pressable>
-				</View>
+		<BodyView className="p-5">
+			<View className="flex items-center justify-center">
+				<Pressable
+					onPress={handleUploadAvatar}
+					className="relative flex w-40 items-center justify-center"
+					disabled={isUploading}
+				>
+					<Avatar alt="User avatar" className="h-24 w-24">
+						<AvatarImage source={{ uri: avatar_url$ ? avatar_url$ : undefined }} />
+						<AvatarFallback>
+							<Ionicons name="person" size={24} className="text-foreground" />
+						</AvatarFallback>
+					</Avatar>
+					{isUploading && <ActivityIndicator size={'large'} className="absolute" />}
+					{!isUploading && (
+						<View className="absolute bottom-0 right-4 rounded-full bg-secondary p-2 shadow">
+							<Ionicons name="create-outline" size={18} className="text-secondary-foreground" />
+						</View>
+					)}
+				</Pressable>
+			</View>
 
-				<UserDetailsForm />
-			</ScrollView>
-		</SafeAreaView>
+			<UserDetailsForm />
+		</BodyView>
 	);
 };
 

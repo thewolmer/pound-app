@@ -51,10 +51,15 @@ export const ForwardCard: React.FC<ForwardCardProps> = ({
 					{IconLeft && !ionicons && <>{IconLeft}</>}
 					<View>
 						<CardHeader className="pb-0">
-							<Text className={cn(titleClassName, 'text-lg font-bold text-card-foreground')}>{title}</Text>
+							<Text className={cn(titleClassName, 'font-heading text-lg font-bold text-card-foreground')}>{title}</Text>
 						</CardHeader>
 						<CardFooter>
-							<Text className={cn('w-[95%] truncate text-balance text-sm text-muted-foreground', descriptionClassName)}>
+							<Text
+								className={cn(
+									'w-[95%] truncate text-balance font-body text-sm text-muted-foreground',
+									descriptionClassName
+								)}
+							>
 								{description}
 							</Text>
 						</CardFooter>

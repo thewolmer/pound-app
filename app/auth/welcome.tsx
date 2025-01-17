@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { BottomSheetBackdrop, type BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet';
-import BottomSheet from '@gorhom/bottom-sheet';
+import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { Link } from 'expo-router';
 import { Dimensions, FlatList, Image, StyleSheet, View } from 'react-native';
 
 import { Button } from '~/components/ui/button';
+import { Modal } from '~/components/ui/modal';
 import { Text } from '~/components/ui/text';
 
 const placeholderImages = [
@@ -18,21 +18,15 @@ const placeholderImages = [
 const { width, height } = Dimensions.get('screen');
 
 export default function Welcome() {
-	const bottomSheetModalRef = useRef<BottomSheet>(null);
+	const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+	const { dismiss } = useBottomSheetModal();
 	const carouselRef = useRef<FlatList>(null);
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
 	const handlePresentModalPress = useCallback(() => {
-		bottomSheetModalRef.current?.snapToIndex(0);
+		bottomSheetModalRef.current?.present();
 	}, []);
-
-	const renderBackDrop = useCallback(
-		(backdropProps: BottomSheetBackdropProps) => (
-			<BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...backdropProps} />
-		),
-		[]
-	);
 
 	const startAutoplay = () => {
 		clearInterval(intervalRef.current as unknown as number);
@@ -85,43 +79,33 @@ export default function Welcome() {
 				)}
 			/>
 
-			<Button size={'lg'} onPress={handlePresentModalPress} className="w-full">
+			<Button size={'lg'} onPress={handlePresentModalPress}>
 				<Text>Get Started</Text>
 			</Button>
 
-			<BottomSheet
-				backdropComponent={renderBackDrop}
-				snapPoints={['50%']}
-				index={-1}
-				enablePanDownToClose
-				ref={bottomSheetModalRef}
-			>
-				<BottomSheetView className="flex-1 gap-4 p-5">
-					<Button variant="outline" size={'lg'} className="flex w-full flex-row gap-4">
+			<Modal snapPoints={['50%']} ref={bottomSheetModalRef}>
+				<View className="gap-5 py-4">
+					<Button variant="outline" size={'lg'} className="flex w-full flex-row gap-4" onPress={() => dismiss()}>
 						<Ionicons name="logo-google" size={24} className="text-foreground" />
 						<Text className="font-bold">Continue with Google</Text>
 					</Button>
-
-					<Button variant="outline" size={'lg'} className="flex w-full flex-row gap-4">
+					<Button variant="outline" size={'lg'} className="flex w-full flex-row gap-4" onPress={() => dismiss()}>
 						<Ionicons name="logo-apple" size={28} className="text-foreground" />
 						<Text className="font-bold">Continue with Apple</Text>
 					</Button>
-
 					<View className="my-2 w-full border border-border/50" />
-
-					<Link href="/auth/login" asChild>
+					<Link href="/auth/login" asChild onPress={() => dismiss()}>
 						<Button variant="secondary" size={'lg'} className="w-full">
 							<Text className="font-bold">Login with email</Text>
 						</Button>
 					</Link>
-
-					<Link href="/auth/register" asChild>
+					<Link href="/auth/register" asChild onPress={() => dismiss()}>
 						<Button variant="default" size={'lg'} className="w-full">
 							<Text className="font-bold">Sign Up with email</Text>
 						</Button>
 					</Link>
-				</BottomSheetView>
-			</BottomSheet>
+				</View>
+			</Modal>
 		</View>
 	);
 }

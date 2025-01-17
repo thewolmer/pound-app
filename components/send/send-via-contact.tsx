@@ -1,11 +1,5 @@
-import { useCallback, useDeferredValue, useRef } from 'react';
-import { Ionicons } from '@expo/vector-icons';
-import {
-	BottomSheetBackdrop,
-	type BottomSheetBackdropProps,
-	BottomSheetModal,
-	BottomSheetView,
-} from '@gorhom/bottom-sheet';
+import { useDeferredValue, useRef } from 'react';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import type { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { use$ } from '@legendapp/state/react';
 import { router } from 'expo-router';
@@ -14,9 +8,8 @@ import { Image, Platform, Pressable, Text, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 
 import { Input } from '../ui/input';
-import { Button } from '~/components/ui/button';
+import { Modal } from '../ui/modal';
 import { ForwardCard } from '~/components/ui/forward-card';
-import { H3 } from '~/components/ui/typography';
 import { refreshContacts, syncDeviceContacts, userContacts$ } from '~/stores/user-contacts.store';
 import type { Tables } from '~/types/database.types';
 
@@ -33,13 +26,6 @@ export const SendViaContact = () => {
 
 	const search = watch('search');
 	const deferredSearch = useDeferredValue(search);
-
-	const renderBackDrop = useCallback(
-		(backdropProps: BottomSheetBackdropProps) => (
-			<BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...backdropProps} />
-		),
-		[]
-	);
 
 	const openContactsModal = async () => {
 		contactsModalRef.current?.present();
@@ -60,62 +46,44 @@ export const SendViaContact = () => {
 				description="Send money to someone in your contacts"
 				onPress={openContactsModal}
 			/>
-			<BottomSheetModal
-				backdropComponent={renderBackDrop}
-				ref={contactsModalRef}
-				snapPoints={['85%']}
-				enableDismissOnClose
-				handleIndicatorStyle={{ backgroundColor: '#fff' }}
-				backgroundStyle={{ backgroundColor: 'transparent' }}
-				onDismiss={() => {}}
-			>
-				<BottomSheetView className="h-full flex-1 gap-5 rounded-t-2xl bg-card p-5">
-					<View className="flex flex-row items-center justify-between">
-						<H3>Select a contact</H3>
-						<Button variant={'link'} onPress={() => contactsModalRef.current?.close()}>
-							<Ionicons name="close" size={24} className="text-foreground" />
-						</Button>
-					</View>
-
-					<Controller
-						name="search"
-						control={control}
-						render={({ field: { onChange, value } }) =>
-							Platform.OS === 'ios' ? (
-								<Input
-									placeholder="Search by name"
-									value={value}
-									onChangeText={onChange}
-									className="rounded-xl border border-border bg-muted p-2 text-foreground"
-								/>
-							) : (
-								<Input
-									placeholder="Search by name"
-									value={value}
-									onChangeText={onChange}
-									className="rounded-xl border border-border bg-muted p-2 text-foreground"
-								/>
-							)
-						}
-					/>
-
-					<FlatList
-						data={filteredContacts}
-						keyExtractor={(item) => item.user_id || ''}
-						renderItem={(props) => renderContactItem({ ...props, ref: contactsModalRef })}
-						ListEmptyComponent={
-							<View className="flex-1 items-center justify-center">
-								<Text className="text-muted-foreground">No contact found.</Text>
-							</View>
-						}
-					/>
-				</BottomSheetView>
-			</BottomSheetModal>
+			<Modal ref={contactsModalRef} title="Select a Contact">
+				<Controller
+					name="search"
+					control={control}
+					render={({ field: { onChange, value } }) =>
+						Platform.OS === 'ios' ? (
+							<Input
+								placeholder="Search by name"
+								value={value}
+								onChangeText={onChange}
+								className="rounded-xl border border-border bg-muted p-2 text-foreground"
+							/>
+						) : (
+							<Input
+								placeholder="Search by name"
+								value={value}
+								onChangeText={onChange}
+								className="rounded-xl border border-border bg-muted p-2 text-foreground"
+							/>
+						)
+					}
+				/>
+				<FlatList
+					data={filteredContacts}
+					keyExtractor={(item) => item.user_id || ''}
+					renderItem={(props) => renderContactItem({ ...props, ref: contactsModalRef })}
+					ListEmptyComponent={
+						<View className="flex-1 items-center justify-center">
+							<Text className="text-muted-foreground">No contact found.</Text>
+						</View>
+					}
+				/>
+			</Modal>
 		</>
 	);
 };
 
-const renderContactItem = ({
+export const renderContactItem = ({
 	item,
 	ref,
 }: {

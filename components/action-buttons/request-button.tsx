@@ -1,11 +1,6 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import {
-	BottomSheetBackdrop,
-	type BottomSheetBackdropProps,
-	BottomSheetModal,
-	BottomSheetView,
-} from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { use$ } from '@legendapp/state/react';
 import { shareAsync } from 'expo-sharing';
@@ -20,6 +15,7 @@ import { Button } from '../ui/button';
 import { Card, CardFooter, CardHeader } from '../ui/card';
 import { IconWrapper } from '../ui/icon-wrapper';
 import { Input } from '../ui/input';
+import { Modal } from '../ui/modal';
 import { H3 } from '../ui/typography';
 import { NAV_THEME } from '~/constants/theme';
 import { parseCurrency } from '~/lib/formatCurrency';
@@ -42,13 +38,6 @@ export const RequestButton = () => {
 	const { triggerHaptics } = useHaptics();
 	const qrCodeRef = useRef(null);
 
-	const renderBackDrop = useCallback(
-		(backdropProps: BottomSheetBackdropProps) => (
-			<BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...backdropProps} />
-		),
-		[]
-	);
-
 	const {
 		control,
 		handleSubmit,
@@ -66,7 +55,6 @@ export const RequestButton = () => {
 	const amount = getValues('amount');
 	const handleClose = () => {
 		Keyboard.dismiss();
-		requestModal.current?.dismiss();
 		reset();
 		setReference(null);
 	};
@@ -114,123 +102,112 @@ export const RequestButton = () => {
 				</IconWrapper>
 				<Text className="text-xs font-semibold text-muted-foreground">Request</Text>
 			</Button>
-			<BottomSheetModal
-				backdropComponent={renderBackDrop}
+			<Modal
 				ref={requestModal}
-				snapPoints={['80']}
-				enableDismissOnClose
 				enablePanDownToClose={false}
-				handleIndicatorStyle={{ backgroundColor: '#fff' }}
-				backgroundStyle={{ backgroundColor: 'transparent' }}
+				className={cn('transition-all duration-700', reference ? 'bg-cyan-50' : 'bg-card')}
 				onDismiss={() => {
 					handleClose();
 				}}
 			>
-				<BottomSheetView
-					className={cn(
-						'flex-1 gap-5 rounded-t-2xl p-5 transition-all duration-700',
-						reference ? 'bg-cyan-50' : 'bg-card'
-					)}
-				>
-					{!reference && (
-						<Animated.View entering={SlideInDown} exiting={SlideOutDown}>
-							<Card>
-								<CardHeader>
-									<H3>Request Money</H3>
-								</CardHeader>
-								<CardFooter className="flex flex-col gap-4">
-									<View className="flex flex-col gap-2">
-										<Controller
-											name="amount"
-											control={control}
-											render={({ field: { onChange, value } }) => (
-												<View className="flex flex-row items-center justify-between gap-1">
-													<Text className="w-[10%] text-2xl font-semibold text-muted-foreground">£</Text>
-													<Input
-														keyboardType="decimal-pad"
-														className="w-[90%] text-2xl placeholder:font-extrabold placeholder:text-muted-foreground"
-														value={isDirty ? value.toString() : ''}
-														autoFocus
-														onChangeText={(text) => onChange(parseCurrency(text))}
-														placeholder="Enter amount"
-													/>
-												</View>
-											)}
-										/>
-										{errors.amount && <Text className="text-red-500">{errors.amount.message}</Text>}
-									</View>
-									<View className="flex w-full flex-row justify-between gap-2">
-										<Button variant={'outline'} className="w-1/2" onPress={() => handleClose()}>
-											<Text className="text-foreground"> Cancel</Text>
-										</Button>
-										<Button className="w-1/2" onPress={handleSubmit(onSubmit)}>
-											<Text className="text-primary-foreground">Create QR Code</Text>
-										</Button>
-									</View>
-								</CardFooter>
-							</Card>
-						</Animated.View>
-					)}
-
-					{reference && isValid && (
-						<Animated.View entering={SlideInDown} exiting={SlideOutUp}>
-							<Button
-								variant={'ghost'}
-								size={'icon'}
-								onPress={handleShareQR}
-								className="absolute inset-0 left-2 top-0 z-50"
-							>
-								<Ionicons name="share-outline" className="text-foreground" size={24} />
-							</Button>
-
-							<H3 className={cn('text-center', reference ? 'text-neutral-800' : '')}>Payment Request</H3>
-							<View className="items-center rounded-xl p-6">
-								<Text
-									className={cn('mb-6 text-2xl font-bold', reference ? 'text-neutral-800' : 'text-accent-foreground')}
-								>
-									£{amount}
-								</Text>
-								<View>
-									<QRCodeStyled
-										ref={qrCodeRef}
-										data={JSON.stringify({
-											type: 'payment_request',
-											accountId: accountId$,
-											amount,
-											reference,
-										})}
-										padding={5}
-										pieceSize={6}
-										pieceCornerType="rounded"
-										isPiecesGlued
-										pieceBorderRadius={2}
-										outerEyesOptions={{
-											borderRadius: 10,
-											color: NAV_THEME.dark.primary,
-											strokeWidth: 2,
-											stroke: NAV_THEME.dark.primary,
-										}}
-										logo={{
-											href: logoFromFile,
-											hidePieces: false,
-											scale: 1.1,
-										}}
+				{!reference && (
+					<Animated.View entering={SlideInDown} exiting={SlideOutDown}>
+						<Card>
+							<CardHeader>
+								<H3>Request Money</H3>
+							</CardHeader>
+							<CardFooter className="flex flex-col gap-4">
+								<View className="flex flex-col gap-2">
+									<Controller
+										name="amount"
+										control={control}
+										render={({ field: { onChange, value } }) => (
+											<View className="flex flex-row items-center justify-between gap-1">
+												<Text className="w-[10%] text-2xl font-semibold text-muted-foreground">£</Text>
+												<Input
+													keyboardType="decimal-pad"
+													className="w-[90%] text-2xl placeholder:font-extrabold placeholder:text-muted-foreground"
+													value={isDirty ? value.toString() : ''}
+													autoFocus
+													onChangeText={(text) => onChange(parseCurrency(text))}
+													placeholder="Enter amount"
+												/>
+											</View>
+										)}
 									/>
+									{errors.amount && <Text className="text-red-500">{errors.amount.message}</Text>}
 								</View>
-								<Button
-									className="mt-20 w-full max-w-sm"
-									variant={'default'}
-									onPress={() => {
-										handleClose();
+								<View className="flex w-full flex-row justify-between gap-2">
+									<Button variant={'outline'} className="w-1/2" onPress={() => requestModal.current?.dismiss()}>
+										<Text className="text-foreground"> Cancel</Text>
+									</Button>
+									<Button className="w-1/2" onPress={handleSubmit(onSubmit)}>
+										<Text className="text-primary-foreground">Create QR Code</Text>
+									</Button>
+								</View>
+							</CardFooter>
+						</Card>
+					</Animated.View>
+				)}
+
+				{reference && isValid && (
+					<Animated.View entering={SlideInDown} exiting={SlideOutUp}>
+						<Button
+							variant={'ghost'}
+							size={'icon'}
+							onPress={handleShareQR}
+							className="absolute inset-0 left-2 top-0 z-50"
+						>
+							<Ionicons name="share-outline" className="text-foreground" size={24} />
+						</Button>
+
+						<H3 className={cn('text-center', reference ? 'text-neutral-800' : '')}>Payment Request</H3>
+						<View className="items-center rounded-xl p-6">
+							<Text
+								className={cn('mb-6 text-2xl font-bold', reference ? 'text-neutral-800' : 'text-accent-foreground')}
+							>
+								£{amount}
+							</Text>
+							<View>
+								<QRCodeStyled
+									ref={qrCodeRef}
+									data={JSON.stringify({
+										type: 'payment_request',
+										accountId: accountId$,
+										amount,
+										reference,
+									})}
+									padding={5}
+									pieceSize={6}
+									pieceCornerType="rounded"
+									isPiecesGlued
+									pieceBorderRadius={2}
+									outerEyesOptions={{
+										borderRadius: 10,
+										color: NAV_THEME.dark.primary,
+										strokeWidth: 2,
+										stroke: NAV_THEME.dark.primary,
 									}}
-								>
-									<Text className="text-primary-foreground">Close</Text>
-								</Button>
+									logo={{
+										href: logoFromFile,
+										hidePieces: false,
+										scale: 1.1,
+									}}
+								/>
 							</View>
-						</Animated.View>
-					)}
-				</BottomSheetView>
-			</BottomSheetModal>
+							<Button
+								className="mt-20 w-full max-w-sm"
+								variant={'default'}
+								onPress={() => {
+									requestModal.current?.dismiss();
+								}}
+							>
+								<Text className="text-primary-foreground">Close</Text>
+							</Button>
+						</View>
+					</Animated.View>
+				)}
+			</Modal>
 		</>
 	);
 };

@@ -7,9 +7,10 @@ import { endOfMonth, isBefore } from 'date-fns';
 import { router } from 'expo-router';
 import { openBrowserAsync } from 'expo-web-browser';
 import { Controller, useForm } from 'react-hook-form';
-import { ActivityIndicator, SafeAreaView, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
 import { z } from 'zod';
 
+import { BodyView } from '~/components/ui/body-view';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Env } from '~/config/env';
@@ -139,118 +140,109 @@ export default function AddCard() {
 	};
 
 	return (
-		<SafeAreaView className="flex-1">
-			<ScrollView contentContainerStyle={{ padding: 16 }}>
-				{/* Card Number */}
-				<View className="mb-4">
-					<Controller
-						name="cardNumber"
-						control={control}
-						render={({ field: { onChange, value } }) => (
-							<View className="relative">
-								{cardType?.type ? (
-									<View
-										style={{ position: 'absolute', left: 12, top: 12, zIndex: 10 }}
-										className="text-muted-foreground"
-									>
-										{getCardIcon(cardType.type)}
-									</View>
-								) : (
-									<Ionicons
-										name={'card-outline'}
-										size={24}
-										className="text-muted-foreground"
-										style={{ position: 'absolute', left: 12, top: 12, zIndex: 10 }}
-									/>
-								)}
-								<Input
-									keyboardType="numeric"
-									placeholder="Card Number"
-									textContentType="creditCardNumber"
-									value={value}
-									onChangeText={onChange}
-									maxLength={19}
-									className="border-border"
-									style={{
-										paddingLeft: 50,
-										borderWidth: 1,
-										borderRadius: 8,
-										height: 48,
-									}}
+		<BodyView>
+			{/* Card Number */}
+			<View className="mb-4">
+				<Controller
+					name="cardNumber"
+					control={control}
+					render={({ field: { onChange, value } }) => (
+						<View className="relative">
+							{cardType?.type ? (
+								<View style={{ position: 'absolute', left: 12, top: 12, zIndex: 10 }} className="text-muted-foreground">
+									{getCardIcon(cardType.type)}
+								</View>
+							) : (
+								<Ionicons
+									name={'card-outline'}
+									size={24}
+									className="text-muted-foreground"
+									style={{ position: 'absolute', left: 12, top: 12, zIndex: 10 }}
 								/>
-							</View>
-						)}
-					/>
-					{errors.cardNumber && <Text className="mt-1 text-sm text-red-500">{errors.cardNumber.message}</Text>}
-				</View>
-
-				{/* Expiry Date */}
-				<View className="mb-4">
-					<Controller
-						name="expiryDate"
-						control={control}
-						render={({ field: { onChange, value } }) => (
-							<Input
-								textContentType="creditCardExpiration"
-								placeholder="MM/YY"
-								value={value}
-								keyboardType="numeric"
-								onChangeText={onChange}
-								maxLength={5}
-							/>
-						)}
-					/>
-					{errors.expiryDate && <Text className="mt-1 text-sm text-red-500">{errors.expiryDate.message}</Text>}
-				</View>
-
-				{/* CVV */}
-				<View className="mb-4">
-					<Controller
-						name="cvv"
-						control={control}
-						render={({ field: { onChange, value } }) => (
+							)}
 							<Input
 								keyboardType="numeric"
-								placeholder={`CVV (${cardType?.code?.size || 3} digits)`}
+								placeholder="Card Number"
+								textContentType="creditCardNumber"
 								value={value}
 								onChangeText={onChange}
-								textContentType="creditCardSecurityCode"
-								secureTextEntry
-								maxLength={cardType?.code?.size || 3}
-								className="rounded-md border p-3"
+								maxLength={19}
+								className="border-border"
+								style={{
+									paddingLeft: 50,
+									borderWidth: 1,
+									borderRadius: 8,
+									height: 48,
+								}}
 							/>
-						)}
-					/>
-					{errors.cvv && <Text className="mt-1 text-sm text-red-500">{errors.cvv.message}</Text>}
-				</View>
-
-				{/* Cardholder Name */}
-				<View className="mb-4">
-					<Controller
-						name="cardHolderName"
-						control={control}
-						render={({ field: { onChange, value } }) => (
-							<Input
-								placeholder="Cardholder Name"
-								value={value}
-								textContentType="name"
-								onChangeText={onChange}
-								className="rounded-md border p-3"
-							/>
-						)}
-					/>
-					{errors.cardHolderName && <Text className="mt-1 text-sm text-red-500">{errors.cardHolderName.message}</Text>}
-				</View>
-
-				{/* Submit Button */}
-				<Button disabled={isPending} onPress={handleSubmit(onSubmit)}>
-					{isPending ? (
-						<ActivityIndicator color={'white'} />
-					) : (
-						<Text className="text-primary-foreground">Add Card</Text>
+						</View>
 					)}
-				</Button>
-			</ScrollView>
-		</SafeAreaView>
+				/>
+				{errors.cardNumber && <Text className="mt-1 text-sm text-red-500">{errors.cardNumber.message}</Text>}
+			</View>
+
+			{/* Expiry Date */}
+			<View className="mb-4">
+				<Controller
+					name="expiryDate"
+					control={control}
+					render={({ field: { onChange, value } }) => (
+						<Input
+							textContentType="creditCardExpiration"
+							placeholder="MM/YY"
+							value={value}
+							keyboardType="numeric"
+							onChangeText={onChange}
+							maxLength={5}
+						/>
+					)}
+				/>
+				{errors.expiryDate && <Text className="mt-1 text-sm text-red-500">{errors.expiryDate.message}</Text>}
+			</View>
+
+			{/* CVV */}
+			<View className="mb-4">
+				<Controller
+					name="cvv"
+					control={control}
+					render={({ field: { onChange, value } }) => (
+						<Input
+							keyboardType="numeric"
+							placeholder={`CVV (${cardType?.code?.size || 3} digits)`}
+							value={value}
+							onChangeText={onChange}
+							textContentType="creditCardSecurityCode"
+							secureTextEntry
+							maxLength={cardType?.code?.size || 3}
+							className="rounded-md border p-3"
+						/>
+					)}
+				/>
+				{errors.cvv && <Text className="mt-1 text-sm text-red-500">{errors.cvv.message}</Text>}
+			</View>
+
+			{/* Cardholder Name */}
+			<View className="mb-4">
+				<Controller
+					name="cardHolderName"
+					control={control}
+					render={({ field: { onChange, value } }) => (
+						<Input
+							placeholder="Cardholder Name"
+							value={value}
+							textContentType="name"
+							onChangeText={onChange}
+							className="rounded-md border p-3"
+						/>
+					)}
+				/>
+				{errors.cardHolderName && <Text className="mt-1 text-sm text-red-500">{errors.cardHolderName.message}</Text>}
+			</View>
+
+			{/* Submit Button */}
+			<Button disabled={isPending} onPress={handleSubmit(onSubmit)}>
+				{isPending ? <ActivityIndicator color={'white'} /> : <Text className="text-primary-foreground">Add Card</Text>}
+			</Button>
+		</BodyView>
 	);
 }

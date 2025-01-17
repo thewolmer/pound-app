@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { use$ } from '@legendapp/state/react';
 import { router } from 'expo-router';
-import { Platform, SafeAreaView, ScrollView, Text, View } from 'react-native';
+import { Platform, Text, View } from 'react-native';
 import { z } from 'zod';
 
+import { BodyView } from '~/components/ui/body-view';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { useDebounce } from '~/hooks/useDebounce';
@@ -70,44 +71,42 @@ export default function UpdateTag() {
 	};
 
 	return (
-		<SafeAreaView className="w-full flex-1 p-6">
-			<ScrollView contentInsetAdjustmentBehavior="automatic" className="flex w-full flex-1 p-6">
-				<View className="mb-10 flex flex-1">
-					<Text className="mb-4 text-lg text-foreground">
-						{initialTag
-							? `Your Pound Tag is @${initialTag},\nYou can change it here if you want`
-							: 'Pound tag is used to send you money,\nAdd a New Tag'}
-					</Text>
-					<Input
-						value={tag}
-						onChangeText={handleTagChange}
-						returnKeyType="done"
-						placeholder={initialTag || 'Enter your tag'}
-						autoCapitalize="none"
-						secureTextEntry={Platform.OS !== 'ios'}
-						keyboardType={Platform.OS === 'ios' ? undefined : 'visible-password'}
-						autoFocus
-					/>
-					{/* TODO: Add a loading indicator */}
-					{debouncedTag && !error && debouncedTag !== initialTag ? (
-						!isAvailable && !error ? (
-							<Text className="mt-2 text-destructive-foreground">Tag is already taken</Text>
-						) : (
-							<Text className="mt-2 text-success-foreground">
-								{debouncedTag.startsWith('@') ? debouncedTag : '@' + debouncedTag} is available
-							</Text>
-						)
-					) : null}
-					{error && <Text className="mt-2 text-destructive-foreground">{error}</Text>}
-				</View>
-				<Button onPress={handleSubmit} disabled={loading || !!error || !isAvailable || initialTag === tag}>
-					{initialTag ? (
-						<Text className="text-white">{loading ? 'Updating...' : 'Update'}</Text>
+		<BodyView className="p-5">
+			<View className="mb-10 flex flex-1">
+				<Text className="mb-4 text-lg text-foreground">
+					{initialTag
+						? `Your Pound Tag is @${initialTag},\nYou can change it here if you want`
+						: 'Pound tag is used to send you money,\nAdd a New Tag'}
+				</Text>
+				<Input
+					value={tag}
+					onChangeText={handleTagChange}
+					returnKeyType="done"
+					placeholder={initialTag || 'Enter your tag'}
+					autoCapitalize="none"
+					secureTextEntry={Platform.OS !== 'ios'}
+					keyboardType={Platform.OS === 'ios' ? undefined : 'visible-password'}
+					autoFocus
+				/>
+				{/* TODO: Add a loading indicator */}
+				{debouncedTag && !error && debouncedTag !== initialTag ? (
+					!isAvailable && !error ? (
+						<Text className="mt-2 text-destructive-foreground">Tag is already taken</Text>
 					) : (
-						<Text className="text-white">{loading ? 'Adding...' : 'Add'}</Text>
-					)}
-				</Button>
-			</ScrollView>
-		</SafeAreaView>
+						<Text className="mt-2 text-success-foreground">
+							{debouncedTag.startsWith('@') ? debouncedTag : '@' + debouncedTag} is available
+						</Text>
+					)
+				) : null}
+				{error && <Text className="mt-2 text-destructive-foreground">{error}</Text>}
+			</View>
+			<Button onPress={handleSubmit} disabled={loading || !!error || !isAvailable || initialTag === tag}>
+				{initialTag ? (
+					<Text className="text-white">{loading ? 'Updating...' : 'Update'}</Text>
+				) : (
+					<Text className="text-white">{loading ? 'Adding...' : 'Add'}</Text>
+				)}
+			</Button>
+		</BodyView>
 	);
 }

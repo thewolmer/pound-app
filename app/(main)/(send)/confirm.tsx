@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { use$ } from '@legendapp/state/react';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Image, SafeAreaView, Text, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
 import Animated, { BounceIn, FadeIn, FadeInUp, FadeOut, SlideInDown } from 'react-native-reanimated';
 
+import { BodyView } from '~/components/ui/body-view';
 import { Button } from '~/components/ui/button';
 import { formatCurrency } from '~/lib/formatCurrency';
 import { supabase } from '~/lib/supabase';
@@ -51,7 +52,7 @@ export default function TransferScreen() {
 	};
 
 	return (
-		<SafeAreaView style={{ flex: 1 }}>
+		<BodyView>
 			<View className="relative h-full w-full flex-1 flex-col items-center justify-center gap-4">
 				{success === null && (
 					<Animated.View entering={FadeInUp} exiting={FadeOut} className="flex flex-col items-center gap-2">
@@ -103,6 +104,6 @@ export default function TransferScreen() {
 					</Animated.View>
 				)}
 			</View>
-		</SafeAreaView>
+		</BodyView>
 	);
 }

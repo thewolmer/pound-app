@@ -4,10 +4,10 @@ import { isAuthApiError } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import Animated, { FadeIn, FadeOut, SlideInRight, SlideOutLeft } from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
 
 import { PoundIcon } from '~/components/icons/pound-icon';
+import { BodyView } from '~/components/ui/body-view';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
@@ -135,7 +135,7 @@ export default function Register() {
 	const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 	return (
-		<SafeAreaView className="items-center bg-background p-10">
+		<BodyView scrollable={false} className="items-center bg-background p-10">
 			<View className="w-full max-w-sm gap-8">
 				<View className="gap-2">
 					<View className="w-52">
@@ -262,6 +262,6 @@ export default function Register() {
 					</Pressable>
 				</View>
 			</View>
-		</SafeAreaView>
+		</BodyView>
 	);
 }

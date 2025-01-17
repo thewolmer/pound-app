@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { use$ } from '@legendapp/state/react';
 import { format } from 'date-fns';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ActivityIndicator, Image, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ActivityIndicator, Text, View } from 'react-native';
 
+import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
+import { BodyView } from '~/components/ui/body-view';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '~/components/ui/card';
+import { Modal } from '~/components/ui/modal';
 import { formatCurrency } from '~/lib/formatCurrency';
 import { supabase } from '~/lib/supabase';
 import { account$ } from '~/stores/account.store';
@@ -25,6 +28,8 @@ function Transaction() {
 	const contacts$ = use$(userContacts$.contacts);
 
 	const [transaction, setTransaction] = useState<TransactionWithAccounts | null>(null);
+	const addToContactModal = React.useRef<BottomSheetModal>(null);
+	const removeFromContactModal = React.useRef<BottomSheetModal>(null);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -37,7 +42,7 @@ function Transaction() {
           origin_account:account_details!transaction_origin_account_id_fkey (*)
         `
 				)
-				.eq('id', id as string)
+				.eq('id', Array.isArray(id) ? id[0] : id)
 				.single();
 
 			if (data) {
@@ -58,15 +63,13 @@ function Transaction() {
 	// FIXME: bad naming convention
 	const isDeposit = transaction?.destination_account_id === accountId$;
 
-	const otherUserId = isDeposit
-		? transaction?.origin_account_details?.user_id
-		: transaction?.destination_account_details?.user_id;
+	const otherUser = isDeposit ? transaction?.origin_account_details : transaction?.destination_account_details;
 
-	const isInContacts = otherUserId ? !!contacts$[otherUserId] : false;
+	const isInContacts = otherUser?.user_id ? !!contacts$[otherUser.user_id] : false;
 
 	const addToContact = () => {
-		if (!isInContacts && typeof otherUserId === 'string') {
-			addContact(otherUserId);
+		if (!isInContacts && typeof otherUser?.user_id === 'string') {
+			addContact(otherUser.user_id);
 		}
 	};
 
@@ -79,66 +82,28 @@ function Transaction() {
 	}
 
 	return (
-		<SafeAreaView className="flex-1">
+		<BodyView>
 			<View className="gap-4 p-6">
 				<Card>
 					<CardHeader>
 						<Text className="text-lg font-bold text-foreground">{isDeposit ? 'Received from ' : 'Sent to'}</Text>
 					</CardHeader>
-					<CardContent className="flex w-full flex-row justify-between gap-4">
+					<CardContent className="flex w-full flex-row items-center justify-between gap-4">
 						<View className="flex w-[60%] flex-row items-center gap-4">
-							{isDeposit ? (
-								<View className="flex h-12 w-12 items-center justify-center rounded-full bg-accent">
-									{transaction?.origin_account_details?.avatar_url ? (
-										<Image
-											source={{ uri: transaction?.origin_account_details?.avatar_url || undefined }}
-											style={{ width: 48, height: 48, borderRadius: 28 }}
-											resizeMode="cover"
-										/>
-									) : (
-										<Text className="text-lg font-black text-accent-foreground">
-											{transaction?.origin_account_details?.display_name?.[0]}
-										</Text>
-									)}
-								</View>
-							) : (
-								<View className="flex h-12 w-12 items-center justify-center rounded-full bg-accent">
-									{transaction?.destination_account_details?.avatar_url ? (
-										<Image
-											source={{ uri: transaction?.destination_account_details?.avatar_url || undefined }}
-											style={{ width: 48, height: 48, borderRadius: 28 }}
-											resizeMode="cover"
-										/>
-									) : (
-										<Text className="text-lg font-black text-accent-foreground">
-											{transaction?.destination_account_details?.display_name?.[0]}
-										</Text>
-									)}
-								</View>
-							)}
-							{isDeposit ? (
-								<View>
-									<Text className="line-clamp-2 items-center truncate font-bold text-foreground">
-										{transaction?.origin_account_details?.display_name}
-									</Text>
-									{transaction?.destination_account_details?.identity_tag && (
-										<Text className="text-sm text-muted-foreground">
-											@{transaction?.origin_account_details?.identity_tag}
-										</Text>
-									)}
-								</View>
-							) : (
-								<View>
-									<Text className="line-clamp-2 items-center truncate font-bold text-foreground">
-										{transaction?.destination_account_details?.display_name}
-									</Text>
-									{transaction?.destination_account_details?.identity_tag && (
-										<Text className="text-sm text-muted-foreground">
-											@{transaction?.destination_account_details?.identity_tag}
-										</Text>
-									)}
-								</View>
-							)}
+							<Avatar alt="User avatar" className="h-14 w-14">
+								<AvatarImage source={{ uri: otherUser?.avatar_url ?? undefined }} />
+								<AvatarFallback>
+									<Ionicons name="person" size={24} className="text-foreground" />
+								</AvatarFallback>
+							</Avatar>
+							<View>
+								<Text className="line-clamp-2 items-center truncate font-bold text-foreground">
+									{otherUser?.display_name ?? 'invalid-user'}
+								</Text>
+								{otherUser?.identity_tag && (
+									<Text className="text-sm text-muted-foreground">@{otherUser.identity_tag ?? 'invalid-user'}</Text>
+								)}
+							</View>
 						</View>
 						<View>
 							<Text className="font-bold text-foreground">{formatCurrency(transaction?.amount as number)}</Text>
@@ -159,31 +124,27 @@ function Transaction() {
 						<View className="gap-1">
 							<Text className="text-sm text-muted-foreground">Status</Text>
 							<Text>
-								{transaction?.status && (
-									<Text className="font-semibold capitalize text-foreground">{transaction.status}</Text>
-								)}
+								<Text className="font-semibold capitalize text-foreground">{transaction.status ?? 'invalid-tx'}</Text>
 							</Text>
 						</View>
 						<View className="gap-1">
 							<Text className="text-sm text-muted-foreground">Transaction Time</Text>
 							<Text>
-								{transaction?.created_at && (
-									<Text className="font-semibold text-foreground">
-										{format(new Date(transaction.created_at), 'PP - pp')}
-									</Text>
-								)}
+								<Text className="font-semibold text-foreground">
+									{format(new Date(transaction.created_at), 'PP - pp')}
+								</Text>
 							</Text>
 						</View>
 						<View className="gap-1">
 							<Text className="text-sm text-muted-foreground">Transaction ID</Text>
-							<Text>{transaction?.id && <Text className="font-semibold text-foreground">{transaction.id}</Text>}</Text>
+							<Text>
+								<Text className="font-semibold text-foreground">{transaction.id ?? 'invalid-tx'}</Text>
+							</Text>
 						</View>
 						<View className="gap-1">
 							<Text className="text-sm text-muted-foreground">Reference</Text>
 							<Text>
-								{transaction?.reference && (
-									<Text className="font-semibold text-foreground">{transaction.reference}</Text>
-								)}
+								<Text className="font-semibold text-foreground">{transaction.reference ?? 'invalid-tx'}</Text>
 							</Text>
 						</View>
 					</View>
@@ -191,15 +152,23 @@ function Transaction() {
 				<Card>
 					<CardHeader className="flex w-full flex-row items-center justify-between">
 						<View className="flex w-[1/4] items-center justify-center gap-1">
-							<Button size={'icon'} variant={'secondary'} disabled={isInContacts} onPress={addToContact}>
+							<Button
+								size={'icon'}
+								variant={'secondary'}
+								onPress={
+									isInContacts
+										? () => removeFromContactModal.current?.present()
+										: () => addToContactModal.current?.present()
+								}
+							>
 								<Ionicons
-									name={isInContacts ? 'person-add' : 'person-add-outline'}
+									name={isInContacts ? 'person-remove-outline' : 'person-add-outline'}
 									size={18}
 									className="text-secondary-foreground"
 								/>
 							</Button>
 							<Text className="w-14 text-balance text-center text-[9px] text-muted-foreground">
-								{isInContacts ? 'Contact Saved' : 'Add Contact'}
+								{isInContacts ? 'Remove Contact' : 'Add Contact'}
 							</Text>
 						</View>
 						<View className="flex w-[1/4] items-center justify-center gap-1">
@@ -248,7 +217,26 @@ function Transaction() {
 					</CardHeader>
 				</Card>
 			</View>
-		</SafeAreaView>
+			<Modal
+				ref={addToContactModal}
+				title={otherUser?.display_name || 'User'}
+				description={'Add this user to your contacts?'}
+				type="confirm"
+				options={{
+					primaryAction: addToContact,
+					primaryBtnText: 'Add to Contacts',
+				}}
+			/>
+			<Modal
+				ref={removeFromContactModal}
+				title={otherUser?.display_name || 'User'}
+				description={'Remove this user from your contacts?'}
+				type="destructive"
+				options={{
+					primaryBtnText: 'Remove',
+				}}
+			/>
+		</BodyView>
 	);
 }
 

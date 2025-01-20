@@ -14,7 +14,7 @@ import { Modal } from '~/components/ui/modal';
 import { formatCurrency } from '~/lib/formatCurrency';
 import { supabase } from '~/lib/supabase';
 import { account$ } from '~/stores/account.store';
-import { addContact, userContacts$ } from '~/stores/user-contacts.store';
+import { addContact, deleteContact, userContacts$ } from '~/stores/user-contacts.store';
 import type { Tables } from '~/types/database.types';
 
 interface TransactionWithAccounts extends Tables<'transactions'> {
@@ -70,6 +70,11 @@ function Transaction() {
 	const addToContact = () => {
 		if (!isInContacts && typeof otherUser?.user_id === 'string') {
 			addContact(otherUser.user_id);
+		}
+	};
+	const removeFromContact = () => {
+		if (typeof otherUser?.user_id === 'string') {
+			deleteContact(otherUser.user_id);
 		}
 	};
 
@@ -234,6 +239,7 @@ function Transaction() {
 				type="destructive"
 				options={{
 					primaryBtnText: 'Remove',
+					primaryAction: removeFromContact,
 				}}
 			/>
 		</BodyView>

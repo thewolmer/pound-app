@@ -140,7 +140,7 @@ export default function AddCard() {
 	};
 
 	return (
-		<BodyView>
+		<BodyView className="p-4">
 			{/* Card Number */}
 			<View className="mb-4">
 				<Controller

@@ -42,7 +42,7 @@ export const SendViaContact = () => {
 		<>
 			<ForwardCard
 				ionicons="people"
-				title="Send from contacts"
+				title="Send to a contact"
 				description="Send money to someone in your contacts"
 				onPress={openContactsModal}
 			/>

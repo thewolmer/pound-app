@@ -219,7 +219,7 @@ export default function Deposit() {
 				{/* Card Select Modal */}
 				<Modal ref={cardSelectModal} title={'Select a Card'}>
 					<View className="gap-2">
-						{isLoading && <ActivityIndicator color={'white'} />}
+						{isLoading && <ActivityIndicator color={'#5230cf'} />}
 						{cards?.map((card) => {
 							const isSelectedCard = selectedCard?.token === card.token;
 							return (

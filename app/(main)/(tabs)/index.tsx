@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { use$ } from '@legendapp/state/react';
-import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
 import { ActivityIndicator, Pressable, RefreshControl, Text, View } from 'react-native';
 
@@ -94,38 +93,36 @@ export default function StartScreen() {
 					</View>
 				</View>
 				<Card>
-					<BlurView tint="systemThinMaterial" intensity={80} className="overflow-hidden rounded-2xl">
-						<CardHeader className="items-center">
-							<Text className="mb-2 font-body text-accent-foreground">Available Balance</Text>
-							{/* TODO: use isAccountRefreshing$ to indicate that balance is refreshing, but keep the old balance */}
-							{balance$ ? <H1>{formatCurrency(balance$)}</H1> : <ActivityIndicator />}
-						</CardHeader>
-						<CardFooter className="flex justify-between">
-							<Button
-								onPress={() => router.push('/(main)/(deposit)/deposit')}
-								variant={'link'}
-								haptics="impact-light"
-								size={'lg'}
-							>
-								<IconWrapper>
-									<Ionicons name="add" className="text-foreground" size={22} />
-								</IconWrapper>
-								<Text className="text-xs font-semibold text-muted-foreground">Add</Text>
-							</Button>
-							<Button
-								onPress={() => router.push('/(main)/(send)/send')}
-								haptics="impact-light"
-								variant={'link'}
-								size={'lg'}
-							>
-								<IconWrapper>
-									<Ionicons name="arrow-up-circle-outline" className="text-foreground" size={24} />
-								</IconWrapper>
-								<Text className="text-xs font-semibold text-muted-foreground">Send</Text>
-							</Button>
-							<RequestButton />
-						</CardFooter>
-					</BlurView>
+					<CardHeader className="items-center">
+						<Text className="mb-2 font-body text-accent-foreground">Available Balance</Text>
+						{/* TODO: use isAccountRefreshing$ to indicate that balance is refreshing, but keep the old balance */}
+						{balance$ ? <H1>{formatCurrency(balance$)}</H1> : <ActivityIndicator />}
+					</CardHeader>
+					<CardFooter className="flex justify-between">
+						<Button
+							onPress={() => router.push('/(main)/(deposit)/deposit')}
+							variant={'link'}
+							haptics="impact-light"
+							size={'lg'}
+						>
+							<IconWrapper>
+								<Ionicons name="add" className="text-foreground" size={22} />
+							</IconWrapper>
+							<Text className="text-xs font-semibold text-muted-foreground">Add</Text>
+						</Button>
+						<Button
+							onPress={() => router.push('/(main)/(send)/send')}
+							haptics="impact-light"
+							variant={'link'}
+							size={'lg'}
+						>
+							<IconWrapper>
+								<Ionicons name="arrow-up-circle-outline" className="text-foreground" size={24} />
+							</IconWrapper>
+							<Text className="text-xs font-semibold text-muted-foreground">Send</Text>
+						</Button>
+						<RequestButton />
+					</CardFooter>
 				</Card>
 				<HomePageAdsSlider />
 				<LatestTransactions count={4} />
